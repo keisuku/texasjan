@@ -124,36 +124,132 @@ button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
 .sheetin{width:100%;max-width:430px;background:linear-gradient(180deg,#20443B,#16302A);border-radius:16px 16px 0 0;
   padding:16px 12px calc(18px + env(safe-area-inset-bottom));border-top:1px solid rgba(201,162,39,.3)}
 .grid{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:10px}
+
+/* ===== Golden Visual V1 — production layout ===== */
+html{background:#071c17}
+body{min-height:100svh;background:
+  radial-gradient(80% 28% at 50% 0%,rgba(255,243,190,.25),transparent 72%),
+  radial-gradient(105% 74% at 50% 18%,#347060 0%,#173e34 45%,#09231d 100%) fixed}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(90deg,rgba(230,197,102,.16),transparent 8% 92%,rgba(230,197,102,.16)),
+    radial-gradient(circle at 50% -6%,transparent 0 31%,rgba(235,212,137,.17) 31.4% 31.8%,transparent 32.2%)}
+#app{max-width:480px;min-height:100svh;padding:env(safe-area-inset-top) 0 calc(10px + env(safe-area-inset-bottom));overflow:hidden}
+.arena{position:relative;margin:4px 7px 0;padding-top:90px;min-height:518px;border-radius:24px 24px 34px 34px;
+  background:linear-gradient(145deg,rgba(255,246,218,.16),transparent 24%),
+    radial-gradient(80% 60% at 50% 34%,#285b4d 0%,#12382f 57%,#0a271f 100%);
+  border:1px solid rgba(235,212,137,.54);box-shadow:inset 0 0 0 3px rgba(35,20,5,.32),inset 0 22px 44px rgba(255,244,200,.07),0 16px 35px rgba(0,0,0,.42)}
+.arena::before{content:"";position:absolute;inset:60px 18px 14px;border:1px dashed rgba(110,226,232,.30);border-radius:48% 48% 42% 42%;
+  filter:drop-shadow(0 0 5px rgba(73,218,230,.45));pointer-events:none}
+.rail{position:absolute;inset:0;display:block;padding:0;z-index:5;pointer-events:none}
+.seat{position:absolute;width:86px;gap:2px;padding:4px 3px;border-radius:13px;transform:translate(-50%,-50%);
+  background:linear-gradient(180deg,rgba(7,27,23,.84),rgba(4,15,13,.92));border:1px solid rgba(235,212,137,.34);
+  box-shadow:0 5px 12px rgba(0,0,0,.38);pointer-events:auto}
+.seat:nth-child(1){left:14%;top:11%}.seat:nth-child(2){left:36%;top:5%}.seat:nth-child(3){left:66%;top:5%}.seat:nth-child(4){left:88%;top:16%}.seat:nth-child(5){left:91%;top:53%}
+.seat.active{border-color:#7ff2f5;box-shadow:0 0 0 2px rgba(89,228,235,.42),0 0 18px rgba(89,228,235,.68)}
+.seat.active::after{content:"TURN";position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);padding:1px 7px;border-radius:99px;
+  background:#d7b447;color:#10231e;font-size:7px;font-weight:900;letter-spacing:.11em}
+.seat .avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin:-18px auto 0;
+  background:linear-gradient(145deg,#eff8f1,#8abbb1 48%,#1f6257);border:2px solid #e8cf82;color:#102d27;font:900 11px/1 serif;
+  box-shadow:0 2px 8px rgba(0,0,0,.45)}
+.seat:nth-child(2) .avatar{background:linear-gradient(145deg,#ffe8d6,#d2887e 52%,#6b3046)}
+.seat:nth-child(3) .avatar{background:linear-gradient(145deg,#e6e9ff,#8796cd 52%,#333f72)}
+.seat:nth-child(4) .avatar{background:linear-gradient(145deg,#fff1ba,#caa24e 52%,#60411d)}
+.seat:nth-child(5) .avatar{background:linear-gradient(145deg,#d8f0dd,#5f9f75 52%,#173e35)}
+.seat .who{font-size:8px;color:#f1e5c4}.seat .bet{font-size:8px;min-height:13px;padding:0 5px}.seat .backs{gap:1px}
+.seat .tile.sm{--w:17px}
+.meSeat{position:absolute;right:5px;bottom:8px;z-index:7;width:92px;padding:7px 5px 5px;text-align:center;border-radius:16px;
+  background:linear-gradient(180deg,rgba(20,79,69,.96),rgba(5,27,23,.96));border:2px solid #65e7ef;
+  box-shadow:0 0 0 2px rgba(230,205,126,.65),0 0 22px rgba(62,220,232,.46)}
+.meSeat.active::before{content:"TURN";position:absolute;left:-42px;top:20px;padding:3px 9px;border-radius:99px;background:#d7b447;color:#11251f;font-size:8px;font-weight:900}
+.meSeat .you{font-size:8px;font-weight:900;color:#7cf1f4;letter-spacing:.18em}.meSeat .stack{font:800 16px/1.2 "Shippori Mincho B1",serif;color:#f2d77f}
+.meSeat .backs{display:flex;justify-content:center;gap:1px;margin:3px 0}.meSeat .tile.sm{--w:18px}
+.board{margin:0 8px;padding:10px 8px 12px;min-height:398px;border-radius:22px;background:rgba(4,25,21,.34);border-color:rgba(235,212,137,.35);box-shadow:none}
+.pot{margin:-3px 0 7px}.pot .val{font-size:27px}.dora{top:7px}.badge{top:7px;right:8px}
+.commons{display:grid;grid-template-columns:repeat(5,auto);justify-content:center;align-content:center;gap:3px;min-height:214px;padding-top:27px}
+.commons .tile.md{--w:39px}
+.commons .hint{grid-column:1/-1;padding:56px 12px}
+.revealRail{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:8px 5px 2px;padding-right:96px}
+.revealGroup{position:relative;display:grid;grid-template-columns:repeat(2,auto);grid-template-rows:repeat(2,auto);justify-content:center;gap:2px;padding:5px 3px 18px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(3,18,15,.44),rgba(2,11,9,.76));border:1px solid rgba(235,212,137,.34)}
+.revealGroup .tile{--w:23px}.revealGroup .revealLabel{position:absolute;left:0;right:0;bottom:1px;text-align:center;color:#e9ce7c;font-size:8px;font-weight:900;letter-spacing:.08em}
+.revealGroup.live{border-color:#e4c564;box-shadow:0 0 12px rgba(226,194,91,.20)}
+.streetNext{position:absolute;right:8px;top:39px;z-index:8;width:82px;padding:7px 5px;border-radius:8px;font-size:9px;background:linear-gradient(180deg,#e9d17c,#bd8f21);color:#192219}
+.sourceZone{margin:8px 8px 0}.sourceZone .row{flex-wrap:nowrap;gap:3px}.sourceZone .tile{--w:clamp(34px,9.2vw,42px)}
+.sourceZone .zonehead{padding-bottom:5px}.sourceZone .eyebrow{font-size:9px}
+.finalZone{position:relative;margin:15px 2px 0;padding:0 3px 5px;z-index:8}
+.finalZone .zonehead{padding:0 9px 6px}.finalZone .zonehead .eyebrow{color:#f4db8c;font-size:10px}
+.rack{gap:1px;width:100%;padding:10px 3px 12px;border-radius:12px 12px 19px 19px;border:1px solid rgba(235,212,137,.55);
+  background:linear-gradient(180deg,#122720,#07130f);box-shadow:inset 0 2px 7px rgba(0,0,0,.7),0 5px 0 #856719,0 12px 24px rgba(0,0,0,.48)}
+.tile.rk,.slot{--w:clamp(22px,calc((100vw - 40px)/14),31px);max-width:31px}
+.tile.last,.slot.last{margin-left:5px}.tile.last{z-index:2;box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 2px #f1ca53,0 0 18px rgba(244,190,40,.75)}
+.status{margin:7px 10px 0;min-height:30px;font-size:10px}
+.winRibbon{display:none;align-items:center;justify-content:center;gap:7px;margin:7px 10px 0;padding:6px;border-radius:9px;
+  background:linear-gradient(90deg,rgba(145,101,12,.25),rgba(231,194,82,.22),rgba(145,101,12,.25));border:1px solid rgba(235,212,137,.55)}
+.winRibbon.on{display:flex}.winRibbon strong{font-family:"Shippori Mincho B1",serif;color:#ffe696;font-size:16px}.winRibbon span{font-size:9px;color:#f1dfae;font-weight:900}
+.recommendPanel{margin:8px 8px 0;padding:5px;border-radius:13px;background:rgba(3,17,14,.62);border:1px solid rgba(235,212,137,.27)}
+.recMain{display:flex;gap:6px}.recMain button{padding:10px 0}.recModes{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:0;opacity:0;overflow:hidden;transition:max-height .28s ease,opacity .2s ease,padding .28s ease;padding-top:0}
+.recommendPanel.open .recModes{max-height:54px;opacity:1;padding-top:5px}.recModes button{padding:8px 1px;font-size:9px;letter-spacing:0;border-radius:7px}
+.recModes button.selected{color:#102b25;border-color:#8cf2f5;background:linear-gradient(180deg,#aaf7f7,#4cced5);box-shadow:0 0 12px rgba(74,216,225,.42)}
+.betBar{display:grid;grid-template-columns:1fr 1.12fr 1fr .78fr;gap:5px;margin:8px 8px 0}.betBar button{min-height:51px;padding:8px 0;border-radius:13px;font-size:12px}
+.betBar .fold{background:linear-gradient(180deg,#c74636,#7e1814)}.betBar .call{background:linear-gradient(180deg,#307bc4,#16437a)}.betBar .raise{background:linear-gradient(180deg,#e1ad45,#9a5e12);color:#19150c}.betBar .dial{border-radius:50%;background:radial-gradient(circle,#143b65 0 48%,#071a2d 50%);color:#fff0b7}
+body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.46) saturate(.72);transition:filter .2s ease}
+body.win-anim .finalZone{filter:none}.finalZone.win .rack{animation:rackWin .85s ease-out both}.finalZone.win .tile.rk{animation:tileWin .72s calc(var(--i)*45ms) ease-out both}
+@keyframes rackWin{0%{box-shadow:inset 0 2px 7px rgba(0,0,0,.7),0 5px 0 #856719}55%{box-shadow:inset 0 0 16px rgba(255,228,126,.65),0 5px 0 #b78b1d,0 0 35px rgba(244,190,40,.82)}100%{box-shadow:inset 0 2px 7px rgba(0,0,0,.7),0 5px 0 #856719,0 0 15px rgba(244,190,40,.36)}}
+@keyframes tileWin{0%{transform:translateY(0)}45%{transform:translateY(-8px);filter:brightness(1.35)}100%{transform:translateY(0)}}
+@media(max-width:380px){.arena{min-height:485px;padding-top:83px}.seat{width:76px}.seat:nth-child(5){top:55%}.commons .tile.md{--w:35px}.revealRail{padding-right:84px}.sourceZone .tile{--w:33px}.betBar button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.finalZone.win .rack,.finalZone.win .tile.rk{animation:none}.recModes{transition:none}}
 </style>
 </head>
 <body>
 <div id="app">
-
-  <div class="rail" id="rail"></div>
-
-  <div class="board">
-    <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
-    <div class="badge" id="street">PREFLOP</div>
-    <div class="pot"><span class="eyebrow">POT</span><span class="val" id="pot">0</span></div>
-    <div class="commons" id="commons"></div>
+  <div class="arena" id="arena">
+    <div class="rail" id="rail"></div>
+    <div class="meSeat" id="meSeat">
+      <div class="you">YOU</div>
+      <div class="backs" id="myBacks"></div>
+      <div class="stack">5,870</div>
+    </div>
+    <div class="board">
+      <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
+      <div class="badge" id="street">PREFLOP</div>
+      <button id="bNext" class="streetNext">参加する</button>
+      <div class="pot"><span class="eyebrow">POT</span><span class="val" id="pot">0</span></div>
+      <div class="commons" id="commons"></div>
+      <div class="revealRail" id="revealRail"></div>
+    </div>
   </div>
 
-  <div class="zone">
+  <div class="zone sourceZone">
     <div class="zonehead"><span class="eyebrow">手元の8枚（非公開）</span><span class="meta" id="pMeta">私牌 0枚</span></div>
     <div class="row" id="myrow"></div>
   </div>
 
-  <div class="zone">
-    <div class="zonehead"><span class="eyebrow">選択中の手牌 13枚＋ツモ牌</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
+  <div class="zone finalZone" id="finalZone">
+    <div class="zonehead"><span class="eyebrow">MY FINAL HAND 13 ＋ TSUMO</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
     <div class="rack" id="rack"></div>
   </div>
 
+  <div class="winRibbon" id="winRibbon"><strong>ツモ</strong><span>リーチ 1翻</span><span>門前ツモ 1翻</span><strong>2翻</strong></div>
   <div class="status" id="status"></div>
 
-  <div class="acts">
-    <button id="bRec" class="prime">おすすめ</button>
-    <button id="bClear">クリア</button>
-    <button id="bNext">次へ</button>
+  <div class="recommendPanel" id="recommendPanel">
+    <div class="recMain">
+      <button id="bRec" class="prime">おすすめ</button>
+      <button id="bClear">クリア</button>
+    </div>
+    <div class="recModes" id="recModes">
+      <button data-mode="sequence">順子系</button>
+      <button data-mode="pairs">対子系</button>
+      <button data-mode="triplet">刻子系</button>
+      <button data-mode="flush">染め系</button>
+    </div>
+  </div>
+
+  <div class="betBar">
+    <button class="fold">FOLD</button>
+    <button class="call">CALL<br>400</button>
+    <button class="raise">RAISE</button>
+    <button class="dial">400</button>
   </div>
 </div>
 
@@ -226,6 +322,8 @@ const NAMES=["トビハネ","九蓮","カムイ","ゼロ","刻"];
 const seats=NAMES.map(function(n){return {n:n,stack:25000,bet:0,folded:false};});
 let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
 let picks=[],pickSeq=0,notice="";
+let activeSeat=0,recOpen=false,recMode="total",wasComplete=false;
+const recCursor={total:0,sequence:0,pairs:0,triplet:0,flush:0};
 
 function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
 function doraOf(i){ if(i<27) return (i%9===8)? i-8 : i+1;
@@ -239,7 +337,8 @@ function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i)
   for(let i=wall.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
 
 function newHand(){
-  shuffle();stage=0;pot=1800;common=[];picks=[];pickSeq=0;notice="";
+  shuffle();stage=0;pot=1800;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
+  Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
   doraInd=wall.splice(0,1)[0];
   seats.forEach(function(s){s.folded=false;s.bet=300;});
@@ -247,9 +346,10 @@ function newHand(){
 }
 function nextStreet(){
   if(stage===0){common=wall.splice(0,15);stage=1;pot+=2400;}
-  else if(stage<3){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
+  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
   else{newHand();return;}
-  seats.forEach(function(s){if(!s.folded&&Math.random()<.2)s.folded=true;s.bet=s.folded?0:[600,1200,2500][stage-1];});
+  activeSeat=(activeSeat+1)%6;
+  seats.forEach(function(s){if(!s.folded&&Math.random()<.16)s.folded=true;s.bet=s.folded?0:[600,1200,2500,4200][stage-1];});
   notice="";
   render();
 }
@@ -285,11 +385,11 @@ function setPicksFromCounts(hand){
     if(need[id]>0){picks.push({src:"c",index:i,id:id,seq:pickSeq++});need[id]--;}
   }
 }
-function solveFlexible(){
+function solveFlexible(mode,cursor){
   const A=cnt(my.concat(common)), P=cnt(my);
   const use=new Array(34).fill(0);
   const dora=doraOf(doraInd);
-  let nodes=0,best=null,bestScore=-1e9;
+  let nodes=0;const solutions=new Map();
 
   function canTake(ts){
     const add=new Array(34).fill(0);
@@ -298,22 +398,33 @@ function solveFlexible(){
     return true;
   }
   function take(ts,delta){for(let i=0;i<ts.length;i++)use[ts[i]]+=delta;}
-  function evaluate(){
-    let d=0,simple=true,privateUse=0;const suits={};
+  function evaluate(isChiitoi){
+    let d=0,simple=true,privateUse=0,honors=0,triplets=0,pairTypes=0,sequences=0;const suits={},suitCount=[0,0,0];
     for(let t=0;t<34;t++){
       const n=use[t];if(!n)continue;
       if(t===dora)d+=n;
       privateUse+=Math.min(P[t],n);
-      if(t>=27)simple=false;
-      else{suits[(t/9)|0]=1;if(t%9===0||t%9===8)simple=false;}
+      if(n>=2)pairTypes++;
+      if(n>=3)triplets++;
+      if(t>=27){simple=false;honors+=n;}
+      else{const s=(t/9)|0;suits[s]=1;suitCount[s]+=n;if(t%9===0||t%9===8)simple=false;}
     }
+    for(let s=0;s<3;s++)for(let r=0;r<=6;r++)sequences+=Math.min(use[s*9+r],use[s*9+r+1],use[s*9+r+2]);
     const nsuit=Object.keys(suits).length;
-    const score=d*8+(simple?4:0)+(nsuit===1?6:0)+privateUse*.35;
-    if(score>bestScore){bestScore=score;best=use.slice();}
+    const dominant=Math.max.apply(null,suitCount),offSuit=suitCount.reduce(function(a,b){return a+b;},0)-dominant;
+    let score=d*7+privateUse*.3;
+    if(mode==="sequence")score+=sequences*15-triplets*4+(simple?10:0)+pairTypes;
+    else if(mode==="pairs")score+=pairTypes*13+(isChiitoi?90:0)+d*3;
+    else if(mode==="triplet")score+=triplets*20+honors*2+pairTypes*2-sequences*2;
+    else if(mode==="flush")score+=dominant*5-offSuit*7+honors*1.3+(nsuit===1?38:0);
+    else score+=sequences*5+triplets*7+pairTypes*2+(simple?5:0)+(nsuit===1?12:0)+(isChiitoi?18:0);
+    const key=use.join("");
+    const prev=solutions.get(key);
+    if(!prev||score>prev.score)solutions.set(key,{hand:use.slice(),score:score});
   }
   function rec(t0,melds,pair){
     if(++nodes>450000)return;
-    if(melds===4&&pair){evaluate();return;}
+    if(melds===4&&pair){evaluate(false);return;}
     for(let t=t0;t<34;t++){
       if(melds<4&&canTake([t,t,t])){
         take([t,t,t],1);rec(t,melds+1,pair);take([t,t,t],-1);
@@ -327,9 +438,32 @@ function solveFlexible(){
     }
   }
   rec(0,0,false);
-  return best;
+
+  const pairChoices=[];
+  for(let t=0;t<34;t++)if(A[t]>=2)pairChoices.push(t);
+  function pairTileScore(t){
+    let v=t===dora?20:0;
+    if(mode==="flush"&&t<27){const suit=(t/9)|0;let suitAvail=0;for(let x=suit*9;x<suit*9+9;x++)suitAvail+=A[x];v+=suitAvail;}
+    if(mode==="pairs")v+=A[t]*4;
+    if(t>=27)v+=3;
+    return v;
+  }
+  pairChoices.sort(function(a,b){return pairTileScore(b)-pairTileScore(a);});
+  if(pairChoices.length>=7){
+    const tries=Math.min(10,pairChoices.length);
+    for(let shift=0;shift<tries;shift++){
+      use.fill(0);
+      for(let k=0;k<7;k++)use[pairChoices[(k+shift)%pairChoices.length]]=2;
+      evaluate(true);
+    }
+    use.fill(0);
+  }
+  const ranked=Array.from(solutions.values()).sort(function(a,b){return b.score-a.score;});
+  if(!ranked.length)return null;
+  const index=cursor%ranked.length;
+  return {hand:ranked[index].hand,index:index,total:ranked.length};
 }
-function fallbackRecommendation(){
+function fallbackRecommendation(mode){
   const items=[];
   my.forEach(function(id,index){items.push({src:"p",index:index,id:id});});
   common.forEach(function(id,index){items.push({src:"c",index:index,id:id});});
@@ -341,24 +475,30 @@ function fallbackRecommendation(){
       const r=t%9;v+=(r>=2&&r<=6)?7:3;
       for(let d=-2;d<=2;d++)if(r+d>=0&&r+d<=8)v+=all[t+d]*(3-Math.abs(d));
     }
+    if(mode==="pairs")v+=all[t]*9;
+    if(mode==="triplet")v+=all[t]*12;
+    if(mode==="flush"&&t<27){const suit=(t/9)|0;let n=0;for(let q=suit*9;q<suit*9+9;q++)n+=all[q];v+=n*2;}
     if(x.src==="p")v+=1;
     return v;
   }
   items.sort(function(a,b){return score(b)-score(a);});
   picks=items.slice(0,MAX_HAND).map(function(x){return {src:x.src,index:x.index,id:x.id,seq:pickSeq++};});
 }
-function recommend(){
-  const hand=solveFlexible();
-  if(hand){
-    setPicksFromCounts(hand);
-    notice="完成する14枚を自動選択しました。使用中の元牌は薄く表示されています。";
+function recommend(mode){
+  recOpen=true;recMode=mode||"total";
+  const cursor=recCursor[recMode]++;
+  const result=solveFlexible(recMode,cursor);
+  const modeName={total:"総合",sequence:"順子系",pairs:"対子系",triplet:"刻子系",flush:"染め系"}[recMode];
+  if(result){
+    setPicksFromCounts(result.hand);
+    notice=modeName+"候補 "+(result.index+1)+" / "+Math.min(result.total,99)+"。同じボタンでもう一案を表示します。";
   }else{
-    picks=[];pickSeq=0;fallbackRecommendation();
-    notice="完成形が見つからないため、つながりの強い14枚を仮選択しました。";
+    picks=[];pickSeq=0;fallbackRecommendation(recMode);
+    notice=modeName+"の完成形がないため、近い14枚を仮選択しました。";
   }
   render();
 }
-function clearRack(){picks=[];notice="";render();}
+function clearRack(){picks=[];notice="";recOpen=false;recMode="total";render();}
 
 function isComplete14(ids){
   if(ids.length!==14)return false;
@@ -389,7 +529,7 @@ function isComplete14(ids){
 }
 
 /* ===== render ===== */
-const STAGE=["PREFLOP","COMMON 15","+4 · 19","+4 · 23"];
+const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23","+4 III · 27"];
 function render(fresh){
   const dora=doraOf(doraInd);
   document.getElementById("street").textContent=STAGE[stage];
@@ -397,23 +537,38 @@ function render(fresh){
   const ds=document.getElementById("doraSlot");ds.innerHTML="";ds.appendChild(tile(doraInd,"sm"));
 
   const rail=document.getElementById("rail");rail.innerHTML="";
-  seats.forEach(function(s){
-    const el=document.createElement("div");el.className="seat"+(s.folded?" folded":"");
-    el.innerHTML='<div class="who">'+s.n+'</div>';
+  seats.forEach(function(s,seatIndex){
+    const el=document.createElement("div");el.className="seat"+(s.folded?" folded":"")+(activeSeat===seatIndex?" active":"");
+    el.innerHTML='<div class="avatar">'+s.n.slice(0,1)+'</div><div class="who">'+s.n+'</div>';
     const b=document.createElement("div");b.className="backs";
-    for(let i=0;i<3;i++)b.appendChild(backTile("sm"));el.appendChild(b);
+    for(let i=0;i<4;i++)b.appendChild(backTile("sm"));el.appendChild(b);
     const bet=document.createElement("div");bet.className="bet"+(s.bet?"":" empty");
     bet.textContent=s.bet?s.bet.toLocaleString():"·";el.appendChild(bet);rail.appendChild(el);});
+  const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
+  const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
+  for(let i=0;i<4;i++)myBacks.appendChild(backTile("sm"));
 
   const c=document.getElementById("commons");c.innerHTML="";
   if(stage===0){c.innerHTML='<div class="hint">共通牌はまだ伏せられています。<br>手元の8枚だけで参加を決めてください。</div>';}
   else{
-    common.forEach(function(id,i){
+    common.slice(0,15).forEach(function(id,i){
       const isUsed=isPicked("c",i);
-      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(i>=common.length-(stage===1?15:4)?" deal":"");
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(stage===1?" deal":"");
       const t=tile(id,cls);
       t.onclick=function(){togglePick("c",i,id);};
       c.appendChild(t);});
+  }
+  const rr=document.getElementById("revealRail");rr.innerHTML="";
+  for(let g=0;g<3;g++){
+    const group=document.createElement("div");group.className="revealGroup"+(stage>=g+2?" live":"");
+    for(let k=0;k<4;k++){
+      const index=15+g*4+k,id=common[index];
+      if(id!==undefined){
+        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":"")+(stage===g+2?"deal":""));
+        t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
+      }else group.appendChild(backTile(""));
+    }
+    const label=document.createElement("div");label.className="revealLabel";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
   }
 
   const mr=document.getElementById("myrow");mr.innerHTML="";
@@ -443,6 +598,7 @@ function render(fresh){
     if(i<ordered.length){
       const pick=ordered[i];
       const t=tile(pick.id,"rk pop"+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
+      t.style.setProperty("--i",i);
       t.onclick=function(){removePick(pick.seq);};
       rk.appendChild(t);
     }else{
@@ -452,6 +608,15 @@ function render(fresh){
     }
   }
 
+  const complete=picks.length===MAX_HAND&&isComplete14(picks.map(function(x){return x.id;}));
+  document.getElementById("finalZone").classList.toggle("win",complete);
+  document.getElementById("winRibbon").classList.toggle("on",complete);
+  if(complete&&!wasComplete){
+    document.body.classList.remove("win-anim");
+    requestAnimationFrame(function(){document.body.classList.add("win-anim");setTimeout(function(){document.body.classList.remove("win-anim");},1500);});
+  }
+  wasComplete=complete;
+
   const st=document.getElementById("status");
   if(stage===0){st.innerHTML="共通牌が開くまで手牌は組めません。";}
   else if(notice){st.innerHTML="<b>"+notice+"</b>";}
@@ -459,24 +624,26 @@ function render(fresh){
   else if(picks.length===13){st.innerHTML="<b>13枚選択済み。</b> 右端のツモ枠へ、和了牌となる14枚目を選んでください。";}
   else{
     const tsumo=ordered[13];
-    const complete=isComplete14(picks.map(function(x){return x.id;}));
     if(complete){
-      st.innerHTML='<span class="yakuTag">リーチ 1翻</span><span class="yakuTag">門前ツモ 1翻</span><span class="yakuOff">一発なし</span><br>'+
-        '和了成立。右端の<b>'+label(tsumo.id)+'</b>をツモ牌として、平和・待ち形・符を判定します。';
+      st.innerHTML='和了成立。右端の<b>'+label(tsumo.id)+'</b>をツモ牌として判定します。<span class="yakuOff">一発なし</span>';
     }else{
       st.innerHTML='<b>14枚選択済み・未完成。</b> 右端の<b>'+label(tsumo.id)+'</b>はツモ牌として扱います。別の牌を入れるには、先に1枚外してください。';
     }
   }
 
   const bn=document.getElementById("bNext");
-  bn.textContent=stage===0?"参加する":stage<3?"次を4枚めくる":"配り直す";
+  bn.textContent=stage===0?"参加する":stage<4?"次の＋4":"配り直す";
+  document.getElementById("recommendPanel").classList.toggle("open",recOpen);
+  document.getElementById("bRec").textContent=recOpen?"総合おすすめ":"おすすめ";
+  document.querySelectorAll("[data-mode]").forEach(function(btn){btn.classList.toggle("selected",recOpen&&btn.dataset.mode===recMode);});
   document.getElementById("bRec").disabled=(stage===0);
   document.getElementById("bClear").disabled=(stage===0);
 }
 
-document.getElementById("bRec").onclick=recommend;
+document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("total");};
 document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=nextStreet;
+document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
 newHand();
 </script>
 </body>
