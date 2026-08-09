@@ -81,7 +81,10 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
 .tile.used::after{content:"✓";position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;
   display:flex;align-items:center;justify-content:center;background:var(--brass);color:#18241F;font-size:9px;font-weight:900;
   box-shadow:0 1px 4px rgba(0,0,0,.45)}
-.tile.last,.slot.last{margin-left:7px}
+.tile.last,.slot.last{margin-left:7px;position:relative}
+.tile.last::before,.slot.last::before{content:"ツモ";position:absolute;left:50%;top:-17px;transform:translateX(-50%);
+  color:var(--brass-hi);font-size:8px;font-weight:900;letter-spacing:.12em;white-space:nowrap;
+  text-shadow:0 1px 4px rgba(0,0,0,.8)}
 .tile.doraMark{box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 2px var(--brass-hi),
   0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.95)}
 .tile.sm{--w:21px;cursor:default}
@@ -102,6 +105,10 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
 .status{margin:8px 11px 0;font-size:11px;line-height:1.6;color:var(--dim);min-height:34px}
 .status b{color:var(--brass-hi);font-weight:900}
 .status .bluff{color:#E0836B;font-weight:900}
+.yakuTag{display:inline-flex;align-items:center;margin:0 4px 3px 0;padding:2px 7px;border-radius:99px;
+  background:rgba(201,162,39,.14);border:1px solid rgba(235,212,137,.48);color:var(--brass-hi);
+  font-size:9px;font-weight:900;letter-spacing:.04em}
+.yakuOff{display:inline-flex;align-items:center;margin-left:2px;color:var(--dim);font-size:9px;font-weight:700}
 .acts{display:flex;gap:6px;margin:10px 8px 0}
 button{flex:1;font-family:inherit;font-weight:900;font-size:12px;letter-spacing:.06em;padding:12px 0;border-radius:9px;
   border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(0,0,0,.24));
@@ -137,7 +144,7 @@ button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
   </div>
 
   <div class="zone">
-    <div class="zonehead"><span class="eyebrow">選択中の手牌 14枚</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
+    <div class="zonehead"><span class="eyebrow">選択中の手牌 13枚＋ツモ牌</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
     <div class="rack" id="rack"></div>
   </div>
 
@@ -353,6 +360,34 @@ function recommend(){
 }
 function clearRack(){picks=[];notice="";render();}
 
+function isComplete14(ids){
+  if(ids.length!==14)return false;
+  const base=cnt(ids);
+  let pairTypes=0;
+  for(let t=0;t<34;t++)if(base[t]===2)pairTypes++;
+  if(pairTypes===7)return true;
+
+  function meldable(c){
+    let t=0;while(t<34&&c[t]===0)t++;
+    if(t===34)return true;
+    if(c[t]>=3){
+      c[t]-=3;if(meldable(c))return true;c[t]+=3;
+    }
+    if(t<27&&t%9<=6&&c[t+1]>0&&c[t+2]>0){
+      c[t]--;c[t+1]--;c[t+2]--;
+      if(meldable(c))return true;
+      c[t]++;c[t+1]++;c[t+2]++;
+    }
+    return false;
+  }
+  for(let p=0;p<34;p++){
+    if(base[p]<2)continue;
+    const c=base.slice();c[p]-=2;
+    if(meldable(c))return true;
+  }
+  return false;
+}
+
 /* ===== render ===== */
 const STAGE=["PREFLOP","COMMON 15","+4 · 19","+4 · 23"];
 function render(fresh){
@@ -421,8 +456,17 @@ function render(fresh){
   if(stage===0){st.innerHTML="共通牌が開くまで手牌は組めません。";}
   else if(notice){st.innerHTML="<b>"+notice+"</b>";}
   else if(picks.length<13){st.innerHTML="共通牌または手元の牌をタップして選択します。使用中の元牌は薄くなり、✓が付きます。";}
-  else if(picks.length===13){st.innerHTML="<b>13枚選択済み。</b> 右端の離れた枠へ、最後の14枚目を選んでください。";}
-  else{st.innerHTML="<b>14枚選択済み。</b> 別の牌を入れるには、先に手牌から1枚外してください。";}
+  else if(picks.length===13){st.innerHTML="<b>13枚選択済み。</b> 右端のツモ枠へ、和了牌となる14枚目を選んでください。";}
+  else{
+    const tsumo=ordered[13];
+    const complete=isComplete14(picks.map(function(x){return x.id;}));
+    if(complete){
+      st.innerHTML='<span class="yakuTag">リーチ 1翻</span><span class="yakuTag">門前ツモ 1翻</span><span class="yakuOff">一発なし</span><br>'+
+        '和了成立。右端の<b>'+label(tsumo.id)+'</b>をツモ牌として、平和・待ち形・符を判定します。';
+    }else{
+      st.innerHTML='<b>14枚選択済み・未完成。</b> 右端の<b>'+label(tsumo.id)+'</b>はツモ牌として扱います。別の牌を入れるには、先に1枚外してください。';
+    }
+  }
 
   const bn=document.getElementById("bNext");
   bn.textContent=stage===0?"参加する":stage<3?"次を4枚めくる":"配り直す";
