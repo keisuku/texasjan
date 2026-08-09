@@ -239,11 +239,11 @@ function newHand(){
   render(true);
 }
 function nextStreet(){
-  if(stage===0){common=wall.splice(0,30);stage=1;pot+=2400;}
+  if(stage===0){common=wall.splice(0,15);stage=1;pot+=2400;}
   else if(stage<3){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
   else{newHand();return;}
   seats.forEach(function(s){if(!s.folded&&Math.random()<.2)s.folded=true;s.bet=s.folded?0:[600,1200,2500][stage-1];});
-  picks=[];notice="";
+  notice="";
   render();
 }
 
@@ -354,7 +354,7 @@ function recommend(){
 function clearRack(){picks=[];notice="";render();}
 
 /* ===== render ===== */
-const STAGE=["PREFLOP","COMMON 30","+4 · 34","+4 · 38"];
+const STAGE=["PREFLOP","COMMON 15","+4 · 19","+4 · 23"];
 function render(fresh){
   const dora=doraOf(doraInd);
   document.getElementById("street").textContent=STAGE[stage];
@@ -375,7 +375,7 @@ function render(fresh){
   else{
     common.forEach(function(id,i){
       const isUsed=isPicked("c",i);
-      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(i>=common.length-(stage===1?30:4)?" deal":"");
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(i>=common.length-(stage===1?15:4)?" deal":"");
       const t=tile(id,cls);
       t.onclick=function(){togglePick("c",i,id);};
       c.appendChild(t);});
