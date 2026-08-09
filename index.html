@@ -198,6 +198,50 @@ body.win-anim .finalZone{filter:none}.finalZone.win .rack{animation:rackWin .85s
 @keyframes tileWin{0%{transform:translateY(0)}45%{transform:translateY(-8px);filter:brightness(1.35)}100%{transform:translateY(0)}}
 @media(max-width:380px){.arena{min-height:485px;padding-top:83px}.seat{width:76px}.seat:nth-child(5){top:55%}.commons .tile.md{--w:35px}.revealRail{padding-right:84px}.sourceZone .tile{--w:33px}.betBar button{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.finalZone.win .rack,.finalZone.win .tile.rk{animation:none}.recModes{transition:none}}
+
+/* ===== Pixel Match V2 — approved mock as real art direction ===== */
+body{align-items:flex-start;background:#061c17;overflow-x:hidden}
+body::before,body::after{display:none}
+#app{--gold:#e8c864;position:relative;width:100%;max-width:480px;min-height:100svh;height:auto;aspect-ratio:941/1850;display:block;overflow:hidden;
+  background:#073126 url("./assets/golden-arena-backplate-v1.webp") center top/100% 100% no-repeat;
+  box-shadow:0 0 55px rgba(0,0,0,.78)}
+.arena{position:absolute;inset:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
+.arena::before{inset:11.5% 5.2% 42%;border-color:rgba(98,228,235,.40);border-radius:50%;opacity:.65}
+.board{position:absolute;inset:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
+.rail{position:absolute;inset:0;z-index:9}
+.seat{width:20%;max-width:92px;padding:5px 4px 4px;transform:translate(-50%,-50%);border-radius:14px;background:linear-gradient(180deg,rgba(4,31,26,.86),rgba(2,14,12,.94));
+  border:1px solid rgba(238,208,116,.72);box-shadow:0 4px 12px rgba(0,0,0,.58),inset 0 0 12px rgba(255,225,139,.05)}
+.seat:nth-child(1){left:12%;top:13%}.seat:nth-child(2){left:88%;top:13%}.seat:nth-child(3){left:10%;top:34%}.seat:nth-child(4){left:90%;top:34%}.seat:nth-child(5){left:11%;top:54%}
+.seat .avatar{display:none}.seat .who{font-size:8px;letter-spacing:.06em}.seat .tile.sm{--w:clamp(15px,4vw,19px)}
+.seat.active{border-color:#77f2f3;box-shadow:0 0 0 2px rgba(88,227,234,.5),0 0 18px rgba(62,218,230,.82)}
+.meSeat{right:1.5%;bottom:auto;top:49%;width:21%;max-width:98px;padding:8px 4px 5px;border-radius:16px;background:linear-gradient(180deg,rgba(11,73,64,.88),rgba(2,31,26,.95))}
+.meSeat .tile.sm{--w:clamp(16px,4vw,20px)}.meSeat .stack{font-size:15px}
+.pot{position:absolute;left:31%;top:7%;width:38%;height:8%;margin:0;display:flex;align-items:center;justify-content:center;border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,249,222,.96),rgba(226,201,146,.96));border:2px solid #c89a31;
+  box-shadow:0 5px 0 #896019,0 9px 21px rgba(0,0,0,.38),inset 0 1px 0 #fff}
+.pot .eyebrow{color:#3d4139;font-size:8px}.pot .val{font-size:clamp(25px,7vw,35px);color:#111;text-shadow:none}
+.dora{left:4%;top:18%;z-index:12}.dora .eyebrow{color:#e9dcae}.dora .tile.sm{--w:24px}
+.badge{right:4%;top:18%;z-index:12;font-size:8px;padding:5px 8px}.streetNext{right:4%;top:22%;width:19%;max-width:92px;padding:8px 4px;font-size:9px}
+.commons{position:absolute;left:29%;top:23%;width:42%;height:19%;min-height:0;padding:10px;display:grid;grid-template-columns:repeat(5,1fr);align-content:center;justify-items:center;gap:3px;
+  border-radius:22px;background:radial-gradient(circle at 50% 10%,rgba(23,78,65,.95),rgba(5,43,35,.98) 72%);border:1px solid rgba(235,210,128,.34);
+  box-shadow:inset 0 10px 24px rgba(255,238,183,.035),0 8px 20px rgba(0,0,0,.28)}
+.commons .tile.md{--w:clamp(27px,7.2vw,35px)}.commons .hint{padding:0;font-size:9px}
+.revealRail{position:absolute;left:26%;top:42.5%;width:48%;height:10.5%;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.revealGroup{height:100%;padding:5px 3px 16px;border-radius:12px;background:linear-gradient(180deg,rgba(2,30,25,.94),rgba(1,15,12,.98));border-color:rgba(239,207,102,.76)}
+.revealGroup .tile{--w:clamp(19px,5vw,25px)}.revealGroup .revealLabel{font-size:8px;bottom:2px}
+.sourceZone{position:absolute;left:13%;top:55.5%;width:74%;height:9.5%;margin:0;z-index:12;padding:0 3px;border-radius:14px;background:rgba(3,35,29,.82)}
+.sourceZone .zonehead{height:24%;padding:0 4px 4px}.sourceZone .row{height:76%;align-items:center;gap:3px;flex-wrap:nowrap}.sourceZone .tile{--w:clamp(26px,7vw,34px)}
+.finalZone{position:absolute;left:0;top:66%;width:100%;height:11.7%;margin:0;padding:0 4px;z-index:15}
+.finalZone .zonehead{height:23%;padding:0 11px 4px}.finalZone .zonehead .eyebrow{font-size:clamp(8px,2.2vw,10px)}
+.rack{height:77%;padding:8px 4px 10px;align-items:center;gap:1px;border-radius:12px 12px 20px 20px;background:linear-gradient(180deg,rgba(5,25,20,.97),rgba(1,10,8,.99));
+  border:1px solid rgba(244,216,127,.85);box-shadow:inset 0 3px 8px rgba(0,0,0,.72),0 5px 0 #936e16,0 0 18px rgba(232,194,71,.25)}
+.tile.rk,.slot{--w:clamp(21px,6.45vw,31px);max-width:31px}.tile.last,.slot.last{margin-left:5px}
+.status{display:none}.winRibbon{position:absolute;left:19%;right:19%;top:63%;z-index:20;margin:0;background:rgba(20,50,42,.96)}
+.recommendPanel{position:absolute;left:2%;top:79%;width:96%;height:auto;margin:0;padding:6px;border-radius:15px;z-index:20;background:linear-gradient(180deg,rgba(4,27,22,.96),rgba(1,14,11,.98));border-color:rgba(235,211,132,.55)}
+.recMain button{padding:11px 0;font-size:12px}.recommendPanel.open .recModes{max-height:48px}.recModes button{padding:9px 1px;font-size:9px}
+.betBar{position:absolute;left:2%;top:90%;width:96%;height:8%;margin:0;z-index:20;gap:6px}.betBar button{min-height:0;height:100%;font-size:12px;border-radius:16px}
+body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
+@media(max-width:380px){#app{aspect-ratio:941/1900}.commons{left:28%;width:44%}.seat{width:21%}.sourceZone{left:11%;width:78%}.finalZone{top:66.3%}.recommendPanel{top:79.5%}.betBar{top:90.5%}}
 </style>
 </head>
 <body>
