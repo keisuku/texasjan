@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>MAHJONG HOLD'EM — 雰囲気モック</title>
+<script>if(new URLSearchParams(location.search).get("mode")==="play")document.documentElement.classList.add("playMode");</script>
+<title>MAHJONG HOLD'EM — Playable Hybrid</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -254,6 +255,8 @@ body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) satu
 #perfectReplica[data-state="recommend"] .stateRecommend,
 #perfectReplica[data-state="tsumo"] .stateTsumo{opacity:1}
 #app{display:none!important}
+html.playMode #perfectReplica{display:none}
+html.playMode #app{display:block!important}
 .mockHit{position:absolute;z-index:5;display:block;margin:0;padding:0;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;opacity:0;cursor:pointer}
 .mockHit:focus,.mockHit:focus-visible{outline:0}
 .mockHit.pressed{opacity:1;background:rgba(255,255,255,.18)!important;box-shadow:inset 0 0 0 2px rgba(255,233,154,.72)!important;border-radius:16px}
@@ -344,10 +347,10 @@ body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) satu
   </div>
 
   <div class="betBar">
-    <button class="fold">FOLD</button>
-    <button class="call">CALL<br>400</button>
-    <button class="raise">RAISE</button>
-    <button class="dial">400</button>
+    <button class="fold" id="bFold">FOLD</button>
+    <button class="call" id="bCall">CALL<br>400</button>
+    <button class="raise" id="bRaise">RAISE</button>
+    <button class="dial" id="bDial">400</button>
   </div>
 </div>
 
@@ -421,6 +424,7 @@ const seats=NAMES.map(function(n){return {n:n,stack:25000,bet:0,folded:false};})
 let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
 let picks=[],pickSeq=0,notice="";
 let activeSeat=0,recOpen=false,recMode="total",wasComplete=false;
+let userStack=5870,betAmount=400,currentCall=400;
 const recCursor={total:0,sequence:0,pairs:0,triplet:0,flush:0};
 
 function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
@@ -446,9 +450,33 @@ function nextStreet(){
   if(stage===0){common=wall.splice(0,15);stage=1;pot+=2400;}
   else if(stage<4){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
   else{newHand();return;}
+  currentCall=[400,800,1200,1600][Math.max(0,stage-1)];
+  if(betAmount<currentCall)betAmount=currentCall;
   activeSeat=(activeSeat+1)%6;
   seats.forEach(function(s){if(!s.folded&&Math.random()<.16)s.folded=true;s.bet=s.folded?0:[600,1200,2500,4200][stage-1];});
   notice="";
+  render();
+}
+
+function cycleBet(){
+  const levels=[400,800,1200,2400,Math.max(0,userStack)];
+  const unique=levels.filter(function(v,i,a){return v>0&&a.indexOf(v)===i&&v<=userStack;});
+  if(!unique.length)return;
+  const at=unique.indexOf(betAmount);
+  betAmount=unique[(at+1+unique.length)%unique.length];
+  render();
+}
+function playerAction(kind){
+  if(kind==="fold"){
+    notice="FOLD。ポットを諦め、次の局へ移ります。";render();
+    window.setTimeout(newHand,650);return;
+  }
+  const requested=kind==="call"?currentCall:betAmount;
+  const paid=Math.min(requested,userStack);
+  if(paid<=0)return;
+  userStack-=paid;pot+=paid;activeSeat=(activeSeat+1)%6;
+  if(kind==="raise")currentCall=paid;
+  notice=(kind==="call"?"CALL ":"RAISE ")+paid.toLocaleString()+"。POTは "+pot.toLocaleString()+"。";
   render();
 }
 
@@ -643,6 +671,7 @@ function render(fresh){
     const bet=document.createElement("div");bet.className="bet"+(s.bet?"":" empty");
     bet.textContent=s.bet?s.bet.toLocaleString():"·";el.appendChild(bet);rail.appendChild(el);});
   const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
+  me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
   for(let i=0;i<4;i++)myBacks.appendChild(backTile("sm"));
 
@@ -736,11 +765,20 @@ function render(fresh){
   document.querySelectorAll("[data-mode]").forEach(function(btn){btn.classList.toggle("selected",recOpen&&btn.dataset.mode===recMode);});
   document.getElementById("bRec").disabled=(stage===0);
   document.getElementById("bClear").disabled=(stage===0);
+  document.getElementById("bCall").innerHTML="CALL<br>"+Math.min(currentCall,userStack).toLocaleString();
+  document.getElementById("bDial").textContent=betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString();
+  document.getElementById("bCall").disabled=userStack<=0;
+  document.getElementById("bRaise").disabled=userStack<=0;
+  document.getElementById("bDial").disabled=userStack<=0;
 }
 
 document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("total");};
 document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=nextStreet;
+document.getElementById("bFold").onclick=function(){playerAction("fold");};
+document.getElementById("bCall").onclick=function(){playerAction("call");};
+document.getElementById("bRaise").onclick=function(){playerAction("raise");};
+document.getElementById("bDial").onclick=cycleBet;
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
 newHand();
 const perfectReplica=document.getElementById("perfectReplica");
