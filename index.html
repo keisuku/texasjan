@@ -77,7 +77,11 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
   box-shadow:inset 0 0 0 1px rgba(0,0,0,.28),inset 0 2px 5px rgba(0,0,0,.35);position:relative}
 .tile.back .face::after{content:"";position:absolute;inset:14%;border-radius:2px;border:1px solid rgba(255,255,255,.14);
   background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 5px)}
-.tile.used{opacity:.2;pointer-events:none}
+.tile.used{opacity:.32;filter:saturate(.35) brightness(.78);transform:translateY(3px)}
+.tile.used::after{content:"✓";position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;background:var(--brass);color:#18241F;font-size:9px;font-weight:900;
+  box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.tile.last,.slot.last{margin-left:7px}
 .tile.doraMark{box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 2px var(--brass-hi),
   0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.95)}
 .tile.sm{--w:21px;cursor:default}
@@ -128,12 +132,12 @@ button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
   </div>
 
   <div class="zone">
-    <div class="zonehead"><span class="eyebrow">手元の8枚（非公開）</span><span class="meta" id="pMeta">0 / 7</span></div>
+    <div class="zonehead"><span class="eyebrow">手元の8枚（非公開）</span><span class="meta" id="pMeta">私牌 0枚</span></div>
     <div class="row" id="myrow"></div>
   </div>
 
   <div class="zone">
-    <div class="zonehead"><span class="eyebrow">手牌 13 ＋ あがり牌</span><span class="meta" id="cMeta">共通 0 / 6</span></div>
+    <div class="zonehead"><span class="eyebrow">選択中の手牌 14枚</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
     <div class="rack" id="rack"></div>
   </div>
 
@@ -145,11 +149,6 @@ button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
     <button id="bNext">次へ</button>
   </div>
 </div>
-
-<div class="sheet" id="sheet"><div class="sheetin">
-  <span class="eyebrow">あがり牌を選ぶ</span>
-  <div class="grid" id="grid"></div>
-</div></div>
 
 <script>
 const KANJI=["一","二","三","四","五","六","七","八","九"];
@@ -215,11 +214,11 @@ function backTile(cls){const d=document.createElement("div");d.className="tile b
   d.innerHTML='<div class="face"></div>';return d;}
 
 /* ===== state ===== */
-const NEED_P=7, NEED_C=6;
+const MAX_HAND=14;
 const NAMES=["トビハネ","九蓮","カムイ","ゼロ","刻"];
 const seats=NAMES.map(function(n){return {n:n,stack:25000,bet:0,folded:false};});
 let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
-let rackP=[],rackC=[],winTile=null;
+let picks=[],pickSeq=0,notice="";
 
 function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
 function doraOf(i){ if(i<27) return (i%9===8)? i-8 : i+1;
@@ -233,133 +232,129 @@ function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i)
   for(let i=wall.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
 
 function newHand(){
-  shuffle();stage=0;pot=1800;common=[];rackP=[];rackC=[];winTile=null;
+  shuffle();stage=0;pot=1800;common=[];picks=[];pickSeq=0;notice="";
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
   doraInd=wall.splice(0,1)[0];
   seats.forEach(function(s){s.folded=false;s.bet=300;});
   render(true);
 }
 function nextStreet(){
-  if(stage===0){common=wall.splice(0,13);stage=1;pot+=2400;}
+  if(stage===0){common=wall.splice(0,30);stage=1;pot+=2400;}
   else if(stage<3){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
   else{newHand();return;}
   seats.forEach(function(s){if(!s.folded&&Math.random()<.2)s.folded=true;s.bet=s.folded?0:[600,1200,2500][stage-1];});
-  rackP=[];rackC=[];winTile=null;
+  picks=[];notice="";
   render();
 }
 
-/* ===== solver: 7私 + 6共通 + 宣言1 = 4面子+雀頭 ===== */
-function solve(){
-  const P=cnt(my), C=cnt(common), vis=cnt(my.concat(common));
-  const uP=new Array(34).fill(0), uC=new Array(34).fill(0);
-  let wt=-1, nodes=0; const out=[];
-  function rec(t0,melds,pair,pL,cL,fL){
-    if(++nodes>400000||out.length>=250) return;
-    if((4-melds)*3+(pair?0:2)!==pL+cL+fL) return;
-    if(melds===4&&pair){out.push({p:uP.slice(),c:uC.slice(),w:wt});return;}
+/* ===== selection + flexible 14-tile solver ===== */
+function isPicked(src,index){return picks.some(function(x){return x.src===src&&x.index===index;});}
+function togglePick(src,index,id){
+  const at=picks.findIndex(function(x){return x.src===src&&x.index===index;});
+  if(at>=0){picks.splice(at,1);notice="";render();return;}
+  if(picks.length>=MAX_HAND){
+    notice="14枚選択済みです。別の牌を入れるには、先に手牌から1枚外してください。";
+    render();return;
+  }
+  picks.push({src:src,index:index,id:id,seq:pickSeq++});
+  notice="";
+  render();
+}
+function removePick(seq){
+  const at=picks.findIndex(function(x){return x.seq===seq;});
+  if(at>=0)picks.splice(at,1);
+  notice="";
+  render();
+}
+function setPicksFromCounts(hand){
+  picks=[];pickSeq=0;
+  const need=hand.slice();
+  for(let i=0;i<my.length;i++){
+    const id=my[i];
+    if(need[id]>0){picks.push({src:"p",index:i,id:id,seq:pickSeq++});need[id]--;}
+  }
+  for(let i=0;i<common.length;i++){
+    const id=common[i];
+    if(need[id]>0){picks.push({src:"c",index:i,id:id,seq:pickSeq++});need[id]--;}
+  }
+}
+function solveFlexible(){
+  const A=cnt(my.concat(common)), P=cnt(my);
+  const use=new Array(34).fill(0);
+  const dora=doraOf(doraInd);
+  let nodes=0,best=null,bestScore=-1e9;
+
+  function canTake(ts){
+    const add=new Array(34).fill(0);
+    for(let i=0;i<ts.length;i++)add[ts[i]]++;
+    for(let t=0;t<34;t++)if(use[t]+add[t]>A[t])return false;
+    return true;
+  }
+  function take(ts,delta){for(let i=0;i<ts.length;i++)use[ts[i]]+=delta;}
+  function evaluate(){
+    let d=0,simple=true,privateUse=0;const suits={};
+    for(let t=0;t<34;t++){
+      const n=use[t];if(!n)continue;
+      if(t===dora)d+=n;
+      privateUse+=Math.min(P[t],n);
+      if(t>=27)simple=false;
+      else{suits[(t/9)|0]=1;if(t%9===0||t%9===8)simple=false;}
+    }
+    const nsuit=Object.keys(suits).length;
+    const score=d*8+(simple?4:0)+(nsuit===1?6:0)+privateUse*.35;
+    if(score>bestScore){bestScore=score;best=use.slice();}
+  }
+  function rec(t0,melds,pair){
+    if(++nodes>450000)return;
+    if(melds===4&&pair){evaluate();return;}
     for(let t=t0;t<34;t++){
-      if(melds<4) asg([t,t,t],0,t,melds+1,pair,pL,cL,fL);
-      if(!pair)   asg([t,t],  0,t,melds,  true, pL,cL,fL);
-      if(melds<4&&t<27&&t%9<=6) asg([t,t+1,t+2],0,t,melds+1,pair,pL,cL,fL);
+      if(melds<4&&canTake([t,t,t])){
+        take([t,t,t],1);rec(t,melds+1,pair);take([t,t,t],-1);
+      }
+      if(!pair&&canTake([t,t])){
+        take([t,t],1);rec(t,melds,true);take([t,t],-1);
+      }
+      if(melds<4&&t<27&&t%9<=6&&canTake([t,t+1,t+2])){
+        take([t,t+1,t+2],1);rec(t,melds+1,pair);take([t,t+1,t+2],-1);
+      }
     }
   }
-  function asg(ts,i,t0,m,pr,pL,cL,fL){
-    if(i===ts.length){rec(t0,m,pr,pL,cL,fL);return;}
-    const t=ts[i];
-    if(pL>0&&uP[t]<P[t]){uP[t]++;asg(ts,i+1,t0,m,pr,pL-1,cL,fL);uP[t]--;}
-    if(cL>0&&uC[t]<C[t]){uC[t]++;asg(ts,i+1,t0,m,pr,pL,cL-1,fL);uC[t]--;}
-    if(fL>0&&vis[t]<4){const o=wt;wt=t;asg(ts,i+1,t0,m,pr,pL,cL,fL-1);wt=o;}
-  }
-  rec(0,0,false,NEED_P,NEED_C,1);
-  if(!out.length) return null;
-  const dora=doraOf(doraInd);
-  let best=null,bs=-1e9;
-  out.forEach(function(s){
-    let d=0,simple=true;const suits={};
-    for(let t=0;t<34;t++){const n=s.p[t]+s.c[t]+(s.w===t?1:0);if(!n)continue;
-      if(t===dora)d+=n;
-      if(t>=27){simple=false;}else{suits[(t/9)|0]=1;if(t%9===0||t%9===8)simple=false;}}
-    const nsuit=Object.keys(suits).length;
-    const sc=d*6+(4-vis[s.w])*2+(simple?4:0)+(nsuit===1?6:0);
-    if(sc>bs){bs=sc;best=s;}
-  });
+  rec(0,0,false);
   return best;
 }
-function bestPartial(){
-  const P=cnt(my), C=cnt(common), dora=doraOf(doraInd);
-  const uP=new Array(34).fill(0), uC=new Array(34).fill(0);
-  let pU=0,cU=0,nodes=0,bestKey=-1,best=null;
-
-  function grab(t){
-    if(uP[t]<P[t]&&pU<NEED_P){uP[t]++;pU++;return 1;}
-    if(uC[t]<C[t]&&cU<NEED_C){uC[t]++;cU++;return 2;}
-    return 0;
-  }
-  function ungrab(t,s){ if(s===1){uP[t]--;pU--;} else {uC[t]--;cU--;} }
-  function tryBlock(ts){
-    const src=[];
-    for(let i=0;i<ts.length;i++){const g=grab(ts[i]);
-      if(!g){for(let j=src.length-1;j>=0;j--)ungrab(ts[j],src[j]);return null;}
-      src.push(g);}
-    return src;
-  }
-  function drop(ts,src){for(let j=src.length-1;j>=0;j--)ungrab(ts[j],src[j]);}
-
-  function evaluate(melds,partials,pair){
-    let d=0; for(let t=0;t<34;t++) if(t===dora) d+=uP[t]+uC[t];
-    const key=(melds*2+partials+(pair?1:0))*1000 + melds*40 + d*12 + pU*2;
-    if(key>bestKey){bestKey=key;best={p:uP.slice(),c:uC.slice(),pU:pU,cU:cU};}
-  }
-  function rec(t,melds,partials,pair){
-    if(++nodes>250000) return;
-    evaluate(melds,partials,pair);
-    if(t>=34) return;
-    const blocksUsed=melds+partials;
-    if(blocksUsed<4){
-      let s1=tryBlock([t,t,t]);            if(s1){rec(t,melds+1,partials,pair);drop([t,t,t],s1);}
-      if(t<27&&t%9<=6){ let s2=tryBlock([t,t+1,t+2]); if(s2){rec(t,melds+1,partials,pair);drop([t,t+1,t+2],s2);} }
+function fallbackRecommendation(){
+  const items=[];
+  my.forEach(function(id,index){items.push({src:"p",index:index,id:id});});
+  common.forEach(function(id,index){items.push({src:"c",index:index,id:id});});
+  const all=cnt(my.concat(common)),dora=doraOf(doraInd);
+  function score(x){
+    const t=x.id;let v=t===dora?30:0;
+    if(t>=27)v+=all[t]*7;
+    else{
+      const r=t%9;v+=(r>=2&&r<=6)?7:3;
+      for(let d=-2;d<=2;d++)if(r+d>=0&&r+d<=8)v+=all[t+d]*(3-Math.abs(d));
     }
-    if(!pair){ let s3=tryBlock([t,t]); if(s3){rec(t,melds,partials,true);drop([t,t],s3);} }
-    else if(blocksUsed<4){ let s4=tryBlock([t,t]); if(s4){rec(t,melds,partials+1,pair);drop([t,t],s4);} }
-    if(blocksUsed<4&&t<27){
-      if(t%9<=7){ let s5=tryBlock([t,t+1]); if(s5){rec(t,melds,partials+1,pair);drop([t,t+1],s5);} }
-      if(t%9<=6){ let s6=tryBlock([t,t+2]); if(s6){rec(t,melds,partials+1,pair);drop([t,t+2],s6);} }
-    }
-    rec(t+1,melds,partials,pair);
-  }
-  rec(0,0,0,false);
-  if(!best) best={p:new Array(34).fill(0),c:new Array(34).fill(0),pU:0,cU:0};
-
-  // 余り枠を埋める: ドラ > 中張牌 > つながる牌 > 孤立字牌
-  const chosen=expand(best.p).concat(expand(best.c));
-  function fscore(t){
-    let v=(t===dora)?24:0;
-    if(t<27){ const r=t%9; v+= (r>=2&&r<=6)?6:(r===1||r===7)?4:2;
-      chosen.forEach(function(x){ if(x<27&&((x/9)|0)===((t/9)|0)){const dd=Math.abs(x-t); if(dd===0)v+=5; else if(dd<=2)v+=4-dd;} });
-    } else { v+=1; chosen.forEach(function(x){ if(x===t) v+=5; }); }
+    if(x.src==="p")v+=1;
     return v;
   }
-  function fill(avail,used,budget,cur){
-    const cand=[];
-    for(let t=0;t<34;t++) for(let k=used[t];k<avail[t];k++) cand.push(t);
-    cand.sort(function(a,b){return fscore(b)-fscore(a);});
-    let n=budget-cur;
-    for(let i=0;i<cand.length&&n>0;i++){used[cand[i]]++;n--;}
-  }
-  fill(P,best.p,NEED_P,best.pU);
-  fill(C,best.c,NEED_C,best.cU);
-  return {p:best.p,c:best.c,w:null};
+  items.sort(function(a,b){return score(b)-score(a);});
+  picks=items.slice(0,MAX_HAND).map(function(x){return {src:x.src,index:x.index,id:x.id,seq:pickSeq++};});
 }
 function recommend(){
-  const s=solve();
-  if(s){rackP=expand(s.p);rackC=expand(s.c);winTile=s.w;}
-  else{const g=bestPartial();rackP=expand(g.p);rackC=expand(g.c);winTile=null;}
+  const hand=solveFlexible();
+  if(hand){
+    setPicksFromCounts(hand);
+    notice="完成する14枚を自動選択しました。使用中の元牌は薄く表示されています。";
+  }else{
+    picks=[];pickSeq=0;fallbackRecommendation();
+    notice="完成形が見つからないため、つながりの強い14枚を仮選択しました。";
+  }
   render();
 }
-function clearRack(){rackP=[];rackC=[];winTile=null;render();}
+function clearRack(){picks=[];notice="";render();}
 
 /* ===== render ===== */
-const STAGE=["PREFLOP","COMMON 13","+4 · 17","+4 · 21"];
+const STAGE=["PREFLOP","COMMON 30","+4 · 34","+4 · 38"];
 function render(fresh){
   const dora=doraOf(doraInd);
   document.getElementById("street").textContent=STAGE[stage];
@@ -378,67 +373,62 @@ function render(fresh){
   const c=document.getElementById("commons");c.innerHTML="";
   if(stage===0){c.innerHTML='<div class="hint">共通牌はまだ伏せられています。<br>手元の8枚だけで参加を決めてください。</div>';}
   else{
-    const left=rackC.slice();
     common.forEach(function(id,i){
-      const isUsed=left.indexOf(id)>=0; if(isUsed)remove(left,id);
-      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(i>=common.length-(stage===1?13:4)?" deal":"");
+      const isUsed=isPicked("c",i);
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(i>=common.length-(stage===1?30:4)?" deal":"");
       const t=tile(id,cls);
-      t.onclick=function(){if(rackC.length>=NEED_C)rackC.shift();rackC.push(id);render();};
+      t.onclick=function(){togglePick("c",i,id);};
       c.appendChild(t);});
   }
 
   const mr=document.getElementById("myrow");mr.innerHTML="";
-  const leftP=rackP.slice();
-  my.forEach(function(id){
-    const isUsed=leftP.indexOf(id)>=0;if(isUsed)remove(leftP,id);
+  my.forEach(function(id,i){
+    const isUsed=isPicked("p",i);
     const t=tile(id,(fresh?"deal ":"")+(isUsed?"used":"")+(id===dora?" doraMark":""));
-    t.onclick=function(){if(rackP.length>=NEED_P)rackP.shift();rackP.push(id);render();};
+    t.onclick=function(){togglePick("p",i,id);};
     mr.appendChild(t);});
-  const pm=document.getElementById("pMeta");pm.textContent=rackP.length+" / "+NEED_P;
-  pm.className="meta"+(rackP.length===NEED_P?"":" warn");
-  const cm=document.getElementById("cMeta");cm.textContent="共通 "+rackC.length+" / "+NEED_C;
-  cm.className="meta"+(rackC.length===NEED_C?"":" warn");
+  const privateCount=picks.filter(function(x){return x.src==="p";}).length;
+  const commonCount=picks.length-privateCount;
+  const pm=document.getElementById("pMeta");pm.textContent="私牌 "+privateCount+"枚";
+  pm.className="meta";
+  const cm=document.getElementById("cMeta");cm.textContent="合計 "+picks.length+" / "+MAX_HAND+"（共通 "+commonCount+"）";
+  cm.className="meta"+(picks.length===MAX_HAND?"":" warn");
 
   const rk=document.getElementById("rack");rk.innerHTML="";
-  const hand=rackP.concat(rackC).sort(function(a,b){return a-b;});
-  for(let i=0;i<13;i++){
-    if(i<hand.length){
-      const id=hand[i];const t=tile(id,"rk pop"+(id===dora?" doraMark":""));
-      t.onclick=function(){ if(rackP.indexOf(id)>=0) remove(rackP,id); else remove(rackC,id); render(); };
-      rk.appendChild(t);
-    } else { const d=document.createElement("div");d.className="slot";rk.appendChild(d); }
+  let ordered=picks.slice();
+  if(ordered.length===MAX_HAND){
+    const last=ordered.reduce(function(a,b){return a.seq>b.seq?a:b;});
+    ordered=ordered.filter(function(x){return x.seq!==last.seq;})
+      .sort(function(a,b){return a.id-b.id||a.seq-b.seq;});
+    ordered.push(last);
+  }else{
+    ordered.sort(function(a,b){return a.id-b.id||a.seq-b.seq;});
   }
-  if(winTile!==null){
-    const t=tile(winTile,"rk"+(winTile===dora?" doraMark":""));
-    t.style.marginLeft="7px";t.onclick=openPicker;rk.appendChild(t);
-  } else { const d=document.createElement("div");d.className="slot win";d.onclick=openPicker;rk.appendChild(d); }
+  for(let i=0;i<MAX_HAND;i++){
+    if(i<ordered.length){
+      const pick=ordered[i];
+      const t=tile(pick.id,"rk pop"+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
+      t.onclick=function(){removePick(pick.seq);};
+      rk.appendChild(t);
+    }else{
+      const d=document.createElement("div");
+      d.className="slot"+(i===13?" last":"");
+      rk.appendChild(d);
+    }
+  }
 
   const st=document.getElementById("status");
   if(stage===0){st.innerHTML="共通牌が開くまで手牌は組めません。";}
-  else if(hand.length<13){st.innerHTML='共通牌・手元の牌をタップして入れ、手牌をタップで戻す。枠が埋まっていれば古い牌と入れ替わります。';}
-  else if(winTile===null){st.innerHTML='13枚そろいました。あがり牌が未定なので<span class="bluff">ブラフ状態</span>のまま勝負します。';}
-  else{const vis=cnt(my.concat(common));
-    st.innerHTML='あがり牌は<b>'+label(winTile)+'</b>。まだ見えていない残りは<b>'+(4-vis[winTile])+'枚</b>。待ちは非公開のまま進みます。';}
+  else if(notice){st.innerHTML="<b>"+notice+"</b>";}
+  else if(picks.length<13){st.innerHTML="共通牌または手元の牌をタップして選択します。使用中の元牌は薄くなり、✓が付きます。";}
+  else if(picks.length===13){st.innerHTML="<b>13枚選択済み。</b> 右端の離れた枠へ、最後の14枚目を選んでください。";}
+  else{st.innerHTML="<b>14枚選択済み。</b> 別の牌を入れるには、先に手牌から1枚外してください。";}
 
   const bn=document.getElementById("bNext");
   bn.textContent=stage===0?"参加する":stage<3?"次を4枚めくる":"配り直す";
   document.getElementById("bRec").disabled=(stage===0);
   document.getElementById("bClear").disabled=(stage===0);
 }
-
-const sheet=document.getElementById("sheet");
-function openPicker(){
-  if(stage===0)return;
-  const g=document.getElementById("grid");g.innerHTML="";
-  const vis=cnt(my.concat(common));
-  for(let id=0;id<34;id++){
-    const t=tile(id,"md"+(vis[id]>=4?" used":""));
-    t.onclick=function(){winTile=id;sheet.classList.remove("on");render();};
-    g.appendChild(t);
-  }
-  sheet.classList.add("on");
-}
-sheet.onclick=function(e){if(e.target===sheet)sheet.classList.remove("on");};
 
 document.getElementById("bRec").onclick=recommend;
 document.getElementById("bClear").onclick=clearRack;
