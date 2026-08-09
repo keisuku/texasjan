@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<script>if(new URLSearchParams(location.search).get("mode")==="play")document.documentElement.classList.add("playMode");</script>
+<title>MAHJONG HOLD'EM — Playable Hybrid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mat:#1C3A33; --mat-lo:#122822; --mat-hi:#264C42;
+  --brass:#C9A227; --brass-hi:#EBD489; --brass-lo:#8A6E17;
+  --body-lo:#B7A67C; --red:#BE2B26; --blue:#1D5A96; --green:#1C7444; --ink:#20201C;
+  --txt:#EDE6D4; --dim:#8FA79E;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{
+  font-family:"Zen Kaku Gothic New",system-ui,sans-serif;
+  background:radial-gradient(120% 70% at 50% 6%,var(--mat-hi) 0%,var(--mat) 42%,var(--mat-lo) 100%) fixed;
+  color:var(--txt);display:flex;justify-content:center;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.5) 0 1px,transparent 1px 3px),
+                   repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 1px,transparent 1px 3px);}
+#app{width:100%;max-width:430px;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;padding-bottom:10px}
+
+.eyebrow{font-size:9px;letter-spacing:.24em;color:var(--dim);font-weight:700}
+
+.rail{display:flex;justify-content:space-between;gap:3px;padding:12px 8px 6px}
+.seat{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .3s}
+.seat.folded{opacity:.26}
+.seat .who{font-size:9px;font-weight:700;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.seat .backs{display:flex;gap:1px}
+.seat .bet{font-size:9px;font-weight:900;font-variant-numeric:tabular-nums;padding:1px 6px;border-radius:99px;
+  background:rgba(0,0,0,.35);border:1px solid rgba(201,162,39,.4);color:var(--brass-hi);min-height:16px;display:flex;align-items:center}
+.seat .bet.empty{opacity:0}
+
+.board{margin:4px 8px 0;padding:12px 8px 14px;border-radius:14px;position:relative;
+  background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.12));
+  border:1px solid rgba(201,162,39,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.34)}
+.badge{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:.16em;font-weight:900;color:var(--mat-lo);
+  background:linear-gradient(180deg,var(--brass-hi),var(--brass));padding:3px 7px;border-radius:3px}
+.dora{position:absolute;top:8px;left:10px;display:flex;align-items:center;gap:5px}
+.dora .eyebrow{font-size:8px}
+.pot{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:6px 0 10px}
+.pot .val{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;
+  color:var(--brass-hi);text-shadow:0 1px 0 var(--brass-lo),0 0 16px rgba(201,162,39,.26)}
+.commons{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;min-height:46px;align-items:center}
+.hint{font-size:11px;color:var(--dim);text-align:center;padding:16px 8px;line-height:1.7}
+
+.zone{margin:10px 8px 0}
+.zonehead{display:flex;justify-content:space-between;align-items:baseline;padding:0 3px 6px}
+.zonehead .meta{font-size:10px;font-weight:900;color:var(--brass-hi);font-variant-numeric:tabular-nums}
+.zonehead .meta.warn{color:#E0836B}
+.row{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+.rack{display:flex;gap:2px;justify-content:center;align-items:flex-end;
+  padding:9px 5px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.5));
+  border:1px solid rgba(201,162,39,.18);box-shadow:inset 0 2px 6px rgba(0,0,0,.5)}
+.slot{--w:calc((100vw - 64px)/14);width:var(--w);height:calc(var(--w)*1.36);max-width:27px;flex:0 0 auto;
+  border-radius:4px;border:1px dashed rgba(255,255,255,.16);background:rgba(255,255,255,.03)}
+.slot.win{border:1px dashed var(--brass);background:rgba(201,162,39,.1);margin-left:7px}
+
+.tile{--w:44px;width:var(--w);height:calc(var(--w)*1.36);border-radius:calc(var(--w)*.13);
+  background:linear-gradient(165deg,#FBF4E2 0%,#EFE3C6 46%,#DCCCA5 100%);
+  padding:calc(var(--w)*.065) calc(var(--w)*.06) calc(var(--w)*.12);
+  box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.95),inset -1px 0 0 rgba(0,0,0,.07);
+  flex:0 0 auto;position:relative;cursor:pointer}
+.tile .face{width:100%;height:100%;border-radius:calc(var(--w)*.08);
+  background:linear-gradient(180deg,#FEFDF8,#F4EEDF);
+  box-shadow:inset 0 1px 2px rgba(90,72,40,.28),inset 0 -1px 0 rgba(255,255,255,.8);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tile.back{background:linear-gradient(165deg,#F6EFDC,#D9C9A2)}
+.tile.back .face{background:radial-gradient(120% 90% at 30% 18%,#34936A,#24714F 48%,#17563B);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.28),inset 0 2px 5px rgba(0,0,0,.35);position:relative}
+.tile.back .face::after{content:"";position:absolute;inset:14%;border-radius:2px;border:1px solid rgba(255,255,255,.14);
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 5px)}
+.tile.used{opacity:.32;filter:saturate(.35) brightness(.78);transform:translateY(3px)}
+.tile.used::after{content:"✓";position:absolute;top:2px;right:2px;width:13px;height:13px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;background:var(--brass);color:#18241F;font-size:9px;font-weight:900;
+  box-shadow:0 1px 4px rgba(0,0,0,.45)}
+.tile.last,.slot.last{margin-left:7px;position:relative}
+.tile.last::before,.slot.last::before{content:"ツモ";position:absolute;left:50%;top:-17px;transform:translateX(-50%);
+  color:var(--brass-hi);font-size:8px;font-weight:900;letter-spacing:.12em;white-space:nowrap;
+  text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.tile.doraMark{box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 2px var(--brass-hi),
+  0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.95)}
+.tile.sm{--w:21px;cursor:default}
+.tile.md{--w:30px}
+.tile.rk{--w:calc((100vw - 64px)/14);max-width:27px}
+.tile.deal{animation:deal .32s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes deal{from{opacity:0;transform:translate(22px,-12px) rotate(8deg) scale(.86)}to{opacity:1;transform:none}}
+.tile.pop{animation:pop .2s ease-out}
+@keyframes pop{from{transform:translateY(-5px) scale(1.06)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.tile.deal,.tile.pop{animation:none}}
+.tile svg{width:100%;height:100%;display:block}
+.glyph{font-family:"Shippori Mincho B1",serif;font-weight:800;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;line-height:.95;width:100%;height:100%}
+.glyph .n{font-size:calc(var(--w)*.44);color:var(--ink)}
+.glyph .m{font-size:calc(var(--w)*.40);color:var(--red);margin-top:calc(var(--w)*.06)}
+.glyph .solo{font-size:calc(var(--w)*.66)}
+
+.status{margin:8px 11px 0;font-size:11px;line-height:1.6;color:var(--dim);min-height:34px}
+.status b{color:var(--brass-hi);font-weight:900}
+.status .bluff{color:#E0836B;font-weight:900}
+.yakuTag{display:inline-flex;align-items:center;margin:0 4px 3px 0;padding:2px 7px;border-radius:99px;
+  background:rgba(201,162,39,.14);border:1px solid rgba(235,212,137,.48);color:var(--brass-hi);
+  font-size:9px;font-weight:900;letter-spacing:.04em}
+.yakuOff{display:inline-flex;align-items:center;margin-left:2px;color:var(--dim);font-size:9px;font-weight:700}
+.acts{display:flex;gap:6px;margin:10px 8px 0}
+button{flex:1;font-family:inherit;font-weight:900;font-size:12px;letter-spacing:.06em;padding:12px 0;border-radius:9px;
+  border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(0,0,0,.24));
+  color:var(--txt);cursor:pointer;transition:transform .08s}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.3;cursor:default}
+button.prime{background:linear-gradient(180deg,var(--brass-hi),var(--brass) 60%,var(--brass-lo));color:#1A1508;
+  border-color:rgba(0,0,0,.3);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
+
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet.on{display:flex}
+.sheetin{width:100%;max-width:430px;background:linear-gradient(180deg,#20443B,#16302A);border-radius:16px 16px 0 0;
+  padding:16px 12px calc(18px + env(safe-area-inset-bottom));border-top:1px solid rgba(201,162,39,.3)}
+.grid{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:10px}
+
+/* ===== Golden Visual V1 — production layout ===== */
+html{background:#071c17}
+body{min-height:100svh;background:
+  radial-gradient(80% 28% at 50% 0%,rgba(255,243,190,.25),transparent 72%),
+  radial-gradient(105% 74% at 50% 18%,#347060 0%,#173e34 45%,#09231d 100%) fixed}
+body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:linear-gradient(90deg,rgba(230,197,102,.16),transparent 8% 92%,rgba(230,197,102,.16)),
+    radial-gradient(circle at 50% -6%,transparent 0 31%,rgba(235,212,137,.17) 31.4% 31.8%,transparent 32.2%)}
+#app{max-width:480px;min-height:100svh;padding:env(safe-area-inset-top) 0 calc(10px + env(safe-area-inset-bottom));overflow:hidden}
+.arena{position:relative;margin:4px 7px 0;padding-top:90px;min-height:518px;border-radius:24px 24px 34px 34px;
+  background:linear-gradient(145deg,rgba(255,246,218,.16),transparent 24%),
+    radial-gradient(80% 60% at 50% 34%,#285b4d 0%,#12382f 57%,#0a271f 100%);
+  border:1px solid rgba(235,212,137,.54);box-shadow:inset 0 0 0 3px rgba(35,20,5,.32),inset 0 22px 44px rgba(255,244,200,.07),0 16px 35px rgba(0,0,0,.42)}
+.arena::before{content:"";position:absolute;inset:60px 18px 14px;border:1px dashed rgba(110,226,232,.30);border-radius:48% 48% 42% 42%;
+  filter:drop-shadow(0 0 5px rgba(73,218,230,.45));pointer-events:none}
+.rail{position:absolute;inset:0;display:block;padding:0;z-index:5;pointer-events:none}
+.seat{position:absolute;width:86px;gap:2px;padding:4px 3px;border-radius:13px;transform:translate(-50%,-50%);
+  background:linear-gradient(180deg,rgba(7,27,23,.84),rgba(4,15,13,.92));border:1px solid rgba(235,212,137,.34);
+  box-shadow:0 5px 12px rgba(0,0,0,.38);pointer-events:auto}
+.seat:nth-child(1){left:14%;top:11%}.seat:nth-child(2){left:36%;top:5%}.seat:nth-child(3){left:66%;top:5%}.seat:nth-child(4){left:88%;top:16%}.seat:nth-child(5){left:91%;top:53%}
+.seat.active{border-color:#7ff2f5;box-shadow:0 0 0 2px rgba(89,228,235,.42),0 0 18px rgba(89,228,235,.68)}
+.seat.active::after{content:"TURN";position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);padding:1px 7px;border-radius:99px;
+  background:#d7b447;color:#10231e;font-size:7px;font-weight:900;letter-spacing:.11em}
+.seat .avatar{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;margin:-18px auto 0;
+  background:linear-gradient(145deg,#eff8f1,#8abbb1 48%,#1f6257);border:2px solid #e8cf82;color:#102d27;font:900 11px/1 serif;
+  box-shadow:0 2px 8px rgba(0,0,0,.45)}
+.seat:nth-child(2) .avatar{background:linear-gradient(145deg,#ffe8d6,#d2887e 52%,#6b3046)}
+.seat:nth-child(3) .avatar{background:linear-gradient(145deg,#e6e9ff,#8796cd 52%,#333f72)}
+.seat:nth-child(4) .avatar{background:linear-gradient(145deg,#fff1ba,#caa24e 52%,#60411d)}
+.seat:nth-child(5) .avatar{background:linear-gradient(145deg,#d8f0dd,#5f9f75 52%,#173e35)}
+.seat .who{font-size:8px;color:#f1e5c4}.seat .bet{font-size:8px;min-height:13px;padding:0 5px}.seat .backs{gap:1px}
+.seat .tile.sm{--w:17px}
+.meSeat{position:absolute;right:5px;bottom:8px;z-index:7;width:92px;padding:7px 5px 5px;text-align:center;border-radius:16px;
+  background:linear-gradient(180deg,rgba(20,79,69,.96),rgba(5,27,23,.96));border:2px solid #65e7ef;
+  box-shadow:0 0 0 2px rgba(230,205,126,.65),0 0 22px rgba(62,220,232,.46)}
+.meSeat.active::before{content:"TURN";position:absolute;left:-42px;top:20px;padding:3px 9px;border-radius:99px;background:#d7b447;color:#11251f;font-size:8px;font-weight:900}
+.meSeat .you{font-size:8px;font-weight:900;color:#7cf1f4;letter-spacing:.18em}.meSeat .stack{font:800 16px/1.2 "Shippori Mincho B1",serif;color:#f2d77f}
+.meSeat .backs{display:flex;justify-content:center;gap:1px;margin:3px 0}.meSeat .tile.sm{--w:18px}
+.board{margin:0 8px;padding:10px 8px 12px;min-height:398px;border-radius:22px;background:rgba(4,25,21,.34);border-color:rgba(235,212,137,.35);box-shadow:none}
+.pot{margin:-3px 0 7px}.pot .val{font-size:27px}.dora{top:7px}.badge{top:7px;right:8px}
+.commons{display:grid;grid-template-columns:repeat(5,auto);justify-content:center;align-content:center;gap:3px;min-height:214px;padding-top:27px}
+.commons .tile.md{--w:39px}
+.commons .hint{grid-column:1/-1;padding:56px 12px}
+.revealRail{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:8px 5px 2px;padding-right:96px}
+.revealGroup{position:relative;display:grid;grid-template-columns:repeat(2,auto);grid-template-rows:repeat(2,auto);justify-content:center;gap:2px;padding:5px 3px 18px;border-radius:10px;
+  background:linear-gradient(180deg,rgba(3,18,15,.44),rgba(2,11,9,.76));border:1px solid rgba(235,212,137,.34)}
+.revealGroup .tile{--w:23px}.revealGroup .revealLabel{position:absolute;left:0;right:0;bottom:1px;text-align:center;color:#e9ce7c;font-size:8px;font-weight:900;letter-spacing:.08em}
+.revealGroup.live{border-color:#e4c564;box-shadow:0 0 12px rgba(226,194,91,.20)}
+.streetNext{position:absolute;right:8px;top:39px;z-index:8;width:82px;padding:7px 5px;border-radius:8px;font-size:9px;background:linear-gradient(180deg,#e9d17c,#bd8f21);color:#192219}
+.sourceZone{margin:8px 8px 0}.sourceZone .row{flex-wrap:nowrap;gap:3px}.sourceZone .tile{--w:clamp(34px,9.2vw,42px)}
+.sourceZone .zonehead{padding-bottom:5px}.sourceZone .eyebrow{font-size:9px}
+.finalZone{position:relative;margin:15px 2px 0;padding:0 3px 5px;z-index:8}
+.finalZone .zonehead{padding:0 9px 6px}.finalZone .zonehead .eyebrow{color:#f4db8c;font-size:10px}
+.rack{gap:1px;width:100%;padding:10px 3px 12px;border-radius:12px 12px 19px 19px;border:1px solid rgba(235,212,137,.55);
+  background:linear-gradient(180deg,#122720,#07130f);box-shadow:inset 0 2px 7px rgba(0,0,0,.7),0 5px 0 #856719,0 12px 24px rgba(0,0,0,.48)}
+.tile.rk,.slot{--w:clamp(22px,calc((100vw - 40px)/14),31px);max-width:31px}
+.tile.last,.slot.last{margin-left:5px}.tile.last{z-index:2;box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 2px #f1ca53,0 0 18px rgba(244,190,40,.75)}
+.status{margin:7px 10px 0;min-height:30px;font-size:10px}
+.winRibbon{display:none;align-items:center;justify-content:center;gap:7px;margin:7px 10px 0;padding:6px;border-radius:9px;
+  background:linear-gradient(90deg,rgba(145,101,12,.25),rgba(231,194,82,.22),rgba(145,101,12,.25));border:1px solid rgba(235,212,137,.55)}
+.winRibbon.on{display:flex}.winRibbon strong{font-family:"Shippori Mincho B1",serif;color:#ffe696;font-size:16px}.winRibbon span{font-size:9px;color:#f1dfae;font-weight:900}
+.recommendPanel{margin:8px 8px 0;padding:5px;border-radius:13px;background:rgba(3,17,14,.62);border:1px solid rgba(235,212,137,.27)}
+.recMain{display:flex;gap:6px}.recMain button{padding:10px 0}.recModes{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;max-height:0;opacity:0;overflow:hidden;transition:max-height .28s ease,opacity .2s ease,padding .28s ease;padding-top:0}
+.recommendPanel.open .recModes{max-height:54px;opacity:1;padding-top:5px}.recModes button{padding:8px 1px;font-size:9px;letter-spacing:0;border-radius:7px}
+.recModes button.selected{color:#102b25;border-color:#8cf2f5;background:linear-gradient(180deg,#aaf7f7,#4cced5);box-shadow:0 0 12px rgba(74,216,225,.42)}
+.betBar{display:grid;grid-template-columns:1fr 1.12fr 1fr .78fr;gap:5px;margin:8px 8px 0}.betBar button{min-height:51px;padding:8px 0;border-radius:13px;font-size:12px}
+.betBar .fold{background:linear-gradient(180deg,#c74636,#7e1814)}.betBar .call{background:linear-gradient(180deg,#307bc4,#16437a)}.betBar .raise{background:linear-gradient(180deg,#e1ad45,#9a5e12);color:#19150c}.betBar .dial{border-radius:50%;background:radial-gradient(circle,#143b65 0 48%,#071a2d 50%);color:#fff0b7}
+body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.46) saturate(.72);transition:filter .2s ease}
+body.win-anim .finalZone{filter:none}.finalZone.win .rack{animation:rackWin .85s ease-out both}.finalZone.win .tile.rk{animation:tileWin .72s calc(var(--i)*45ms) ease-out both}
+@keyframes rackWin{0%{box-shadow:inset 0 2px 7px rgba(0,0,0,.7),0 5px 0 #856719}55%{box-shadow:inset 0 0 16px rgba(255,228,126,.65),0 5px 0 #b78b1d,0 0 35px rgba(244,190,40,.82)}100%{box-shadow:inset 0 2px 7px rgba(0,0,0,.7),0 5px 0 #856719,0 0 15px rgba(244,190,40,.36)}}
+@keyframes tileWin{0%{transform:translateY(0)}45%{transform:translateY(-8px);filter:brightness(1.35)}100%{transform:translateY(0)}}
+@media(max-width:380px){.arena{min-height:485px;padding-top:83px}.seat{width:76px}.seat:nth-child(5){top:55%}.commons .tile.md{--w:35px}.revealRail{padding-right:84px}.sourceZone .tile{--w:33px}.betBar button{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.finalZone.win .rack,.finalZone.win .tile.rk{animation:none}.recModes{transition:none}}
+
+/* ===== Pixel Match V2 — approved mock as real art direction ===== */
+body{align-items:flex-start;background:#061c17;overflow-x:hidden}
+body::before,body::after{display:none}
+#app{--gold:#e8c864;position:relative;width:100%;max-width:480px;min-height:100svh;height:auto;aspect-ratio:941/1850;display:block;overflow:hidden;
+  background:#073126 url("./assets/golden-arena-backplate-v1.webp") center top/100% 100% no-repeat;
+  box-shadow:0 0 55px rgba(0,0,0,.78)}
+.arena{position:absolute;inset:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
+.arena::before{inset:11.5% 5.2% 42%;border-color:rgba(98,228,235,.40);border-radius:50%;opacity:.65}
+.board{position:absolute;inset:0;min-height:0;margin:0;padding:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
+.rail{position:absolute;inset:0;z-index:9}
+.seat{width:20%;max-width:92px;padding:5px 4px 4px;transform:translate(-50%,-50%);border-radius:14px;background:linear-gradient(180deg,rgba(4,31,26,.86),rgba(2,14,12,.94));
+  border:1px solid rgba(238,208,116,.72);box-shadow:0 4px 12px rgba(0,0,0,.58),inset 0 0 12px rgba(255,225,139,.05)}
+.seat:nth-child(1){left:12%;top:13%}.seat:nth-child(2){left:88%;top:13%}.seat:nth-child(3){left:10%;top:34%}.seat:nth-child(4){left:90%;top:34%}.seat:nth-child(5){left:11%;top:54%}
+.seat .avatar{display:none}.seat .who{font-size:8px;letter-spacing:.06em}.seat .tile.sm{--w:clamp(15px,4vw,19px)}
+.seat.active{border-color:#77f2f3;box-shadow:0 0 0 2px rgba(88,227,234,.5),0 0 18px rgba(62,218,230,.82)}
+.meSeat{right:1.5%;bottom:auto;top:49%;width:21%;max-width:98px;padding:8px 4px 5px;border-radius:16px;background:linear-gradient(180deg,rgba(11,73,64,.88),rgba(2,31,26,.95))}
+.meSeat .tile.sm{--w:clamp(16px,4vw,20px)}.meSeat .stack{font-size:15px}
+.pot{position:absolute;left:31%;top:7%;width:38%;height:8%;margin:0;display:flex;align-items:center;justify-content:center;border-radius:18px;
+  background:linear-gradient(180deg,rgba(255,249,222,.96),rgba(226,201,146,.96));border:2px solid #c89a31;
+  box-shadow:0 5px 0 #896019,0 9px 21px rgba(0,0,0,.38),inset 0 1px 0 #fff}
+.pot .eyebrow{color:#3d4139;font-size:8px}.pot .val{font-size:clamp(25px,7vw,35px);color:#111;text-shadow:none}
+.dora{left:4%;top:18%;z-index:12}.dora .eyebrow{color:#e9dcae}.dora .tile.sm{--w:24px}
+.badge{right:4%;top:18%;z-index:12;font-size:8px;padding:5px 8px}.streetNext{right:4%;top:22%;width:19%;max-width:92px;padding:8px 4px;font-size:9px}
+.commons{position:absolute;left:29%;top:23%;width:42%;height:19%;min-height:0;padding:10px;display:grid;grid-template-columns:repeat(5,1fr);align-content:center;justify-items:center;gap:3px;
+  border-radius:22px;background:radial-gradient(circle at 50% 10%,rgba(23,78,65,.95),rgba(5,43,35,.98) 72%);border:1px solid rgba(235,210,128,.34);
+  box-shadow:inset 0 10px 24px rgba(255,238,183,.035),0 8px 20px rgba(0,0,0,.28)}
+.commons .tile.md{--w:clamp(27px,7.2vw,35px)}.commons .hint{padding:0;font-size:9px}
+.revealRail{position:absolute;left:26%;top:42.5%;width:48%;height:10.5%;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.revealGroup{height:100%;padding:5px 3px 16px;border-radius:12px;background:linear-gradient(180deg,rgba(2,30,25,.94),rgba(1,15,12,.98));border-color:rgba(239,207,102,.76)}
+.revealGroup .tile{--w:clamp(19px,5vw,25px)}.revealGroup .revealLabel{font-size:8px;bottom:2px}
+.sourceZone{position:absolute;left:13%;top:55.5%;width:74%;height:9.5%;margin:0;z-index:12;padding:0 3px;border-radius:14px;background:rgba(3,35,29,.82)}
+.sourceZone .zonehead{height:24%;padding:0 4px 4px}.sourceZone .row{height:76%;align-items:center;gap:3px;flex-wrap:nowrap}.sourceZone .tile{--w:clamp(26px,7vw,34px)}
+.finalZone{position:absolute;left:0;top:66%;width:100%;height:11.7%;margin:0;padding:0 4px;z-index:15}
+.finalZone .zonehead{height:23%;padding:0 11px 4px}.finalZone .zonehead .eyebrow{font-size:clamp(8px,2.2vw,10px)}
+.rack{height:77%;padding:8px 4px 10px;align-items:center;gap:1px;border-radius:12px 12px 20px 20px;background:linear-gradient(180deg,rgba(5,25,20,.97),rgba(1,10,8,.99));
+  border:1px solid rgba(244,216,127,.85);box-shadow:inset 0 3px 8px rgba(0,0,0,.72),0 5px 0 #936e16,0 0 18px rgba(232,194,71,.25)}
+.tile.rk,.slot{--w:clamp(21px,6.45vw,31px);max-width:31px}.tile.last,.slot.last{margin-left:5px}
+.status{display:none}.winRibbon{position:absolute;left:19%;right:19%;top:63%;z-index:20;margin:0;background:rgba(20,50,42,.96)}
+.recommendPanel{position:absolute;left:2%;top:79%;width:96%;height:auto;margin:0;padding:6px;border-radius:15px;z-index:20;background:linear-gradient(180deg,rgba(4,27,22,.96),rgba(1,14,11,.98));border-color:rgba(235,211,132,.55)}
+.recMain button{padding:11px 0;font-size:12px}.recommendPanel.open .recModes{max-height:48px}.recModes button{padding:9px 1px;font-size:9px}
+.betBar{position:absolute;left:2%;top:90%;width:96%;height:8%;margin:0;z-index:20;gap:6px}.betBar button{min-height:0;height:100%;font-size:12px;border-radius:16px}
+body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
+@media(max-width:380px){#app{aspect-ratio:941/1900}.commons{left:28%;width:44%}.seat{width:21%}.sourceZone{left:11%;width:78%}.finalZone{top:66.3%}.recommendPanel{top:79.5%}.betBar{top:90.5%}}
+
+/* ===== Pixel-exact Haribote mode =====
+   The approved Golden Visual itself is the rendered surface.
+   Transparent hit targets keep the prototype tappable without changing a pixel. */
+#perfectReplica{position:relative;width:100%;max-width:480px;margin:0 auto;background:#071f19;line-height:0;overflow:hidden}
+.replicaLayer{position:absolute;inset:0;z-index:1;opacity:0;pointer-events:none;transition:opacity .14s ease-out}
+.replicaLayer.stateNormal{position:relative}
+.replicaLayer img{display:block;width:100%;height:auto;margin:0;padding:0;user-select:none;-webkit-user-drag:none}
+#perfectReplica[data-state="normal"] .stateNormal,
+#perfectReplica[data-state="recommend"] .stateRecommend,
+#perfectReplica[data-state="tsumo"] .stateTsumo{opacity:1}
+#app{display:none!important}
+html.playMode #perfectReplica{display:none}
+html.playMode #app{display:block!important}
+.mockHit{position:absolute;z-index:5;display:block;margin:0;padding:0;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;opacity:0;cursor:pointer}
+.mockHit:focus,.mockHit:focus-visible{outline:0}
+.mockHit.pressed{opacity:1;background:rgba(255,255,255,.18)!important;box-shadow:inset 0 0 0 2px rgba(255,233,154,.72)!important;border-radius:16px}
+.hitRec{left:12%;top:76.2%;width:39%;height:5.7%}.hitClear{left:55%;top:76.2%;width:34%;height:5.7%}
+.hitSeq{left:10%;top:81.8%;width:20%;height:4.7%}.hitPair{left:30.5%;top:81.8%;width:20%;height:4.7%}.hitTrip{left:51%;top:81.8%;width:20%;height:4.7%}.hitFlush{left:71.5%;top:81.8%;width:19%;height:4.7%}
+.hitFold{left:2%;top:88%;width:24%;height:10%}.hitCall{left:27%;top:88%;width:27%;height:10%}.hitRaise{left:55%;top:88%;width:26%;height:10%}.hitDial{left:82%;top:88%;width:16%;height:10%}
+</style>
+</head>
+<body>
+<div id="perfectReplica" data-state="normal" aria-live="polite" aria-label="MAHJONG HOLD'EM Golden Visual interactive prototype">
+  <div class="replicaLayer stateNormal" aria-hidden="false">
+    <img src="./assets/mock-normal-slice-00.png" alt="MAHJONG HOLD'EM 通常状態">
+    <img src="./assets/mock-normal-slice-01.png" alt="">
+    <img src="./assets/mock-normal-slice-02.png" alt="">
+    <img src="./assets/mock-normal-slice-03.png" alt="">
+    <img src="./assets/mock-normal-slice-04.png" alt="">
+    <img src="./assets/mock-normal-slice-05.png" alt="">
+  </div>
+  <div class="replicaLayer stateRecommend" aria-hidden="true">
+    <img src="./assets/mock-slice-00.png" alt="MAHJONG HOLD'EM おすすめ展開状態">
+    <img src="./assets/mock-slice-01.png" alt="">
+    <img src="./assets/mock-slice-02.png" alt="">
+    <img src="./assets/mock-slice-03.png" alt="">
+    <img src="./assets/mock-slice-04.png" alt="">
+    <img src="./assets/mock-slice-05.png" alt="">
+  </div>
+  <div class="replicaLayer stateTsumo" aria-hidden="true">
+    <img src="./assets/mock-tsumo-slice-00.png" alt="MAHJONG HOLD'EM ツモ確定状態">
+    <img src="./assets/mock-tsumo-slice-01.png" alt="">
+    <img src="./assets/mock-tsumo-slice-02.png" alt="">
+    <img src="./assets/mock-tsumo-slice-03.png" alt="">
+    <img src="./assets/mock-tsumo-slice-04.png" alt="">
+    <img src="./assets/mock-tsumo-slice-05.png" alt="">
+  </div>
+  <button class="mockHit hitRec" data-mock-action="total" aria-label="総合おすすめ"></button>
+  <button class="mockHit hitClear" data-mock-action="clear" aria-label="クリア"></button>
+  <button class="mockHit hitSeq" data-mock-action="sequence" aria-label="順子系"></button>
+  <button class="mockHit hitPair" data-mock-action="pairs" aria-label="対子系"></button>
+  <button class="mockHit hitTrip" data-mock-action="triplet" aria-label="刻子系"></button>
+  <button class="mockHit hitFlush" data-mock-action="flush" aria-label="染め系"></button>
+  <button class="mockHit hitFold" data-mock-action="fold" aria-label="FOLD"></button>
+  <button class="mockHit hitCall" data-mock-action="call" aria-label="CALL 400"></button>
+  <button class="mockHit hitRaise" data-mock-action="raise" aria-label="RAISE"></button>
+  <button class="mockHit hitDial" data-mock-action="dial" aria-label="BET 400"></button>
+</div>
+<div id="app">
+  <div class="arena" id="arena">
+    <div class="rail" id="rail"></div>
+    <div class="meSeat" id="meSeat">
+      <div class="you">YOU</div>
+      <div class="backs" id="myBacks"></div>
+      <div class="stack">5,870</div>
+    </div>
+    <div class="board">
+      <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
+      <div class="badge" id="street">PREFLOP</div>
+      <button id="bNext" class="streetNext">参加する</button>
+      <div class="pot"><span class="eyebrow">POT</span><span class="val" id="pot">0</span></div>
+      <div class="commons" id="commons"></div>
+      <div class="revealRail" id="revealRail"></div>
+    </div>
+  </div>
+
+  <div class="zone sourceZone">
+    <div class="zonehead"><span class="eyebrow">手元の8枚（非公開）</span><span class="meta" id="pMeta">私牌 0枚</span></div>
+    <div class="row" id="myrow"></div>
+  </div>
+
+  <div class="zone finalZone" id="finalZone">
+    <div class="zonehead"><span class="eyebrow">MY FINAL HAND 13 ＋ TSUMO</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
+    <div class="rack" id="rack"></div>
+  </div>
+
+  <div class="winRibbon" id="winRibbon"><strong>ツモ</strong><span>リーチ 1翻</span><span>門前ツモ 1翻</span><strong>2翻</strong></div>
+  <div class="status" id="status"></div>
+
+  <div class="recommendPanel" id="recommendPanel">
+    <div class="recMain">
+      <button id="bRec" class="prime">おすすめ</button>
+      <button id="bClear">クリア</button>
+    </div>
+    <div class="recModes" id="recModes">
+      <button data-mode="sequence">順子系</button>
+      <button data-mode="pairs">対子系</button>
+      <button data-mode="triplet">刻子系</button>
+      <button data-mode="flush">染め系</button>
+    </div>
+  </div>
+
+  <div class="betBar">
+    <button class="fold" id="bFold">FOLD</button>
+    <button class="call" id="bCall">CALL<br>400</button>
+    <button class="raise" id="bRaise">RAISE</button>
+    <button class="dial" id="bDial">400</button>
+  </div>
+</div>
+
+<script>
+const KANJI=["一","二","三","四","五","六","七","八","九"];
+const HONOR=["東","南","西","北","白","發","中"];
+
+function pinSVG(n){
+  const L={1:[[50,68,17]],2:[[50,44,11],[50,92,11]],3:[[27,38,10],[50,68,10],[73,98,10]],
+    4:[[32,44,11],[68,44,11],[32,92,11],[68,92,11]],
+    5:[[30,40,10],[70,40,10],[50,68,10],[30,96,10],[70,96,10]],
+    6:[[32,36,10],[68,36,10],[32,68,10],[68,68,10],[32,100,10],[68,100,10]],
+    7:[[26,30,9],[50,42,9],[74,54,9],[32,86,9],[68,86,9],[32,110,9],[68,110,9]],
+    8:[[34,26,9],[66,26,9],[34,52,9],[66,52,9],[34,84,9],[66,84,9],[34,110,9],[66,110,9]],
+    9:[[26,36,9.5],[50,36,9.5],[74,36,9.5],[26,68,9.5],[50,68,9.5],[74,68,9.5],[26,100,9.5],[50,100,9.5],[74,100,9.5]]}[n];
+  const C={b:"#1D5A96",g:"#1C7444",r:"#BE2B26"};
+  const col=i=>{ if(n===2)return i===0?"g":"b"; if(n===3)return i===1?"g":"b";
+    if(n===5)return i===2?"r":(i%2?"g":"b"); if(n===7)return i<3?"r":"g";
+    if(n===9)return i<3?"g":(i<6?"b":"r"); return "b"; };
+  let s='<svg viewBox="0 0 100 136">';
+  if(n===1){const a=L[0],x=a[0],y=a[1],r=a[2];
+    s+=`<circle cx="${x}" cy="${y}" r="${r+5}" fill="#F7F2E4" stroke="#1D5A96" stroke-width="3"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#BE2B26" stroke-width="4"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${r-6}" fill="#1D5A96"/>`;
+  } else L.forEach(function(a,i){const x=a[0],y=a[1],r=a[2];
+    s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${C[col(i)]}" stroke="rgba(0,0,0,.28)" stroke-width="1"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${r*.42}" fill="#F7F2E4"/>`;});
+  return s+"</svg>";
+}
+function bamboo(x,y,h,c){const w=h*.30;return `<g>
+  <rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="${w*.42}" fill="${c}" stroke="rgba(0,0,0,.25)"/>
+  <rect x="${x-w*.62}" y="${y-h*.10}" width="${w*1.24}" height="${h*.19}" rx="1.5" fill="${c}" stroke="rgba(0,0,0,.25)"/>
+  <rect x="${x-w*.16}" y="${y-h*.40}" width="${w*.3}" height="${h*.24}" rx="1" fill="rgba(255,255,255,.55)"/></g>`;}
+function souSVG(n){
+  const G="#1C7444",R="#BE2B26";
+  if(n===1) return `<svg viewBox="0 0 100 136">
+    <path d="M50 20 C34 30 28 48 34 62 C24 70 22 88 32 100 C40 110 60 112 70 102 C80 92 78 74 66 66 C74 52 68 32 50 20 Z" fill="${G}" stroke="rgba(0,0,0,.25)"/>
+    <path d="M50 26 C40 36 38 50 44 60 C50 50 54 38 50 26 Z" fill="rgba(255,255,255,.42)"/>
+    <circle cx="43" cy="40" r="3.4" fill="#F7F2E4"/><path d="M34 44 L22 40 L33 36 Z" fill="${R}"/>
+    <path d="M56 96 C64 104 58 116 48 114" stroke="${R}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M40 112 L50 124 L62 112" stroke="${R}" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`;
+  const L={2:[[50,42,34,G],[50,94,34,G]],3:[[50,36,32,G],[32,96,32,G],[68,96,32,G]],
+    4:[[32,40,32,G],[68,40,32,G],[32,96,32,G],[68,96,32,G]],
+    5:[[30,36,30,G],[70,36,30,G],[50,68,30,R],[30,100,30,G],[70,100,30,G]],
+    6:[[30,34,28,G],[70,34,28,G],[30,68,28,G],[70,68,28,G],[30,102,28,G],[70,102,28,G]],
+    7:[[50,26,26,R],[30,62,26,G],[70,62,26,G],[30,92,26,G],[70,92,26,G],[30,120,24,G],[70,120,24,G]],
+    8:[[34,26,24,G],[66,26,24,G],[34,54,24,G],[66,54,24,G],[34,82,24,G],[66,82,24,G],[34,110,24,G],[66,110,24,G]],
+    9:[[26,34,28,R],[50,34,28,G],[74,34,28,R],[26,68,28,G],[50,68,28,G],[74,68,28,G],[26,102,28,R],[50,102,28,G],[74,102,28,R]]}[n];
+  let s='<svg viewBox="0 0 100 136">';
+  L.forEach(function(a){s+=bamboo(a[0],a[1],a[2],a[3]);});
+  return s+"</svg>";
+}
+function faceHTML(id){
+  if(id<9) return `<div class="glyph"><span class="n">${KANJI[id]}</span><span class="m">萬</span></div>`;
+  if(id<18) return pinSVG(id-8);
+  if(id<27) return souSVG(id-17);
+  const h=HONOR[id-27];
+  if(h==="白") return "";
+  const c=h==="中"?"var(--red)":h==="發"?"var(--green)":"var(--ink)";
+  return `<div class="glyph"><span class="solo" style="color:${c}">${h}</span></div>`;
+}
+function tile(id,cls){const d=document.createElement("div");d.className="tile "+(cls||"");
+  d.innerHTML=`<div class="face">${faceHTML(id)}</div>`;return d;}
+function backTile(cls){const d=document.createElement("div");d.className="tile back "+(cls||"");
+  d.innerHTML='<div class="face"></div>';return d;}
+
+/* ===== state ===== */
+const MAX_HAND=14;
+const NAMES=["トビハネ","九蓮","カムイ","ゼロ","刻"];
+const seats=NAMES.map(function(n){return {n:n,stack:25000,bet:0,folded:false};});
+let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
+let picks=[],pickSeq=0,notice="";
+let activeSeat=0,recOpen=false,recMode="total",wasComplete=false;
+let userStack=5870,betAmount=400,currentCall=400;
+const recCursor={total:0,sequence:0,pairs:0,triplet:0,flush:0};
+
+function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
+function doraOf(i){ if(i<27) return (i%9===8)? i-8 : i+1;
+  if(i<31) return (i===30)? 27 : i+1;  // 東南西北
+  return (i===33)? 31 : i+1; }         // 白發中
+function remove(arr,v){const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);}
+function expand(c){const a=[];for(let t=0;t<34;t++)for(let k=0;k<c[t];k++)a.push(t);return a;}
+function label(id){ if(id<9)return KANJI[id]+"萬"; if(id<18)return (id-8)+"筒"; if(id<27)return (id-17)+"索"; return HONOR[id-27]; }
+
+function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i);
+  for(let i=wall.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
+
+function newHand(){
+  shuffle();stage=0;pot=1800;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
+  Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
+  my=wall.splice(0,8).sort(function(a,b){return a-b;});
+  doraInd=wall.splice(0,1)[0];
+  seats.forEach(function(s){s.folded=false;s.bet=300;});
+  render(true);
+}
+function nextStreet(){
+  if(stage===0){common=wall.splice(0,15);stage=1;pot+=2400;}
+  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
+  else{newHand();return;}
+  currentCall=[400,800,1200,1600][Math.max(0,stage-1)];
+  if(betAmount<currentCall)betAmount=currentCall;
+  activeSeat=(activeSeat+1)%6;
+  seats.forEach(function(s){if(!s.folded&&Math.random()<.16)s.folded=true;s.bet=s.folded?0:[600,1200,2500,4200][stage-1];});
+  notice="";
+  render();
+}
+
+function cycleBet(){
+  const levels=[400,800,1200,2400,Math.max(0,userStack)];
+  const unique=levels.filter(function(v,i,a){return v>0&&a.indexOf(v)===i&&v<=userStack;});
+  if(!unique.length)return;
+  const at=unique.indexOf(betAmount);
+  betAmount=unique[(at+1+unique.length)%unique.length];
+  render();
+}
+function playerAction(kind){
+  if(kind==="fold"){
+    notice="FOLD。ポットを諦め、次の局へ移ります。";render();
+    window.setTimeout(newHand,650);return;
+  }
+  const requested=kind==="call"?currentCall:betAmount;
+  const paid=Math.min(requested,userStack);
+  if(paid<=0)return;
+  userStack-=paid;pot+=paid;activeSeat=(activeSeat+1)%6;
+  if(kind==="raise")currentCall=paid;
+  notice=(kind==="call"?"CALL ":"RAISE ")+paid.toLocaleString()+"。POTは "+pot.toLocaleString()+"。";
+  render();
+}
+
+/* ===== selection + flexible 14-tile solver ===== */
+function isPicked(src,index){return picks.some(function(x){return x.src===src&&x.index===index;});}
+function togglePick(src,index,id){
+  const at=picks.findIndex(function(x){return x.src===src&&x.index===index;});
+  if(at>=0){picks.splice(at,1);notice="";render();return;}
+  if(picks.length>=MAX_HAND){
+    notice="14枚選択済みです。別の牌を入れるには、先に手牌から1枚外してください。";
+    render();return;
+  }
+  picks.push({src:src,index:index,id:id,seq:pickSeq++});
+  notice="";
+  render();
+}
+function removePick(seq){
+  const at=picks.findIndex(function(x){return x.seq===seq;});
+  if(at>=0)picks.splice(at,1);
+  notice="";
+  render();
+}
+function setPicksFromCounts(hand){
+  picks=[];pickSeq=0;
+  const need=hand.slice();
+  for(let i=0;i<my.length;i++){
+    const id=my[i];
+    if(need[id]>0){picks.push({src:"p",index:i,id:id,seq:pickSeq++});need[id]--;}
+  }
+  for(let i=0;i<common.length;i++){
+    const id=common[i];
+    if(need[id]>0){picks.push({src:"c",index:i,id:id,seq:pickSeq++});need[id]--;}
+  }
+}
+function solveFlexible(mode,cursor){
+  const A=cnt(my.concat(common)), P=cnt(my);
+  const use=new Array(34).fill(0);
+  const dora=doraOf(doraInd);
+  let nodes=0;const solutions=new Map();
+
+  function canTake(ts){
+    const add=new Array(34).fill(0);
+    for(let i=0;i<ts.length;i++)add[ts[i]]++;
+    for(let t=0;t<34;t++)if(use[t]+add[t]>A[t])return false;
+    return true;
+  }
+  function take(ts,delta){for(let i=0;i<ts.length;i++)use[ts[i]]+=delta;}
+  function evaluate(isChiitoi){
+    let d=0,simple=true,privateUse=0,honors=0,triplets=0,pairTypes=0,sequences=0;const suits={},suitCount=[0,0,0];
+    for(let t=0;t<34;t++){
+      const n=use[t];if(!n)continue;
+      if(t===dora)d+=n;
+      privateUse+=Math.min(P[t],n);
+      if(n>=2)pairTypes++;
+      if(n>=3)triplets++;
+      if(t>=27){simple=false;honors+=n;}
+      else{const s=(t/9)|0;suits[s]=1;suitCount[s]+=n;if(t%9===0||t%9===8)simple=false;}
+    }
+    for(let s=0;s<3;s++)for(let r=0;r<=6;r++)sequences+=Math.min(use[s*9+r],use[s*9+r+1],use[s*9+r+2]);
+    const nsuit=Object.keys(suits).length;
+    const dominant=Math.max.apply(null,suitCount),offSuit=suitCount.reduce(function(a,b){return a+b;},0)-dominant;
+    let score=d*7+privateUse*.3;
+    if(mode==="sequence")score+=sequences*15-triplets*4+(simple?10:0)+pairTypes;
+    else if(mode==="pairs")score+=pairTypes*13+(isChiitoi?90:0)+d*3;
+    else if(mode==="triplet")score+=triplets*20+honors*2+pairTypes*2-sequences*2;
+    else if(mode==="flush")score+=dominant*5-offSuit*7+honors*1.3+(nsuit===1?38:0);
+    else score+=sequences*5+triplets*7+pairTypes*2+(simple?5:0)+(nsuit===1?12:0)+(isChiitoi?18:0);
+    const key=use.join("");
+    const prev=solutions.get(key);
+    if(!prev||score>prev.score)solutions.set(key,{hand:use.slice(),score:score});
+  }
+  function rec(t0,melds,pair){
+    if(++nodes>450000)return;
+    if(melds===4&&pair){evaluate(false);return;}
+    for(let t=t0;t<34;t++){
+      if(melds<4&&canTake([t,t,t])){
+        take([t,t,t],1);rec(t,melds+1,pair);take([t,t,t],-1);
+      }
+      if(!pair&&canTake([t,t])){
+        take([t,t],1);rec(t,melds,true);take([t,t],-1);
+      }
+      if(melds<4&&t<27&&t%9<=6&&canTake([t,t+1,t+2])){
+        take([t,t+1,t+2],1);rec(t,melds+1,pair);take([t,t+1,t+2],-1);
+      }
+    }
+  }
+  rec(0,0,false);
+
+  const pairChoices=[];
+  for(let t=0;t<34;t++)if(A[t]>=2)pairChoices.push(t);
+  function pairTileScore(t){
+    let v=t===dora?20:0;
+    if(mode==="flush"&&t<27){const suit=(t/9)|0;let suitAvail=0;for(let x=suit*9;x<suit*9+9;x++)suitAvail+=A[x];v+=suitAvail;}
+    if(mode==="pairs")v+=A[t]*4;
+    if(t>=27)v+=3;
+    return v;
+  }
+  pairChoices.sort(function(a,b){return pairTileScore(b)-pairTileScore(a);});
+  if(pairChoices.length>=7){
+    const tries=Math.min(10,pairChoices.length);
+    for(let shift=0;shift<tries;shift++){
+      use.fill(0);
+      for(let k=0;k<7;k++)use[pairChoices[(k+shift)%pairChoices.length]]=2;
+      evaluate(true);
+    }
+    use.fill(0);
+  }
+  const ranked=Array.from(solutions.values()).sort(function(a,b){return b.score-a.score;});
+  if(!ranked.length)return null;
+  const index=cursor%ranked.length;
+  return {hand:ranked[index].hand,index:index,total:ranked.length};
+}
+function fallbackRecommendation(mode){
+  const items=[];
+  my.forEach(function(id,index){items.push({src:"p",index:index,id:id});});
+  common.forEach(function(id,index){items.push({src:"c",index:index,id:id});});
+  const all=cnt(my.concat(common)),dora=doraOf(doraInd);
+  function score(x){
+    const t=x.id;let v=t===dora?30:0;
+    if(t>=27)v+=all[t]*7;
+    else{
+      const r=t%9;v+=(r>=2&&r<=6)?7:3;
+      for(let d=-2;d<=2;d++)if(r+d>=0&&r+d<=8)v+=all[t+d]*(3-Math.abs(d));
+    }
+    if(mode==="pairs")v+=all[t]*9;
+    if(mode==="triplet")v+=all[t]*12;
+    if(mode==="flush"&&t<27){const suit=(t/9)|0;let n=0;for(let q=suit*9;q<suit*9+9;q++)n+=all[q];v+=n*2;}
+    if(x.src==="p")v+=1;
+    return v;
+  }
+  items.sort(function(a,b){return score(b)-score(a);});
+  picks=items.slice(0,MAX_HAND).map(function(x){return {src:x.src,index:x.index,id:x.id,seq:pickSeq++};});
+}
+function recommend(mode){
+  recOpen=true;recMode=mode||"total";
+  const cursor=recCursor[recMode]++;
+  const result=solveFlexible(recMode,cursor);
+  const modeName={total:"総合",sequence:"順子系",pairs:"対子系",triplet:"刻子系",flush:"染め系"}[recMode];
+  if(result){
+    setPicksFromCounts(result.hand);
+    notice=modeName+"候補 "+(result.index+1)+" / "+Math.min(result.total,99)+"。同じボタンでもう一案を表示します。";
+  }else{
+    picks=[];pickSeq=0;fallbackRecommendation(recMode);
+    notice=modeName+"の完成形がないため、近い14枚を仮選択しました。";
+  }
+  render();
+}
+function clearRack(){picks=[];notice="";recOpen=false;recMode="total";render();}
+
+function isComplete14(ids){
+  if(ids.length!==14)return false;
+  const base=cnt(ids);
+  let pairTypes=0;
+  for(let t=0;t<34;t++)if(base[t]===2)pairTypes++;
+  if(pairTypes===7)return true;
+
+  function meldable(c){
+    let t=0;while(t<34&&c[t]===0)t++;
+    if(t===34)return true;
+    if(c[t]>=3){
+      c[t]-=3;if(meldable(c))return true;c[t]+=3;
+    }
+    if(t<27&&t%9<=6&&c[t+1]>0&&c[t+2]>0){
+      c[t]--;c[t+1]--;c[t+2]--;
+      if(meldable(c))return true;
+      c[t]++;c[t+1]++;c[t+2]++;
+    }
+    return false;
+  }
+  for(let p=0;p<34;p++){
+    if(base[p]<2)continue;
+    const c=base.slice();c[p]-=2;
+    if(meldable(c))return true;
+  }
+  return false;
+}
+
+/* ===== render ===== */
+const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23","+4 III · 27"];
+function render(fresh){
+  const dora=doraOf(doraInd);
+  document.getElementById("street").textContent=STAGE[stage];
+  document.getElementById("pot").textContent=pot.toLocaleString();
+  const ds=document.getElementById("doraSlot");ds.innerHTML="";ds.appendChild(tile(doraInd,"sm"));
+
+  const rail=document.getElementById("rail");rail.innerHTML="";
+  seats.forEach(function(s,seatIndex){
+    const el=document.createElement("div");el.className="seat"+(s.folded?" folded":"")+(activeSeat===seatIndex?" active":"");
+    el.innerHTML='<div class="avatar">'+s.n.slice(0,1)+'</div><div class="who">'+s.n+'</div>';
+    const b=document.createElement("div");b.className="backs";
+    for(let i=0;i<4;i++)b.appendChild(backTile("sm"));el.appendChild(b);
+    const bet=document.createElement("div");bet.className="bet"+(s.bet?"":" empty");
+    bet.textContent=s.bet?s.bet.toLocaleString():"·";el.appendChild(bet);rail.appendChild(el);});
+  const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
+  me.querySelector(".stack").textContent=userStack.toLocaleString();
+  const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
+  for(let i=0;i<4;i++)myBacks.appendChild(backTile("sm"));
+
+  const c=document.getElementById("commons");c.innerHTML="";
+  if(stage===0){c.innerHTML='<div class="hint">共通牌はまだ伏せられています。<br>手元の8枚だけで参加を決めてください。</div>';}
+  else{
+    common.slice(0,15).forEach(function(id,i){
+      const isUsed=isPicked("c",i);
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(stage===1?" deal":"");
+      const t=tile(id,cls);
+      t.onclick=function(){togglePick("c",i,id);};
+      c.appendChild(t);});
+  }
+  const rr=document.getElementById("revealRail");rr.innerHTML="";
+  for(let g=0;g<3;g++){
+    const group=document.createElement("div");group.className="revealGroup"+(stage>=g+2?" live":"");
+    for(let k=0;k<4;k++){
+      const index=15+g*4+k,id=common[index];
+      if(id!==undefined){
+        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":"")+(stage===g+2?"deal":""));
+        t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
+      }else group.appendChild(backTile(""));
+    }
+    const label=document.createElement("div");label.className="revealLabel";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
+  }
+
+  const mr=document.getElementById("myrow");mr.innerHTML="";
+  my.forEach(function(id,i){
+    const isUsed=isPicked("p",i);
+    const t=tile(id,(fresh?"deal ":"")+(isUsed?"used":"")+(id===dora?" doraMark":""));
+    t.onclick=function(){togglePick("p",i,id);};
+    mr.appendChild(t);});
+  const privateCount=picks.filter(function(x){return x.src==="p";}).length;
+  const commonCount=picks.length-privateCount;
+  const pm=document.getElementById("pMeta");pm.textContent="私牌 "+privateCount+"枚";
+  pm.className="meta";
+  const cm=document.getElementById("cMeta");cm.textContent="合計 "+picks.length+" / "+MAX_HAND+"（共通 "+commonCount+"）";
+  cm.className="meta"+(picks.length===MAX_HAND?"":" warn");
+
+  const rk=document.getElementById("rack");rk.innerHTML="";
+  let ordered=picks.slice();
+  if(ordered.length===MAX_HAND){
+    const last=ordered.reduce(function(a,b){return a.seq>b.seq?a:b;});
+    ordered=ordered.filter(function(x){return x.seq!==last.seq;})
+      .sort(function(a,b){return a.id-b.id||a.seq-b.seq;});
+    ordered.push(last);
+  }else{
+    ordered.sort(function(a,b){return a.id-b.id||a.seq-b.seq;});
+  }
+  for(let i=0;i<MAX_HAND;i++){
+    if(i<ordered.length){
+      const pick=ordered[i];
+      const t=tile(pick.id,"rk pop"+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
+      t.style.setProperty("--i",i);
+      t.onclick=function(){removePick(pick.seq);};
+      rk.appendChild(t);
+    }else{
+      const d=document.createElement("div");
+      d.className="slot"+(i===13?" last":"");
+      rk.appendChild(d);
+    }
+  }
+
+  const complete=picks.length===MAX_HAND&&isComplete14(picks.map(function(x){return x.id;}));
+  document.getElementById("finalZone").classList.toggle("win",complete);
+  document.getElementById("winRibbon").classList.toggle("on",complete);
+  if(complete&&!wasComplete){
+    document.body.classList.remove("win-anim");
+    requestAnimationFrame(function(){document.body.classList.add("win-anim");setTimeout(function(){document.body.classList.remove("win-anim");},1500);});
+  }
+  wasComplete=complete;
+
+  const st=document.getElementById("status");
+  if(stage===0){st.innerHTML="共通牌が開くまで手牌は組めません。";}
+  else if(notice){st.innerHTML="<b>"+notice+"</b>";}
+  else if(picks.length<13){st.innerHTML="共通牌または手元の牌をタップして選択します。使用中の元牌は薄くなり、✓が付きます。";}
+  else if(picks.length===13){st.innerHTML="<b>13枚選択済み。</b> 右端のツモ枠へ、和了牌となる14枚目を選んでください。";}
+  else{
+    const tsumo=ordered[13];
+    if(complete){
+      st.innerHTML='和了成立。右端の<b>'+label(tsumo.id)+'</b>をツモ牌として判定します。<span class="yakuOff">一発なし</span>';
+    }else{
+      st.innerHTML='<b>14枚選択済み・未完成。</b> 右端の<b>'+label(tsumo.id)+'</b>はツモ牌として扱います。別の牌を入れるには、先に1枚外してください。';
+    }
+  }
+
+  const bn=document.getElementById("bNext");
+  bn.textContent=stage===0?"参加する":stage<4?"次の＋4":"配り直す";
+  document.getElementById("recommendPanel").classList.toggle("open",recOpen);
+  document.getElementById("bRec").textContent=recOpen?"総合おすすめ":"おすすめ";
+  document.querySelectorAll("[data-mode]").forEach(function(btn){btn.classList.toggle("selected",recOpen&&btn.dataset.mode===recMode);});
+  document.getElementById("bRec").disabled=(stage===0);
+  document.getElementById("bClear").disabled=(stage===0);
+  document.getElementById("bCall").innerHTML="CALL<br>"+Math.min(currentCall,userStack).toLocaleString();
+  document.getElementById("bDial").textContent=betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString();
+  document.getElementById("bCall").disabled=userStack<=0;
+  document.getElementById("bRaise").disabled=userStack<=0;
+  document.getElementById("bDial").disabled=userStack<=0;
+}
+
+document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("total");};
+document.getElementById("bClear").onclick=clearRack;
+document.getElementById("bNext").onclick=nextStreet;
+document.getElementById("bFold").onclick=function(){playerAction("fold");};
+document.getElementById("bCall").onclick=function(){playerAction("call");};
+document.getElementById("bRaise").onclick=function(){playerAction("raise");};
+document.getElementById("bDial").onclick=cycleBet;
+document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
+newHand();
+const perfectReplica=document.getElementById("perfectReplica");
+let replicaTimer=0;
+function setReplicaState(state){
+  window.clearTimeout(replicaTimer);
+  perfectReplica.dataset.state=state;
+  perfectReplica.querySelectorAll(".replicaLayer").forEach(function(layer){
+    layer.setAttribute("aria-hidden",String(!layer.classList.contains("state"+state.charAt(0).toUpperCase()+state.slice(1))));
+  });
+  if(state==="tsumo")replicaTimer=window.setTimeout(function(){setReplicaState("recommend");},1800);
+}
+document.querySelectorAll("[data-mock-action]").forEach(function(hit){
+  hit.addEventListener("click",function(){
+    const action=hit.dataset.mockAction;
+    hit.classList.add("pressed");
+    window.setTimeout(function(){hit.classList.remove("pressed");},130);
+    if(navigator.vibrate)navigator.vibrate(18);
+    if(action==="clear"){setReplicaState("normal");window.setTimeout(clearRack,0);return;}
+    if(action==="fold"){setReplicaState("normal");return;}
+    if(["total","sequence","pairs","triplet","flush"].includes(action)){
+      setReplicaState(action==="total"?"recommend":"tsumo");
+      window.setTimeout(function(){
+        try{
+          if(stage===0){common=wall.splice(0,27);stage=4;}
+          wasComplete=false;recommend(action);
+        }catch(error){console.warn("Background recommendation failed",error);}
+      },0);
+      return;
+    }
+  });
+});
+</script>
+</body>
+</html>

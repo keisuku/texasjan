@@ -1,0 +1,53 @@
+{
+  "project": "MAHJONG HOLD'EM / Future Mahjong",
+  "designResolution": { "width": 941, "height": 1672 },
+  "interaction": "tap source tile -> append to final hand; tap final tile -> remove",
+  "dragAndDrop": false,
+  "assets": [
+    {
+      "path": "visual/golden-target.webp",
+      "role": "visual acceptance target only",
+      "runtime": false
+    },
+    {
+      "path": "visual/arena-with-characters.webp",
+      "role": "runtime fixed background for first implementation",
+      "runtime": true
+    },
+    {
+      "path": "visual/arena-clean.webp",
+      "role": "clean arena background for future character separation",
+      "runtime": false
+    },
+    {
+      "path": "visual/state-normal.webp",
+      "role": "normal state reference",
+      "runtime": false
+    },
+    {
+      "path": "visual/state-recommend.webp",
+      "role": "recommendation state reference",
+      "runtime": false
+    },
+    {
+      "path": "visual/state-tsumo.webp",
+      "role": "tsumo state reference",
+      "runtime": false
+    },
+    {
+      "path": "visual/traditional-tile-reference.jpeg",
+      "role": "traditional face design reference",
+      "runtime": false
+    },
+    {
+      "path": "visual/sample-9pin.png",
+      "role": "Golden Visual tile quality sample",
+      "runtime": false
+    },
+    {
+      "path": "source/current-playable-reference.html",
+      "role": "logic and 34-tile renderer source reference",
+      "runtime": false
+    }
+  ]
+}
