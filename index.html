@@ -258,6 +258,13 @@ body::before,body::after{display:none}
   background:linear-gradient(180deg,rgba(9,32,26,.94),rgba(2,12,10,.96));
   border:1px solid rgba(238,208,116,.8);color:#f5dd94;box-shadow:0 .2cqw .6cqw rgba(0,0,0,.5)}
 .seat.folded{opacity:.3}
+/* ショーダウン: 私牌8枚を2段4列で開く。 */
+.seat .backs.open{display:grid;grid-template-columns:repeat(4,auto);gap:.3cqw;justify-content:center}
+.seat .backs.open .tile.sm{--w:3.1cqw}
+.seat.won .bet{border-color:#ffe89a;color:#fff6d2;
+  background:linear-gradient(180deg,#8a6a17,#4a3607);box-shadow:0 0 1.6cqw rgba(255,222,120,.9)}
+.seat.won::after{content:"WIN";position:absolute;left:50%;top:-1.6cqw;transform:translateX(-50%);
+  padding:.1cqw 1cqw;border-radius:99px;background:#ffd964;color:#2a1f04;font-size:1.6cqw;font-weight:900;letter-spacing:.1em}
 .seat.active{box-shadow:none}
 .seat.active::after{display:none}
 .seat.active .bet{border-color:#7ff2f5;box-shadow:0 0 .9cqw rgba(89,228,235,.75)}
@@ -332,6 +339,10 @@ body::before,body::after{display:none}
 .winRibbon{position:absolute;left:19%;right:19%;top:63.2%;z-index:20;margin:0;padding:.6cqw;
   border-radius:1cqw;background:rgba(20,50,42,.96)}
 .winRibbon strong{font-size:3cqw}.winRibbon span{font-size:1.9cqw}
+.winRibbon.result{display:block;top:61.4%;left:22%;right:22%;text-align:center;
+  font-size:2.3cqw;font-weight:900;color:#ffe9a8;
+  padding:.9cqw .8cqw;border-color:#f0d489;background:rgba(12,42,34,.97);
+  box-shadow:0 .4cqw 1.6cqw rgba(0,0,0,.6),0 0 2.4cqw rgba(240,200,90,.35)}
 
 /* --- おすすめ / クリア --- */
 .recommendPanel{position:absolute;left:21.25%;top:79.07%;width:54.73%;height:3.89%;margin:0;padding:0;
@@ -486,11 +497,23 @@ function backTile(cls){const d=document.createElement("div");d.className="tile b
 /* ===== state ===== */
 const MAX_HAND=14;
 const NAMES=["トビハネ","九蓮","カムイ","ゼロ","刻"];
-const seats=NAMES.map(function(n){return {n:n,stack:25000,bet:0,folded:false};});
+/* 初期持ち点はGolden Visualに描かれている数字をそのまま使う。 */
+const START_STACKS=[3940,4620,4730,4110,4880];
+/* 相手ごとの打ち筋。showdown で solveFlexible に渡す。 */
+const SEAT_MODES=["sequence","flush","triplet","pairs","total"];
+const seats=NAMES.map(function(n,i){
+  return {n:n,stack:START_STACKS[i],mode:SEAT_MODES[i],bet:0,folded:false,hand:[],best:null,won:false};
+});
+/* ベットは持ち点に対する割合で決める。固定額だと数局で全員飛ぶ。
+   Golden Visual の POT 22,200 は総額28,150のほぼ全部が中央にある山場の絵であって、
+   毎局の定常状態ではない。 */
+const ANTE=300, STREET_FRACTION=[.06,.10,.16,.24], MIN_BET=100;
+let sessionResets=0;
 let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
 let picks=[],pickSeq=0,notice="";
 let activeSeat=0,recOpen=false,recMode="total",wasComplete=false,dealAnim=0;
 let userStack=5870,betAmount=400,currentCall=400;
+let phase="play",userFolded=false,resultText="";
 const recCursor={total:0,sequence:0,pairs:0,triplet:0,flush:0};
 
 function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
@@ -505,29 +528,146 @@ function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i)
   for(let i=wall.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
 
 function newHand(){
-  shuffle();stage=0;pot=1800;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
+  ensureTable();
+  shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
+  phase="play";userFolded=false;resultText="";
   Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
+  seats.forEach(function(s){
+    s.best=null;s.won=false;s.bet=0;
+    s.hand=wall.splice(0,8).sort(function(a,b){return a-b;});
+    s.folded=s.stack<=0;            /* 点棒が尽きた席はその局を降りる */
+  });
   doraInd=wall.splice(0,1)[0];
-  seats.forEach(function(s){s.folded=false;s.bet=300;});
+  postAnte();
   openCommon15();
   render(true);
 }
+/* ポットは全て誰かの持ち点から出る。合計（全席+自分+POT）は常に保存される。 */
+function anteFor(stack){return Math.min(Math.max(50,Math.floor(stack*.06)),ANTE,stack);}
+function postAnte(){
+  seats.forEach(function(s){
+    if(s.folded)return;
+    const paid=Math.min(anteFor(s.stack),s.stack);s.stack-=paid;s.bet=paid;pot+=paid;
+  });
+  const mine=Math.min(anteFor(userStack),userStack);userStack-=mine;pot+=mine;
+}
+/* 下限を先に効かせてから持ち点で頭打ちにする。順序を逆にすると持ち点を超えて払う。 */
+function streetBetFor(stack){
+  return Math.min(Math.max(MIN_BET,Math.floor(stack*STREET_FRACTION[Math.max(0,stage-1)])),stack);
+}
+function postStreet(){
+  let high=MIN_BET;
+  seats.forEach(function(s){
+    if(s.folded||s.stack<=0){s.bet=0;s.folded=true;return;}
+    if(seatWillFold(s)){s.folded=true;s.bet=0;return;}
+    const paid=streetBetFor(s.stack);s.stack-=paid;s.bet=paid;pot+=paid;
+    if(paid>high)high=paid;
+  });
+  /* コール額はテーブルの最高ベットに合わせる。自分の持ち点にも自動で追従する。 */
+  currentCall=Math.min(high,userStack);
+  if(betAmount<currentCall)betAmount=currentCall;
+}
+/* 誰も相手がいなくなったらセッションを仕切り直す。 */
+function ensureTable(){
+  const alive=seats.filter(function(s){return s.stack>0;}).length;
+  if(alive>=2&&userStack>0)return;
+  seats.forEach(function(s,i){s.stack=START_STACKS[i];});
+  userStack=5870;sessionResets++;
+  flashToast("新しいセッション。持ち点をリセットしました。");
+}
 /* 共通15枚の公開。開始直後の画面がGolden Visualと同じ構図になるよう newHand から直接呼ぶ。 */
 function openCommon15(){
-  common=wall.splice(0,15);stage=1;pot+=2400;dealAnim=1;
-  currentCall=400;if(betAmount<currentCall)betAmount=currentCall;
-  seats.forEach(function(s){s.bet=s.folded?0:600;});
+  common=wall.splice(0,15);stage=1;dealAnim=1;
+  postStreet();
 }
 function nextStreet(){
+  if(phase!=="play")return;
   if(stage===0){openCommon15();}
-  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;dealAnim=stage;}
-  else{newHand();return;}
-  currentCall=[400,800,1200,1600][Math.max(0,stage-1)];
-  if(betAmount<currentCall)betAmount=currentCall;
+  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;postStreet();}
+  else{showdown();return;}
   activeSeat=(activeSeat+1)%6;
-  seats.forEach(function(s){if(!s.folded&&Math.random()<.16)s.folded=true;s.bet=s.folded?0:[600,1200,2500,4200][stage-1];});
   notice="";
+  render();
+}
+
+/* ===== showdown ===== */
+/* 面子数の貪欲カウント。AIの判断と手の比較に使う軽量版。 */
+function quickMelds(c){
+  c=c.slice();let m=0;
+  for(let t=0;t<34&&m<4;t++)while(c[t]>=3&&m<4){c[t]-=3;m++;}
+  for(let s=0;s<3&&m<4;s++)for(let r=0;r<=6&&m<4;r++)
+    while(c[s*9+r]>0&&c[s*9+r+1]>0&&c[s*9+r+2]>0&&m<4){c[s*9+r]--;c[s*9+r+1]--;c[s*9+r+2]--;m++;}
+  return m;
+}
+function doraCount(ids){const d=doraOf(doraInd);let n=0;ids.forEach(function(t){if(t===d)n++;});return n;}
+/* 手の強さ。完成形が最優先、次に面子数、雀頭、ドラ。役と点数は Stage B で入れ替える。 */
+function handScore(ids){
+  const c=cnt(ids);
+  let hasPair=false;for(let t=0;t<34;t++)if(c[t]>=2){hasPair=true;break;}
+  const complete=ids.length===MAX_HAND&&isComplete14(ids);
+  return (complete?10000:0)+quickMelds(c)*100+(hasPair?50:0)+doraCount(ids)*10;
+}
+/* 私牌がどれだけ手を伸ばしたかで降りるか決める。乱数だけの判断はやめる。 */
+function seatWillFold(s){
+  const gain=quickMelds(cnt(s.hand.concat(common)))-quickMelds(cnt(common));
+  const strength=gain*3+doraCount(s.hand)*2;
+  const bar=[-1,0,1,2][Math.max(0,stage-1)];
+  return strength<=bar&&Math.random()<.45;
+}
+/* solveFlexible が完成形を見つけられなかったときの14枚。私牌を優先して埋める。 */
+function bestFallback(priv){
+  const pool=priv.concat(common),all=cnt(pool),dora=doraOf(doraInd);
+  const items=pool.map(function(id,i){return {id:id,priv:i<priv.length};});
+  items.sort(function(a,b){return score(b)-score(a);});
+  function score(x){
+    const t=x.id;let v=t===dora?30:0;
+    if(t>=27)v+=all[t]*7;
+    else{const r=t%9;v+=(r>=2&&r<=6)?7:3;
+      for(let d=-2;d<=2;d++)if(r+d>=0&&r+d<=8)v+=all[t+d]*(3-Math.abs(d));}
+    if(x.priv)v+=1;
+    return v;
+  }
+  return items.slice(0,MAX_HAND).map(function(x){return x.id;});
+}
+function seatBestHand(s){
+  let r=solveFlexible(s.mode,0,s.hand);
+  if(!r&&s.mode!=="total")r=solveFlexible("total",0,s.hand);
+  return r?expand(r.hand):bestFallback(s.hand);
+}
+function showdown(){
+  if(phase!=="play")return;
+  if(!userFolded&&picks.length<MAX_HAND){
+    flashToast("14枚そろえてからショーダウンしてください。");return;
+  }
+  const entries=[];
+  if(!userFolded){
+    const ids=picks.map(function(x){return x.id;});
+    entries.push({who:"あなた",seat:null,ids:ids,score:handScore(ids)});
+  }
+  seats.forEach(function(s){
+    if(s.folded){s.best=null;return;}
+    s.best=seatBestHand(s);
+    entries.push({who:s.n,seat:s,ids:s.best,score:handScore(s.best)});
+  });
+
+  phase="result";
+  if(!entries.length){                       /* 全員降りた。POTは自分へ戻す */
+    userStack+=pot;pot=0;resultText="全員フォールド。POTを回収しました。";
+    render();return;
+  }
+  let top=-1;entries.forEach(function(e){if(e.score>top)top=e.score;});
+  const winners=entries.filter(function(e){return e.score===top;});
+  const share=Math.floor(pot/winners.length), rest=pot-share*winners.length;
+  winners.forEach(function(e,i){
+    const amt=share+(i===0?rest:0);
+    if(e.seat){e.seat.stack+=amt;e.seat.won=true;}else userStack+=amt;
+  });
+  const won=pot;pot=0;
+  const w=winners[0];
+  const detail=(w.score>=10000?"完成形":"面子"+quickMelds(cnt(w.ids))+"組")
+    +(doraCount(w.ids)?" ドラ"+doraCount(w.ids):"");
+  resultText=winners.map(function(e){return e.who;}).join("・")+" の勝ち（"+detail+"） "+won.toLocaleString();
   render();
 }
 
@@ -540,10 +680,13 @@ function cycleBet(){
   render();
 }
 function playerAction(kind){
+  if(phase==="result")return;
   if(kind==="fold"){
-    notice="FOLD。ポットを諦め、次の局へ移ります。";render();
-    window.setTimeout(newHand,650);return;
+    /* 降りても局は続く。POTは残った誰かが取る。 */
+    userFolded=true;flashToast("FOLD。POTは残った相手が争います。");
+    showdown();return;
   }
+  if(kind==="call"&&stage>=4){showdown();return;}
   const requested=kind==="call"?currentCall:betAmount;
   const paid=Math.min(requested,userStack);
   if(paid<=0)return;
@@ -592,8 +735,10 @@ function setPicksFromCounts(hand){
     if(need[id]>0){picks.push({src:"c",index:i,id:id,seq:pickSeq++});need[id]--;}
   }
 }
-function solveFlexible(mode,cursor){
-  const A=cnt(my.concat(common)), P=cnt(my);
+/* priv を省略すると自分の私牌。相手の手を解かせるときだけ渡す。 */
+function solveFlexible(mode,cursor,priv){
+  const hand=priv||my;
+  const A=cnt(hand.concat(common)), P=cnt(hand);
   const use=new Array(34).fill(0);
   const dora=doraOf(doraInd);
   let nodes=0;const solutions=new Map();
@@ -744,13 +889,23 @@ function render(fresh){
   const ds=document.getElementById("doraSlot");ds.innerHTML="";ds.appendChild(tile(doraInd,"sm"));
 
   const rail=document.getElementById("rail");rail.innerHTML="";
+  const showing=(phase==="result");
   seats.forEach(function(s,seatIndex){
-    const el=document.createElement("div");el.className="seat"+(s.folded?" folded":"")+(activeSeat===seatIndex?" active":"");
+    const el=document.createElement("div");
+    el.className="seat"+(s.folded?" folded":"")+(activeSeat===seatIndex&&!showing?" active":"")+(s.won?" won":"");
     el.innerHTML='<div class="avatar">'+s.n.slice(0,1)+'</div><div class="who">'+s.n+'</div>';
     const b=document.createElement("div");b.className="backs";
-    for(let i=0;i<4;i++)b.appendChild(backTile("sm"));el.appendChild(b);
-    const bet=document.createElement("div");bet.className="bet"+(s.bet?"":" empty");
-    bet.textContent=s.bet?s.bet.toLocaleString():"·";el.appendChild(bet);rail.appendChild(el);});
+    if(showing&&!s.folded){
+      /* ショーダウンでは私牌8枚を開く。2段4列で座席パネルに収める。 */
+      b.className="backs open";
+      s.hand.forEach(function(id){b.appendChild(tile(id,"sm"+(id===dora?" doraMark":"")));});
+    }else{
+      for(let i=0;i<4;i++)b.appendChild(backTile("sm"));
+    }
+    el.appendChild(b);
+    /* 数字はベット額ではなく持ち点。Golden Visual の 3,940 等と同じ意味になる。 */
+    const bet=document.createElement("div");bet.className="bet";
+    bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
   const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
   me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
@@ -827,8 +982,16 @@ function render(fresh){
 
   const complete=picks.length===MAX_HAND&&isComplete14(picks.map(function(x){return x.id;}));
   document.getElementById("finalZone").classList.toggle("win",complete);
-  document.getElementById("winRibbon").classList.toggle("on",complete);
-  if(complete&&!wasComplete){
+  const ribbon=document.getElementById("winRibbon");
+  if(phase==="result"){
+    ribbon.className="winRibbon on result";
+    ribbon.textContent=resultText;
+  }else{
+    ribbon.className="winRibbon"+(complete?" on":"");
+    if(complete)ribbon.innerHTML='<strong>完成</strong><span>面子'+quickMelds(cnt(picks.map(function(x){return x.id;})))
+      +'組</span><span>ドラ'+doraCount(picks.map(function(x){return x.id;}))+'</span>';
+  }
+  if(complete&&!wasComplete&&phase==="play"){
     document.body.classList.remove("win-anim");
     requestAnimationFrame(function(){document.body.classList.add("win-anim");setTimeout(function(){document.body.classList.remove("win-anim");},1500);});
   }
@@ -855,11 +1018,15 @@ function render(fresh){
   document.querySelectorAll("[data-mode]").forEach(function(btn){btn.classList.toggle("selected",recOpen&&btn.dataset.mode===recMode);});
   document.getElementById("bRec").disabled=(stage===0);
   document.getElementById("bClear").disabled=(stage===0);
-  document.getElementById("bCall").innerHTML="CALL<br>"+Math.min(currentCall,userStack).toLocaleString();
+  /* CALLボタンが局の進行役を兼ねる。+4 III まで来たらショーダウン、決着後は次の局。 */
+  const call=document.getElementById("bCall");
+  if(phase==="result"){call.innerHTML="次の局";call.disabled=false;}
+  else if(stage>=4){call.innerHTML="SHOW<br>DOWN";call.disabled=false;}
+  else{call.innerHTML="CALL<br>"+Math.min(currentCall,userStack).toLocaleString();call.disabled=userStack<=0;}
   document.getElementById("bDial").textContent=betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString();
-  document.getElementById("bCall").disabled=userStack<=0;
-  document.getElementById("bRaise").disabled=userStack<=0;
-  document.getElementById("bDial").disabled=userStack<=0;
+  document.getElementById("bFold").disabled=(phase==="result");
+  document.getElementById("bRaise").disabled=userStack<=0||phase==="result"||stage>=4;
+  document.getElementById("bDial").disabled=userStack<=0||phase==="result";
   dealAnim=0;
 }
 
@@ -867,7 +1034,10 @@ document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("
 document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=nextStreet;
 document.getElementById("bFold").onclick=function(){playerAction("fold");};
-document.getElementById("bCall").onclick=function(){playerAction("call");};
+document.getElementById("bCall").onclick=function(){
+  if(phase==="result"){newHand();return;}
+  playerAction("call");
+};
 document.getElementById("bRaise").onclick=function(){playerAction("raise");};
 document.getElementById("bDial").onclick=cycleBet;
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
