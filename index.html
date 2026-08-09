@@ -247,23 +247,47 @@ body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) satu
    The approved Golden Visual itself is the rendered surface.
    Transparent hit targets keep the prototype tappable without changing a pixel. */
 #perfectReplica{position:relative;width:100%;max-width:480px;margin:0 auto;background:#071f19;line-height:0;overflow:hidden}
-#perfectReplica>img{display:block;width:100%;height:auto;margin:0;padding:0;user-select:none;-webkit-user-drag:none}
+.replicaLayer{position:absolute;inset:0;z-index:1;opacity:0;pointer-events:none;transition:opacity .14s ease-out}
+.replicaLayer.stateNormal{position:relative}
+.replicaLayer img{display:block;width:100%;height:auto;margin:0;padding:0;user-select:none;-webkit-user-drag:none}
+#perfectReplica[data-state="normal"] .stateNormal,
+#perfectReplica[data-state="recommend"] .stateRecommend,
+#perfectReplica[data-state="tsumo"] .stateTsumo{opacity:1}
 #app{display:none!important}
 .mockHit{position:absolute;z-index:5;display:block;margin:0;padding:0;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;opacity:0;cursor:pointer}
 .mockHit:focus,.mockHit:focus-visible{outline:0}
+.mockHit.pressed{opacity:1;background:rgba(255,255,255,.18)!important;box-shadow:inset 0 0 0 2px rgba(255,233,154,.72)!important;border-radius:16px}
 .hitRec{left:12%;top:76.2%;width:39%;height:5.7%}.hitClear{left:55%;top:76.2%;width:34%;height:5.7%}
 .hitSeq{left:10%;top:81.8%;width:20%;height:4.7%}.hitPair{left:30.5%;top:81.8%;width:20%;height:4.7%}.hitTrip{left:51%;top:81.8%;width:20%;height:4.7%}.hitFlush{left:71.5%;top:81.8%;width:19%;height:4.7%}
 .hitFold{left:2%;top:88%;width:24%;height:10%}.hitCall{left:27%;top:88%;width:27%;height:10%}.hitRaise{left:55%;top:88%;width:26%;height:10%}.hitDial{left:82%;top:88%;width:16%;height:10%}
 </style>
 </head>
 <body>
-<div id="perfectReplica" aria-label="MAHJONG HOLD'EM Golden Visual prototype">
-  <img src="./assets/mock-slice-00.png" alt="MAHJONG HOLD'EM Golden Visual">
-  <img src="./assets/mock-slice-01.png" alt="">
-  <img src="./assets/mock-slice-02.png" alt="">
-  <img src="./assets/mock-slice-03.png" alt="">
-  <img src="./assets/mock-slice-04.png" alt="">
-  <img src="./assets/mock-slice-05.png" alt="">
+<div id="perfectReplica" data-state="normal" aria-live="polite" aria-label="MAHJONG HOLD'EM Golden Visual interactive prototype">
+  <div class="replicaLayer stateNormal" aria-hidden="false">
+    <img src="./assets/mock-normal-slice-00.png" alt="MAHJONG HOLD'EM 通常状態">
+    <img src="./assets/mock-normal-slice-01.png" alt="">
+    <img src="./assets/mock-normal-slice-02.png" alt="">
+    <img src="./assets/mock-normal-slice-03.png" alt="">
+    <img src="./assets/mock-normal-slice-04.png" alt="">
+    <img src="./assets/mock-normal-slice-05.png" alt="">
+  </div>
+  <div class="replicaLayer stateRecommend" aria-hidden="true">
+    <img src="./assets/mock-slice-00.png" alt="MAHJONG HOLD'EM おすすめ展開状態">
+    <img src="./assets/mock-slice-01.png" alt="">
+    <img src="./assets/mock-slice-02.png" alt="">
+    <img src="./assets/mock-slice-03.png" alt="">
+    <img src="./assets/mock-slice-04.png" alt="">
+    <img src="./assets/mock-slice-05.png" alt="">
+  </div>
+  <div class="replicaLayer stateTsumo" aria-hidden="true">
+    <img src="./assets/mock-tsumo-slice-00.png" alt="MAHJONG HOLD'EM ツモ確定状態">
+    <img src="./assets/mock-tsumo-slice-01.png" alt="">
+    <img src="./assets/mock-tsumo-slice-02.png" alt="">
+    <img src="./assets/mock-tsumo-slice-03.png" alt="">
+    <img src="./assets/mock-tsumo-slice-04.png" alt="">
+    <img src="./assets/mock-tsumo-slice-05.png" alt="">
+  </div>
   <button class="mockHit hitRec" data-mock-action="total" aria-label="総合おすすめ"></button>
   <button class="mockHit hitClear" data-mock-action="clear" aria-label="クリア"></button>
   <button class="mockHit hitSeq" data-mock-action="sequence" aria-label="順子系"></button>
@@ -719,14 +743,29 @@ document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=nextStreet;
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
 newHand();
+const perfectReplica=document.getElementById("perfectReplica");
+let replicaTimer=0;
+function setReplicaState(state){
+  window.clearTimeout(replicaTimer);
+  perfectReplica.dataset.state=state;
+  perfectReplica.querySelectorAll(".replicaLayer").forEach(function(layer){
+    layer.setAttribute("aria-hidden",String(!layer.classList.contains("state"+state.charAt(0).toUpperCase()+state.slice(1))));
+  });
+  if(state==="tsumo")replicaTimer=window.setTimeout(function(){setReplicaState("recommend");},1800);
+}
 document.querySelectorAll("[data-mock-action]").forEach(function(hit){
   hit.addEventListener("click",function(){
     const action=hit.dataset.mockAction;
+    hit.classList.add("pressed");
+    window.setTimeout(function(){hit.classList.remove("pressed");},130);
     if(navigator.vibrate)navigator.vibrate(18);
-    if(action==="clear"){clearRack();return;}
+    if(action==="clear"){clearRack();setReplicaState("normal");return;}
+    if(action==="fold"){setReplicaState("normal");return;}
     if(["total","sequence","pairs","triplet","flush"].includes(action)){
       if(stage===0){common=wall.splice(0,27);stage=4;}
-      wasComplete=false;recommend(action);return;
+      wasComplete=false;recommend(action);
+      setReplicaState(action==="total"?"recommend":"tsumo");
+      return;
     }
   });
 });
