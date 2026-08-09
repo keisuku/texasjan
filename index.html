@@ -242,9 +242,34 @@ body::before,body::after{display:none}
 .betBar{position:absolute;left:2%;top:90%;width:96%;height:8%;margin:0;z-index:20;gap:6px}.betBar button{min-height:0;height:100%;font-size:12px;border-radius:16px}
 body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
 @media(max-width:380px){#app{aspect-ratio:941/1900}.commons{left:28%;width:44%}.seat{width:21%}.sourceZone{left:11%;width:78%}.finalZone{top:66.3%}.recommendPanel{top:79.5%}.betBar{top:90.5%}}
+
+/* ===== Pixel-exact Haribote mode =====
+   The approved Golden Visual itself is the rendered surface.
+   Transparent hit targets keep the prototype tappable without changing a pixel. */
+#perfectReplica{position:relative;width:100%;max-width:480px;margin:0 auto;background:#071f19;line-height:0;overflow:hidden}
+#perfectReplica>img{display:block;width:100%;height:auto;margin:0;padding:0;user-select:none;-webkit-user-drag:none}
+#app{display:none!important}
+.mockHit{position:absolute;z-index:5;display:block;margin:0;padding:0;border:0!important;border-radius:0;background:transparent!important;box-shadow:none!important;opacity:0;cursor:pointer}
+.mockHit:focus,.mockHit:focus-visible{outline:0}
+.hitRec{left:12%;top:76.2%;width:39%;height:5.7%}.hitClear{left:55%;top:76.2%;width:34%;height:5.7%}
+.hitSeq{left:10%;top:81.8%;width:20%;height:4.7%}.hitPair{left:30.5%;top:81.8%;width:20%;height:4.7%}.hitTrip{left:51%;top:81.8%;width:20%;height:4.7%}.hitFlush{left:71.5%;top:81.8%;width:19%;height:4.7%}
+.hitFold{left:2%;top:88%;width:24%;height:10%}.hitCall{left:27%;top:88%;width:27%;height:10%}.hitRaise{left:55%;top:88%;width:26%;height:10%}.hitDial{left:82%;top:88%;width:16%;height:10%}
 </style>
 </head>
 <body>
+<div id="perfectReplica" aria-label="MAHJONG HOLD'EM Golden Visual prototype">
+  <img src="./assets/mock-recommend-lossless.webp" alt="MAHJONG HOLD'EM Golden Visual">
+  <button class="mockHit hitRec" data-mock-action="total" aria-label="総合おすすめ"></button>
+  <button class="mockHit hitClear" data-mock-action="clear" aria-label="クリア"></button>
+  <button class="mockHit hitSeq" data-mock-action="sequence" aria-label="順子系"></button>
+  <button class="mockHit hitPair" data-mock-action="pairs" aria-label="対子系"></button>
+  <button class="mockHit hitTrip" data-mock-action="triplet" aria-label="刻子系"></button>
+  <button class="mockHit hitFlush" data-mock-action="flush" aria-label="染め系"></button>
+  <button class="mockHit hitFold" data-mock-action="fold" aria-label="FOLD"></button>
+  <button class="mockHit hitCall" data-mock-action="call" aria-label="CALL 400"></button>
+  <button class="mockHit hitRaise" data-mock-action="raise" aria-label="RAISE"></button>
+  <button class="mockHit hitDial" data-mock-action="dial" aria-label="BET 400"></button>
+</div>
 <div id="app">
   <div class="arena" id="arena">
     <div class="rail" id="rail"></div>
@@ -689,6 +714,17 @@ document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=nextStreet;
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
 newHand();
+document.querySelectorAll("[data-mock-action]").forEach(function(hit){
+  hit.addEventListener("click",function(){
+    const action=hit.dataset.mockAction;
+    if(navigator.vibrate)navigator.vibrate(18);
+    if(action==="clear"){clearRack();return;}
+    if(["total","sequence","pairs","triplet","flush"].includes(action)){
+      if(stage===0){common=wall.splice(0,27);stage=4;}
+      wasComplete=false;recommend(action);return;
+    }
+  });
+});
 </script>
 </body>
 </html>
