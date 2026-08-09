@@ -759,12 +759,16 @@ document.querySelectorAll("[data-mock-action]").forEach(function(hit){
     hit.classList.add("pressed");
     window.setTimeout(function(){hit.classList.remove("pressed");},130);
     if(navigator.vibrate)navigator.vibrate(18);
-    if(action==="clear"){clearRack();setReplicaState("normal");return;}
+    if(action==="clear"){setReplicaState("normal");window.setTimeout(clearRack,0);return;}
     if(action==="fold"){setReplicaState("normal");return;}
     if(["total","sequence","pairs","triplet","flush"].includes(action)){
-      if(stage===0){common=wall.splice(0,27);stage=4;}
-      wasComplete=false;recommend(action);
       setReplicaState(action==="total"?"recommend":"tsumo");
+      window.setTimeout(function(){
+        try{
+          if(stage===0){common=wall.splice(0,27);stage=4;}
+          wasComplete=false;recommend(action);
+        }catch(error){console.warn("Background recommendation failed",error);}
+      },0);
       return;
     }
   });
