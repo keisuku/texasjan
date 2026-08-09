@@ -1,1 +1,449 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MAHJONG HOLD'EM — 雰囲気モック</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mat:#1C3A33; --mat-lo:#122822; --mat-hi:#264C42;
+  --brass:#C9A227; --brass-hi:#EBD489; --brass-lo:#8A6E17;
+  --body-lo:#B7A67C; --red:#BE2B26; --blue:#1D5A96; --green:#1C7444; --ink:#20201C;
+  --txt:#EDE6D4; --dim:#8FA79E;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{
+  font-family:"Zen Kaku Gothic New",system-ui,sans-serif;
+  background:radial-gradient(120% 70% at 50% 6%,var(--mat-hi) 0%,var(--mat) 42%,var(--mat-lo) 100%) fixed;
+  color:var(--txt);display:flex;justify-content:center;overflow-x:hidden;
+}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
+  background-image:repeating-linear-gradient(0deg,rgba(0,0,0,.5) 0 1px,transparent 1px 3px),
+                   repeating-linear-gradient(90deg,rgba(255,255,255,.2) 0 1px,transparent 1px 3px);}
+#app{width:100%;max-width:430px;min-height:100vh;display:flex;flex-direction:column;position:relative;z-index:1;padding-bottom:10px}
 
+.eyebrow{font-size:9px;letter-spacing:.24em;color:var(--dim);font-weight:700}
+
+.rail{display:flex;justify-content:space-between;gap:3px;padding:12px 8px 6px}
+.seat{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;gap:4px;transition:opacity .3s}
+.seat.folded{opacity:.26}
+.seat .who{font-size:9px;font-weight:700;color:var(--dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.seat .backs{display:flex;gap:1px}
+.seat .bet{font-size:9px;font-weight:900;font-variant-numeric:tabular-nums;padding:1px 6px;border-radius:99px;
+  background:rgba(0,0,0,.35);border:1px solid rgba(201,162,39,.4);color:var(--brass-hi);min-height:16px;display:flex;align-items:center}
+.seat .bet.empty{opacity:0}
+
+.board{margin:4px 8px 0;padding:12px 8px 14px;border-radius:14px;position:relative;
+  background:linear-gradient(180deg,rgba(0,0,0,.3),rgba(0,0,0,.12));
+  border:1px solid rgba(201,162,39,.2);box-shadow:inset 0 1px 0 rgba(255,255,255,.05),0 8px 24px rgba(0,0,0,.34)}
+.badge{position:absolute;top:10px;right:10px;font-size:9px;letter-spacing:.16em;font-weight:900;color:var(--mat-lo);
+  background:linear-gradient(180deg,var(--brass-hi),var(--brass));padding:3px 7px;border-radius:3px}
+.dora{position:absolute;top:8px;left:10px;display:flex;align-items:center;gap:5px}
+.dora .eyebrow{font-size:8px}
+.pot{display:flex;align-items:baseline;justify-content:center;gap:8px;margin:6px 0 10px}
+.pot .val{font-family:"Shippori Mincho B1",serif;font-weight:800;font-size:24px;font-variant-numeric:tabular-nums;
+  color:var(--brass-hi);text-shadow:0 1px 0 var(--brass-lo),0 0 16px rgba(201,162,39,.26)}
+.commons{display:flex;flex-wrap:wrap;gap:3px;justify-content:center;min-height:46px;align-items:center}
+.hint{font-size:11px;color:var(--dim);text-align:center;padding:16px 8px;line-height:1.7}
+
+.zone{margin:10px 8px 0}
+.zonehead{display:flex;justify-content:space-between;align-items:baseline;padding:0 3px 6px}
+.zonehead .meta{font-size:10px;font-weight:900;color:var(--brass-hi);font-variant-numeric:tabular-nums}
+.zonehead .meta.warn{color:#E0836B}
+.row{display:flex;gap:3px;justify-content:center;flex-wrap:wrap}
+.rack{display:flex;gap:2px;justify-content:center;align-items:flex-end;
+  padding:9px 5px;border-radius:12px;background:linear-gradient(180deg,rgba(0,0,0,.34),rgba(0,0,0,.5));
+  border:1px solid rgba(201,162,39,.18);box-shadow:inset 0 2px 6px rgba(0,0,0,.5)}
+.slot{--w:calc((100vw - 64px)/14);width:var(--w);height:calc(var(--w)*1.36);max-width:27px;flex:0 0 auto;
+  border-radius:4px;border:1px dashed rgba(255,255,255,.16);background:rgba(255,255,255,.03)}
+.slot.win{border:1px dashed var(--brass);background:rgba(201,162,39,.1);margin-left:7px}
+
+.tile{--w:44px;width:var(--w);height:calc(var(--w)*1.36);border-radius:calc(var(--w)*.13);
+  background:linear-gradient(165deg,#FBF4E2 0%,#EFE3C6 46%,#DCCCA5 100%);
+  padding:calc(var(--w)*.065) calc(var(--w)*.06) calc(var(--w)*.12);
+  box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),
+    inset 0 1px 0 rgba(255,255,255,.95),inset -1px 0 0 rgba(0,0,0,.07);
+  flex:0 0 auto;position:relative;cursor:pointer}
+.tile .face{width:100%;height:100%;border-radius:calc(var(--w)*.08);
+  background:linear-gradient(180deg,#FEFDF8,#F4EEDF);
+  box-shadow:inset 0 1px 2px rgba(90,72,40,.28),inset 0 -1px 0 rgba(255,255,255,.8);
+  display:flex;align-items:center;justify-content:center;overflow:hidden}
+.tile.back{background:linear-gradient(165deg,#F6EFDC,#D9C9A2)}
+.tile.back .face{background:radial-gradient(120% 90% at 30% 18%,#34936A,#24714F 48%,#17563B);
+  box-shadow:inset 0 0 0 1px rgba(0,0,0,.28),inset 0 2px 5px rgba(0,0,0,.35);position:relative}
+.tile.back .face::after{content:"";position:absolute;inset:14%;border-radius:2px;border:1px solid rgba(255,255,255,.14);
+  background:repeating-linear-gradient(135deg,rgba(255,255,255,.05) 0 2px,transparent 2px 5px)}
+.tile.used{opacity:.2;pointer-events:none}
+.tile.doraMark{box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 2px var(--brass-hi),
+  0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.95)}
+.tile.sm{--w:21px;cursor:default}
+.tile.md{--w:30px}
+.tile.rk{--w:calc((100vw - 64px)/14);max-width:27px}
+.tile.deal{animation:deal .32s cubic-bezier(.2,.9,.3,1.4) both}
+@keyframes deal{from{opacity:0;transform:translate(22px,-12px) rotate(8deg) scale(.86)}to{opacity:1;transform:none}}
+.tile.pop{animation:pop .2s ease-out}
+@keyframes pop{from{transform:translateY(-5px) scale(1.06)}to{transform:none}}
+@media (prefers-reduced-motion:reduce){.tile.deal,.tile.pop{animation:none}}
+.tile svg{width:100%;height:100%;display:block}
+.glyph{font-family:"Shippori Mincho B1",serif;font-weight:800;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;line-height:.95;width:100%;height:100%}
+.glyph .n{font-size:calc(var(--w)*.44);color:var(--ink)}
+.glyph .m{font-size:calc(var(--w)*.40);color:var(--red);margin-top:calc(var(--w)*.06)}
+.glyph .solo{font-size:calc(var(--w)*.66)}
+
+.status{margin:8px 11px 0;font-size:11px;line-height:1.6;color:var(--dim);min-height:34px}
+.status b{color:var(--brass-hi);font-weight:900}
+.status .bluff{color:#E0836B;font-weight:900}
+.acts{display:flex;gap:6px;margin:10px 8px 0}
+button{flex:1;font-family:inherit;font-weight:900;font-size:12px;letter-spacing:.06em;padding:12px 0;border-radius:9px;
+  border:1px solid rgba(255,255,255,.14);background:linear-gradient(180deg,rgba(255,255,255,.1),rgba(0,0,0,.24));
+  color:var(--txt);cursor:pointer;transition:transform .08s}
+button:active{transform:translateY(1px)}
+button:disabled{opacity:.3;cursor:default}
+button.prime{background:linear-gradient(180deg,var(--brass-hi),var(--brass) 60%,var(--brass-lo));color:#1A1508;
+  border-color:rgba(0,0,0,.3);box-shadow:0 2px 0 rgba(0,0,0,.35)}
+button:focus-visible{outline:2px solid var(--brass-hi);outline-offset:2px}
+
+.sheet{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet.on{display:flex}
+.sheetin{width:100%;max-width:430px;background:linear-gradient(180deg,#20443B,#16302A);border-radius:16px 16px 0 0;
+  padding:16px 12px calc(18px + env(safe-area-inset-bottom));border-top:1px solid rgba(201,162,39,.3)}
+.grid{display:flex;flex-wrap:wrap;gap:4px;justify-content:center;margin-top:10px}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <div class="rail" id="rail"></div>
+
+  <div class="board">
+    <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
+    <div class="badge" id="street">PREFLOP</div>
+    <div class="pot"><span class="eyebrow">POT</span><span class="val" id="pot">0</span></div>
+    <div class="commons" id="commons"></div>
+  </div>
+
+  <div class="zone">
+    <div class="zonehead"><span class="eyebrow">手元の8枚（非公開）</span><span class="meta" id="pMeta">0 / 7</span></div>
+    <div class="row" id="myrow"></div>
+  </div>
+
+  <div class="zone">
+    <div class="zonehead"><span class="eyebrow">手牌 13 ＋ あがり牌</span><span class="meta" id="cMeta">共通 0 / 6</span></div>
+    <div class="rack" id="rack"></div>
+  </div>
+
+  <div class="status" id="status"></div>
+
+  <div class="acts">
+    <button id="bRec" class="prime">おすすめ</button>
+    <button id="bClear">クリア</button>
+    <button id="bNext">次へ</button>
+  </div>
+</div>
+
+<div class="sheet" id="sheet"><div class="sheetin">
+  <span class="eyebrow">あがり牌を選ぶ</span>
+  <div class="grid" id="grid"></div>
+</div></div>
+
+<script>
+const KANJI=["一","二","三","四","五","六","七","八","九"];
+const HONOR=["東","南","西","北","白","發","中"];
+
+function pinSVG(n){
+  const L={1:[[50,68,17]],2:[[50,44,11],[50,92,11]],3:[[27,38,10],[50,68,10],[73,98,10]],
+    4:[[32,44,11],[68,44,11],[32,92,11],[68,92,11]],
+    5:[[30,40,10],[70,40,10],[50,68,10],[30,96,10],[70,96,10]],
+    6:[[32,36,10],[68,36,10],[32,68,10],[68,68,10],[32,100,10],[68,100,10]],
+    7:[[26,30,9],[50,42,9],[74,54,9],[32,86,9],[68,86,9],[32,110,9],[68,110,9]],
+    8:[[34,26,9],[66,26,9],[34,52,9],[66,52,9],[34,84,9],[66,84,9],[34,110,9],[66,110,9]],
+    9:[[26,36,9.5],[50,36,9.5],[74,36,9.5],[26,68,9.5],[50,68,9.5],[74,68,9.5],[26,100,9.5],[50,100,9.5],[74,100,9.5]]}[n];
+  const C={b:"#1D5A96",g:"#1C7444",r:"#BE2B26"};
+  const col=i=>{ if(n===2)return i===0?"g":"b"; if(n===3)return i===1?"g":"b";
+    if(n===5)return i===2?"r":(i%2?"g":"b"); if(n===7)return i<3?"r":"g";
+    if(n===9)return i<3?"g":(i<6?"b":"r"); return "b"; };
+  let s='<svg viewBox="0 0 100 136">';
+  if(n===1){const a=L[0],x=a[0],y=a[1],r=a[2];
+    s+=`<circle cx="${x}" cy="${y}" r="${r+5}" fill="#F7F2E4" stroke="#1D5A96" stroke-width="3"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#BE2B26" stroke-width="4"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${r-6}" fill="#1D5A96"/>`;
+  } else L.forEach(function(a,i){const x=a[0],y=a[1],r=a[2];
+    s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${C[col(i)]}" stroke="rgba(0,0,0,.28)" stroke-width="1"/>`;
+    s+=`<circle cx="${x}" cy="${y}" r="${r*.42}" fill="#F7F2E4"/>`;});
+  return s+"</svg>";
+}
+function bamboo(x,y,h,c){const w=h*.30;return `<g>
+  <rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="${w*.42}" fill="${c}" stroke="rgba(0,0,0,.25)"/>
+  <rect x="${x-w*.62}" y="${y-h*.10}" width="${w*1.24}" height="${h*.19}" rx="1.5" fill="${c}" stroke="rgba(0,0,0,.25)"/>
+  <rect x="${x-w*.16}" y="${y-h*.40}" width="${w*.3}" height="${h*.24}" rx="1" fill="rgba(255,255,255,.55)"/></g>`;}
+function souSVG(n){
+  const G="#1C7444",R="#BE2B26";
+  if(n===1) return `<svg viewBox="0 0 100 136">
+    <path d="M50 20 C34 30 28 48 34 62 C24 70 22 88 32 100 C40 110 60 112 70 102 C80 92 78 74 66 66 C74 52 68 32 50 20 Z" fill="${G}" stroke="rgba(0,0,0,.25)"/>
+    <path d="M50 26 C40 36 38 50 44 60 C50 50 54 38 50 26 Z" fill="rgba(255,255,255,.42)"/>
+    <circle cx="43" cy="40" r="3.4" fill="#F7F2E4"/><path d="M34 44 L22 40 L33 36 Z" fill="${R}"/>
+    <path d="M56 96 C64 104 58 116 48 114" stroke="${R}" stroke-width="5" fill="none" stroke-linecap="round"/>
+    <path d="M40 112 L50 124 L62 112" stroke="${R}" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`;
+  const L={2:[[50,42,34,G],[50,94,34,G]],3:[[50,36,32,G],[32,96,32,G],[68,96,32,G]],
+    4:[[32,40,32,G],[68,40,32,G],[32,96,32,G],[68,96,32,G]],
+    5:[[30,36,30,G],[70,36,30,G],[50,68,30,R],[30,100,30,G],[70,100,30,G]],
+    6:[[30,34,28,G],[70,34,28,G],[30,68,28,G],[70,68,28,G],[30,102,28,G],[70,102,28,G]],
+    7:[[50,26,26,R],[30,62,26,G],[70,62,26,G],[30,92,26,G],[70,92,26,G],[30,120,24,G],[70,120,24,G]],
+    8:[[34,26,24,G],[66,26,24,G],[34,54,24,G],[66,54,24,G],[34,82,24,G],[66,82,24,G],[34,110,24,G],[66,110,24,G]],
+    9:[[26,34,28,R],[50,34,28,G],[74,34,28,R],[26,68,28,G],[50,68,28,G],[74,68,28,G],[26,102,28,R],[50,102,28,G],[74,102,28,R]]}[n];
+  let s='<svg viewBox="0 0 100 136">';
+  L.forEach(function(a){s+=bamboo(a[0],a[1],a[2],a[3]);});
+  return s+"</svg>";
+}
+function faceHTML(id){
+  if(id<9) return `<div class="glyph"><span class="n">${KANJI[id]}</span><span class="m">萬</span></div>`;
+  if(id<18) return pinSVG(id-8);
+  if(id<27) return souSVG(id-17);
+  const h=HONOR[id-27];
+  if(h==="白") return "";
+  const c=h==="中"?"var(--red)":h==="發"?"var(--green)":"var(--ink)";
+  return `<div class="glyph"><span class="solo" style="color:${c}">${h}</span></div>`;
+}
+function tile(id,cls){const d=document.createElement("div");d.className="tile "+(cls||"");
+  d.innerHTML=`<div class="face">${faceHTML(id)}</div>`;return d;}
+function backTile(cls){const d=document.createElement("div");d.className="tile back "+(cls||"");
+  d.innerHTML='<div class="face"></div>';return d;}
+
+/* ===== state ===== */
+const NEED_P=7, NEED_C=6;
+const NAMES=["トビハネ","九蓮","カムイ","ゼロ","刻"];
+const seats=NAMES.map(function(n){return {n:n,stack:25000,bet:0,folded:false};});
+let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
+let rackP=[],rackC=[],winTile=null;
+
+function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
+function doraOf(i){ if(i<27) return (i%9===8)? i-8 : i+1;
+  if(i<31) return (i===30)? 27 : i+1;  // 東南西北
+  return (i===33)? 31 : i+1; }         // 白發中
+function remove(arr,v){const i=arr.indexOf(v);if(i>=0)arr.splice(i,1);}
+function expand(c){const a=[];for(let t=0;t<34;t++)for(let k=0;k<c[t];k++)a.push(t);return a;}
+function label(id){ if(id<9)return KANJI[id]+"萬"; if(id<18)return (id-8)+"筒"; if(id<27)return (id-17)+"索"; return HONOR[id-27]; }
+
+function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i);
+  for(let i=wall.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
+
+function newHand(){
+  shuffle();stage=0;pot=1800;common=[];rackP=[];rackC=[];winTile=null;
+  my=wall.splice(0,8).sort(function(a,b){return a-b;});
+  doraInd=wall.splice(0,1)[0];
+  seats.forEach(function(s){s.folded=false;s.bet=300;});
+  render(true);
+}
+function nextStreet(){
+  if(stage===0){common=wall.splice(0,13);stage=1;pot+=2400;}
+  else if(stage<3){common=common.concat(wall.splice(0,4));stage++;pot+=3600*stage;}
+  else{newHand();return;}
+  seats.forEach(function(s){if(!s.folded&&Math.random()<.2)s.folded=true;s.bet=s.folded?0:[600,1200,2500][stage-1];});
+  rackP=[];rackC=[];winTile=null;
+  render();
+}
+
+/* ===== solver: 7私 + 6共通 + 宣言1 = 4面子+雀頭 ===== */
+function solve(){
+  const P=cnt(my), C=cnt(common), vis=cnt(my.concat(common));
+  const uP=new Array(34).fill(0), uC=new Array(34).fill(0);
+  let wt=-1, nodes=0; const out=[];
+  function rec(t0,melds,pair,pL,cL,fL){
+    if(++nodes>400000||out.length>=250) return;
+    if((4-melds)*3+(pair?0:2)!==pL+cL+fL) return;
+    if(melds===4&&pair){out.push({p:uP.slice(),c:uC.slice(),w:wt});return;}
+    for(let t=t0;t<34;t++){
+      if(melds<4) asg([t,t,t],0,t,melds+1,pair,pL,cL,fL);
+      if(!pair)   asg([t,t],  0,t,melds,  true, pL,cL,fL);
+      if(melds<4&&t<27&&t%9<=6) asg([t,t+1,t+2],0,t,melds+1,pair,pL,cL,fL);
+    }
+  }
+  function asg(ts,i,t0,m,pr,pL,cL,fL){
+    if(i===ts.length){rec(t0,m,pr,pL,cL,fL);return;}
+    const t=ts[i];
+    if(pL>0&&uP[t]<P[t]){uP[t]++;asg(ts,i+1,t0,m,pr,pL-1,cL,fL);uP[t]--;}
+    if(cL>0&&uC[t]<C[t]){uC[t]++;asg(ts,i+1,t0,m,pr,pL,cL-1,fL);uC[t]--;}
+    if(fL>0&&vis[t]<4){const o=wt;wt=t;asg(ts,i+1,t0,m,pr,pL,cL,fL-1);wt=o;}
+  }
+  rec(0,0,false,NEED_P,NEED_C,1);
+  if(!out.length) return null;
+  const dora=doraOf(doraInd);
+  let best=null,bs=-1e9;
+  out.forEach(function(s){
+    let d=0,simple=true;const suits={};
+    for(let t=0;t<34;t++){const n=s.p[t]+s.c[t]+(s.w===t?1:0);if(!n)continue;
+      if(t===dora)d+=n;
+      if(t>=27){simple=false;}else{suits[(t/9)|0]=1;if(t%9===0||t%9===8)simple=false;}}
+    const nsuit=Object.keys(suits).length;
+    const sc=d*6+(4-vis[s.w])*2+(simple?4:0)+(nsuit===1?6:0);
+    if(sc>bs){bs=sc;best=s;}
+  });
+  return best;
+}
+function bestPartial(){
+  const P=cnt(my), C=cnt(common), dora=doraOf(doraInd);
+  const uP=new Array(34).fill(0), uC=new Array(34).fill(0);
+  let pU=0,cU=0,nodes=0,bestKey=-1,best=null;
+
+  function grab(t){
+    if(uP[t]<P[t]&&pU<NEED_P){uP[t]++;pU++;return 1;}
+    if(uC[t]<C[t]&&cU<NEED_C){uC[t]++;cU++;return 2;}
+    return 0;
+  }
+  function ungrab(t,s){ if(s===1){uP[t]--;pU--;} else {uC[t]--;cU--;} }
+  function tryBlock(ts){
+    const src=[];
+    for(let i=0;i<ts.length;i++){const g=grab(ts[i]);
+      if(!g){for(let j=src.length-1;j>=0;j--)ungrab(ts[j],src[j]);return null;}
+      src.push(g);}
+    return src;
+  }
+  function drop(ts,src){for(let j=src.length-1;j>=0;j--)ungrab(ts[j],src[j]);}
+
+  function evaluate(melds,partials,pair){
+    let d=0; for(let t=0;t<34;t++) if(t===dora) d+=uP[t]+uC[t];
+    const key=(melds*2+partials+(pair?1:0))*1000 + melds*40 + d*12 + pU*2;
+    if(key>bestKey){bestKey=key;best={p:uP.slice(),c:uC.slice(),pU:pU,cU:cU};}
+  }
+  function rec(t,melds,partials,pair){
+    if(++nodes>250000) return;
+    evaluate(melds,partials,pair);
+    if(t>=34) return;
+    const blocksUsed=melds+partials;
+    if(blocksUsed<4){
+      let s1=tryBlock([t,t,t]);            if(s1){rec(t,melds+1,partials,pair);drop([t,t,t],s1);}
+      if(t<27&&t%9<=6){ let s2=tryBlock([t,t+1,t+2]); if(s2){rec(t,melds+1,partials,pair);drop([t,t+1,t+2],s2);} }
+    }
+    if(!pair){ let s3=tryBlock([t,t]); if(s3){rec(t,melds,partials,true);drop([t,t],s3);} }
+    else if(blocksUsed<4){ let s4=tryBlock([t,t]); if(s4){rec(t,melds,partials+1,pair);drop([t,t],s4);} }
+    if(blocksUsed<4&&t<27){
+      if(t%9<=7){ let s5=tryBlock([t,t+1]); if(s5){rec(t,melds,partials+1,pair);drop([t,t+1],s5);} }
+      if(t%9<=6){ let s6=tryBlock([t,t+2]); if(s6){rec(t,melds,partials+1,pair);drop([t,t+2],s6);} }
+    }
+    rec(t+1,melds,partials,pair);
+  }
+  rec(0,0,0,false);
+  if(!best) best={p:new Array(34).fill(0),c:new Array(34).fill(0),pU:0,cU:0};
+
+  // 余り枠を埋める: ドラ > 中張牌 > つながる牌 > 孤立字牌
+  const chosen=expand(best.p).concat(expand(best.c));
+  function fscore(t){
+    let v=(t===dora)?24:0;
+    if(t<27){ const r=t%9; v+= (r>=2&&r<=6)?6:(r===1||r===7)?4:2;
+      chosen.forEach(function(x){ if(x<27&&((x/9)|0)===((t/9)|0)){const dd=Math.abs(x-t); if(dd===0)v+=5; else if(dd<=2)v+=4-dd;} });
+    } else { v+=1; chosen.forEach(function(x){ if(x===t) v+=5; }); }
+    return v;
+  }
+  function fill(avail,used,budget,cur){
+    const cand=[];
+    for(let t=0;t<34;t++) for(let k=used[t];k<avail[t];k++) cand.push(t);
+    cand.sort(function(a,b){return fscore(b)-fscore(a);});
+    let n=budget-cur;
+    for(let i=0;i<cand.length&&n>0;i++){used[cand[i]]++;n--;}
+  }
+  fill(P,best.p,NEED_P,best.pU);
+  fill(C,best.c,NEED_C,best.cU);
+  return {p:best.p,c:best.c,w:null};
+}
+function recommend(){
+  const s=solve();
+  if(s){rackP=expand(s.p);rackC=expand(s.c);winTile=s.w;}
+  else{const g=bestPartial();rackP=expand(g.p);rackC=expand(g.c);winTile=null;}
+  render();
+}
+function clearRack(){rackP=[];rackC=[];winTile=null;render();}
+
+/* ===== render ===== */
+const STAGE=["PREFLOP","COMMON 13","+4 · 17","+4 · 21"];
+function render(fresh){
+  const dora=doraOf(doraInd);
+  document.getElementById("street").textContent=STAGE[stage];
+  document.getElementById("pot").textContent=pot.toLocaleString();
+  const ds=document.getElementById("doraSlot");ds.innerHTML="";ds.appendChild(tile(doraInd,"sm"));
+
+  const rail=document.getElementById("rail");rail.innerHTML="";
+  seats.forEach(function(s){
+    const el=document.createElement("div");el.className="seat"+(s.folded?" folded":"");
+    el.innerHTML='<div class="who">'+s.n+'</div>';
+    const b=document.createElement("div");b.className="backs";
+    for(let i=0;i<3;i++)b.appendChild(backTile("sm"));el.appendChild(b);
+    const bet=document.createElement("div");bet.className="bet"+(s.bet?"":" empty");
+    bet.textContent=s.bet?s.bet.toLocaleString():"·";el.appendChild(bet);rail.appendChild(el);});
+
+  const c=document.getElementById("commons");c.innerHTML="";
+  if(stage===0){c.innerHTML='<div class="hint">共通牌はまだ伏せられています。<br>手元の8枚だけで参加を決めてください。</div>';}
+  else{
+    const left=rackC.slice();
+    common.forEach(function(id,i){
+      const isUsed=left.indexOf(id)>=0; if(isUsed)remove(left,id);
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(i>=common.length-(stage===1?13:4)?" deal":"");
+      const t=tile(id,cls);
+      t.onclick=function(){if(rackC.length>=NEED_C)rackC.shift();rackC.push(id);render();};
+      c.appendChild(t);});
+  }
+
+  const mr=document.getElementById("myrow");mr.innerHTML="";
+  const leftP=rackP.slice();
+  my.forEach(function(id){
+    const isUsed=leftP.indexOf(id)>=0;if(isUsed)remove(leftP,id);
+    const t=tile(id,(fresh?"deal ":"")+(isUsed?"used":"")+(id===dora?" doraMark":""));
+    t.onclick=function(){if(rackP.length>=NEED_P)rackP.shift();rackP.push(id);render();};
+    mr.appendChild(t);});
+  const pm=document.getElementById("pMeta");pm.textContent=rackP.length+" / "+NEED_P;
+  pm.className="meta"+(rackP.length===NEED_P?"":" warn");
+  const cm=document.getElementById("cMeta");cm.textContent="共通 "+rackC.length+" / "+NEED_C;
+  cm.className="meta"+(rackC.length===NEED_C?"":" warn");
+
+  const rk=document.getElementById("rack");rk.innerHTML="";
+  const hand=rackP.concat(rackC).sort(function(a,b){return a-b;});
+  for(let i=0;i<13;i++){
+    if(i<hand.length){
+      const id=hand[i];const t=tile(id,"rk pop"+(id===dora?" doraMark":""));
+      t.onclick=function(){ if(rackP.indexOf(id)>=0) remove(rackP,id); else remove(rackC,id); render(); };
+      rk.appendChild(t);
+    } else { const d=document.createElement("div");d.className="slot";rk.appendChild(d); }
+  }
+  if(winTile!==null){
+    const t=tile(winTile,"rk"+(winTile===dora?" doraMark":""));
+    t.style.marginLeft="7px";t.onclick=openPicker;rk.appendChild(t);
+  } else { const d=document.createElement("div");d.className="slot win";d.onclick=openPicker;rk.appendChild(d); }
+
+  const st=document.getElementById("status");
+  if(stage===0){st.innerHTML="共通牌が開くまで手牌は組めません。";}
+  else if(hand.length<13){st.innerHTML='共通牌・手元の牌をタップして入れ、手牌をタップで戻す。枠が埋まっていれば古い牌と入れ替わります。';}
+  else if(winTile===null){st.innerHTML='13枚そろいました。あがり牌が未定なので<span class="bluff">ブラフ状態</span>のまま勝負します。';}
+  else{const vis=cnt(my.concat(common));
+    st.innerHTML='あがり牌は<b>'+label(winTile)+'</b>。まだ見えていない残りは<b>'+(4-vis[winTile])+'枚</b>。待ちは非公開のまま進みます。';}
+
+  const bn=document.getElementById("bNext");
+  bn.textContent=stage===0?"参加する":stage<3?"次を4枚めくる":"配り直す";
+  document.getElementById("bRec").disabled=(stage===0);
+  document.getElementById("bClear").disabled=(stage===0);
+}
+
+const sheet=document.getElementById("sheet");
+function openPicker(){
+  if(stage===0)return;
+  const g=document.getElementById("grid");g.innerHTML="";
+  const vis=cnt(my.concat(common));
+  for(let id=0;id<34;id++){
+    const t=tile(id,"md"+(vis[id]>=4?" used":""));
+    t.onclick=function(){winTile=id;sheet.classList.remove("on");render();};
+    g.appendChild(t);
+  }
+  sheet.classList.add("on");
+}
+sheet.onclick=function(e){if(e.target===sheet)sheet.classList.remove("on");};
+
+document.getElementById("bRec").onclick=recommend;
+document.getElementById("bClear").onclick=clearRack;
+document.getElementById("bNext").onclick=nextStreet;
+newHand();
+</script>
+</body>
+</html>
