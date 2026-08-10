@@ -63,16 +63,33 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
   border-radius:4px;border:1px dashed rgba(255,255,255,.16);background:rgba(255,255,255,.03)}
 .slot.win{border:1px dashed var(--brass);background:rgba(201,162,39,.1);margin-left:7px}
 
-.tile{--w:44px;--ar:1.36;width:var(--w);height:calc(var(--w)*var(--ar));border-radius:calc(var(--w)*.13);
-  background:linear-gradient(165deg,#FBF4E2 0%,#EFE3C6 46%,#DCCCA5 100%);
-  padding:calc(var(--w)*.065) calc(var(--w)*.06) calc(var(--w)*.12);
-  box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 calc(var(--w)*.09) calc(var(--w)*.2) rgba(0,0,0,.5),
-    inset 0 1px 0 rgba(255,255,255,.95),inset -1px 0 0 rgba(0,0,0,.07);
+/* 象牙のカラーランプは art/art-bible.md の実測値（golden-target.webp / sample-9pin.png より）。
+   単純な2段グラデではなく、上端の鏡面リム・湾曲した反射・階調のある下端の面取りで構成する。 */
+:root{
+  --iv-rim:#FFFDF1;    --iv-hi:#FDE6D7;   --iv-lit:#F2E3D7;
+  --iv-base:#E1D1C2;   --iv-mid:#DDCFBF;  --iv-shade:#CCC3B3;
+  --iv-bevel1:#735F4D; --iv-bevel2:#594D41; --iv-bevel3:#1A1410;
+}
+.tile{--w:44px;--ar:1.36;width:var(--w);height:calc(var(--w)*var(--ar));border-radius:calc(var(--w)*.062);
+  background:
+    /* 下端11%の面取り。階調をつけて牌の厚みを出す */
+    linear-gradient(180deg,transparent 0 88.6%,#C0AE9A 89.2%,#9C8B79 91%,#7E7060 93%,
+      #6A5D50 95%,#5E5246 97%,#3A322A 98.6%,#1E1A16 100%),
+    /* 面の湾曲。透過の陰影なので本体の明度を落とさない。幅の12%と82%に弱い鏡面 */
+    linear-gradient(90deg,rgba(96,78,48,.28) 0,rgba(255,255,255,.07) 12%,rgba(255,255,255,0) 46%,
+      rgba(255,255,255,.08) 82%,rgba(96,78,48,.10) 96%,rgba(96,78,48,.32) 100%),
+    /* 縦方向。上端の鏡面リムと中央の明部。輝度は sample-9pin.png の実測に合わせてある */
+    linear-gradient(180deg,#FFFDF1 0 1.6%,#E1D1C2 7%,#EDDFCF 48%,#E1D1C2 85%,#D6C6B6 100%);
+  padding:calc(var(--w)*.055) calc(var(--w)*.06) calc(var(--w)*.135);
+  box-shadow:0 calc(var(--w)*.055) calc(var(--w)*.09) rgba(0,0,0,.42),
+    inset 0 1px 0 rgba(255,255,255,.85),inset -1px 0 0 rgba(90,72,40,.10),inset 1px 0 0 rgba(255,255,255,.35);
   flex:0 0 auto;position:relative;cursor:pointer;
   touch-action:manipulation;user-select:none;-webkit-user-select:none;-webkit-user-drag:none}
-.tile .face{width:100%;height:100%;border-radius:calc(var(--w)*.08);
-  background:linear-gradient(180deg,#FEFDF8,#F4EEDF);
-  box-shadow:inset 0 1px 2px rgba(90,72,40,.28),inset 0 -1px 0 rgba(255,255,255,.8);
+/* 面パネルが牌の可視面の大半を占めるので、実測の本体輝度205-224はここで出す。 */
+.tile .face{width:100%;height:100%;border-radius:calc(var(--w)*.045);
+  background:linear-gradient(180deg,#EFE1D1 0%,#EDDFCF 46%,#E3D3C4 100%);
+  box-shadow:inset 0 1px 2px rgba(90,72,40,.34),inset 0 -1px 0 rgba(255,255,255,.55),
+    inset 0 0 0 1px rgba(120,98,62,.07);
   display:flex;align-items:center;justify-content:center;overflow:hidden}
 .tile.back{background:linear-gradient(165deg,#F6EFDC,#D9C9A2)}
 .tile.back .face{background:radial-gradient(120% 90% at 30% 18%,#34936A,#24714F 48%,#17563B);
@@ -367,6 +384,45 @@ body::before,body::after{display:none}
   background:radial-gradient(circle,#16406e 0 52%,#061a2c 54%);color:#fff0b7}
 body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
 
+/* ===== スプライトのスロット =====
+   assets/ui/ に素材が置かれると JS が html にクラスを立て、ここが CSS の描画を置き換える。
+   素材が無い間は上の実測値ベースのCSSがそのまま使われる。仕様は ASSET_BRIEF.md。 */
+html.has-tile-body-flat .commons .tile:not(.back),
+html.has-tile-body-flat .sourceZone .tile:not(.back),
+html.has-tile-body-flat .revealGroup .tile:not(.back),
+html.has-tile-body-flat .seat .tile:not(.back),
+html.has-tile-body-flat .meSeat .tile:not(.back){
+  background:url("./assets/ui/tile-body-flat.png") center/100% 100% no-repeat;
+  box-shadow:none}
+html.has-tile-body-upright .tile.rk{
+  background:url("./assets/ui/tile-body-upright.png") center/100% 100% no-repeat;
+  box-shadow:none}
+html.has-tile-body-flat .tile:not(.back) .face,
+html.has-tile-body-upright .tile.rk .face{background:none;box-shadow:none}
+html.has-tile-back-flat .tile.back{
+  background:url("./assets/ui/tile-back-flat.png") center/100% 100% no-repeat;box-shadow:none}
+html.has-tile-back-flat .tile.back .face{background:none;box-shadow:none}
+html.has-tile-back-flat .tile.back .face::after{display:none}
+html.has-frame-gold-plate .pot{
+  border:0;background:url("./assets/ui/frame-gold-plate.png") center/100% 100% no-repeat;box-shadow:none}
+html.has-frame-gold-ribbon .goldLabel{
+  border:0;background:url("./assets/ui/frame-gold-ribbon.png") center/100% 100% no-repeat;box-shadow:none}
+html.has-frame-gold-ribbon .goldLabel::before,
+html.has-frame-gold-ribbon .goldLabel::after{display:none}
+html.has-frame-seat-plate .seat .bet,
+html.has-frame-seat-plate .meSeat .stack{
+  border:0;background:url("./assets/ui/frame-seat-plate.png") center/100% 100% no-repeat;box-shadow:none}
+html.has-frame-group .revealGroup{
+  border:0;background:url("./assets/ui/frame-group.png") center/100% 100% no-repeat;box-shadow:none}
+html.has-btn-fold .betBar .fold,
+html.has-btn-call .betBar .call,
+html.has-btn-raise .betBar .raise,
+html.has-dial .betBar .dial{border:0;box-shadow:none;background-repeat:no-repeat;background-size:100% 100%;background-position:center}
+html.has-btn-fold .betBar .fold{background-image:url("./assets/ui/btn-fold.png")}
+html.has-btn-call .betBar .call{background-image:url("./assets/ui/btn-call.png")}
+html.has-btn-raise .betBar .raise{background-image:url("./assets/ui/btn-raise.png")}
+html.has-dial .betBar .dial{background-image:url("./assets/ui/dial.png")}
+
 /* --- dev-only calibration overlay: ?calib puts the Golden Visual on top --- */
 #calib{display:none;position:absolute;inset:0;z-index:99;pointer-events:none;opacity:.45;
   background:url("./claude-handoff/visual/golden-target.webp") center/100% 100% no-repeat}
@@ -432,6 +488,16 @@ html.calib #calib{display:block}
 </div>
 
 <script>
+/* assets/ui/ に素材が置かれていれば html にクラスを立て、CSSのスプライト版へ切り替える。
+   1点ずつ納品されても壊れないよう、存在するものだけを個別に有効化する。
+   一覧は assets/ui/MANIFEST.json、仕様は ASSET_BRIEF.md。 */
+["tile-body-flat","tile-body-upright","tile-back-flat","frame-gold-plate","frame-gold-ribbon",
+ "frame-seat-plate","frame-group","btn-fold","btn-call","btn-raise","dial"].forEach(function(id){
+  const probe=new Image();
+  probe.onload=function(){if(probe.naturalWidth>1)document.documentElement.classList.add("has-"+id);};
+  probe.src="./assets/ui/"+id+".png";
+});
+
 const KANJI=["一","二","三","四","五","六","七","八","九"];
 const HONOR=["東","南","西","北","白","發","中"];
 
