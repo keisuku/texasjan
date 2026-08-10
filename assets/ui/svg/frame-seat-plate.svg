@@ -1,13 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48">
   <defs>
     <linearGradient id="outer" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#80623B"/><stop offset=".55" stop-color="#26180D"/><stop offset="1" stop-color="#0B0603"/></linearGradient>
-    <linearGradient id="brightBevel" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#F0D69A"/><stop offset=".35" stop-color="#9B7443"/><stop offset="1" stop-color="#3B200B"/></linearGradient>
+    <linearGradient id="brightBevel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFFEA"/><stop offset=".10" stop-color="#7C451B"/><stop offset=".20" stop-color="#EFC18B"/><stop offset=".32" stop-color="#5E2B09"/><stop offset=".45" stop-color="#C88C4F"/><stop offset=".58" stop-color="#472005"/><stop offset=".72" stop-color="#A06B3A"/><stop offset=".86" stop-color="#623011"/><stop offset="1" stop-color="#251004"/></linearGradient>
     <linearGradient id="valley" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4A2A11"/><stop offset=".45" stop-color="#110700"/><stop offset="1" stop-color="#030100"/></linearGradient>
     <linearGradient id="rise" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#E5C07B"/><stop offset=".4" stop-color="#75502A"/><stop offset="1" stop-color="#211006"/></linearGradient>
     <linearGradient id="innerLine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#F7E4A8"/><stop offset=".45" stop-color="#A47A45"/><stop offset="1" stop-color="#3D210B"/></linearGradient>
     <linearGradient id="seatFace" x1="0" y1="0" x2=".75" y2="1"><stop stop-color="#123C2A"/><stop offset=".32" stop-color="#092016"/><stop offset="1" stop-color="#03100B"/></linearGradient>
     <linearGradient id="seatGloss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#B5E0C7" stop-opacity=".2"/><stop offset=".4" stop-color="#6CAC8C" stop-opacity=".04"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient>
     <linearGradient id="pressed" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset=".4" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#D8F1C8" stop-opacity=".16"/></linearGradient>
+    <linearGradient id="innerGlow" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#E8FFD9"/><stop offset=".36" stop-color="#86B998"/><stop offset=".74" stop-color="#16442E"/><stop offset="1" stop-color="#061A11"/></linearGradient>
+    <radialGradient id="vignette" cx="47%" cy="40%" r="74%"><stop stop-color="#AEE2C5" stop-opacity=".13"/><stop offset=".5" stop-color="#AEE2C5" stop-opacity="0"/><stop offset=".8" stop-color="#000" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></radialGradient>
     <clipPath id="faceClip"><rect x="5" y="5" width="150" height="38" rx="10"/></clipPath>
   </defs>
   <g id="rim">
@@ -16,8 +18,17 @@
     <rect x="2" y="2" width="156" height="44" rx="13" fill="url(#valley)"/>
     <rect x="3" y="3" width="154" height="42" rx="12" fill="url(#rise)"/>
     <rect x="4" y="4" width="152" height="40" rx="11" fill="url(#innerLine)"/>
+    <rect x="42" y="1" width="76" height="1" fill="#FFFFE8" fill-opacity=".88"/>
+    <rect x="36" y="2" width="88" height="1" fill="#351305" fill-opacity=".94"/>
+    <rect x="31" y="3" width="98" height="1" fill="#E8B777" fill-opacity=".82"/>
+    <rect x="27" y="4" width="106" height="1" fill="#3D1705" fill-opacity=".9"/>
   </g>
   <g id="face"><rect x="5" y="5" width="150" height="38" rx="10" fill="url(#seatFace)"/></g>
-  <g id="gloss" clip-path="url(#faceClip)"><path d="M6 6H154V17C111 10 52 11 6 23Z" fill="url(#seatGloss)"/></g>
+  <g id="gloss" clip-path="url(#faceClip)">
+    <path d="M6 6H154V17C111 10 52 11 6 23Z" fill="url(#seatGloss)"/>
+    <rect x="5" y="5" width="150" height="38" fill="url(#vignette)"/>
+    <rect x="6" y="6" width="148" height="36" rx="9" fill="none" stroke="url(#innerGlow)" stroke-width="1.5"/>
+    <path d="M16 8C53 4 106 5 143 9" fill="none" stroke="#FFF7D7" stroke-opacity=".86" stroke-width="1.8" stroke-linecap="round"/>
+  </g>
   <g id="press" opacity="0" clip-path="url(#faceClip)"><rect x="5" y="5" width="150" height="38" fill="url(#pressed)"/></g>
 </svg>

@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 56">
   <defs>
     <linearGradient id="outer" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8A7047"/><stop offset=".52" stop-color="#26180D"/><stop offset="1" stop-color="#080402"/></linearGradient>
-    <linearGradient id="brightBevel" x1="0" y1="0" x2=".78" y2="1"><stop stop-color="#FFFFD8"/><stop offset=".24" stop-color="#DDB480"/><stop offset=".58" stop-color="#8E5B2E"/><stop offset="1" stop-color="#351707"/></linearGradient>
+    <linearGradient id="brightBevel" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFFFEA"/><stop offset=".10" stop-color="#7C451B"/><stop offset=".20" stop-color="#EFC18B"/><stop offset=".32" stop-color="#5E2B09"/><stop offset=".45" stop-color="#C88C4F"/><stop offset=".58" stop-color="#472005"/><stop offset=".72" stop-color="#A06B3A"/><stop offset=".86" stop-color="#623011"/><stop offset="1" stop-color="#251004"/></linearGradient>
     <linearGradient id="valley" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4B2A11"/><stop offset=".42" stop-color="#120600"/><stop offset="1" stop-color="#030100"/></linearGradient>
     <linearGradient id="rise" x1="0" y1="0" x2=".78" y2="1"><stop stop-color="#F2CB8D"/><stop offset=".4" stop-color="#8D6034"/><stop offset="1" stop-color="#271106"/></linearGradient>
     <linearGradient id="innerLine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF0AF"/><stop offset=".42" stop-color="#C09258"/><stop offset="1" stop-color="#4F2B11"/></linearGradient>
@@ -9,6 +9,8 @@
     <linearGradient id="ribbonGloss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#CBE8D3" stop-opacity=".2"/><stop offset=".38" stop-color="#75AE90" stop-opacity=".04"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient>
     <linearGradient id="pressed" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".56"/><stop offset=".38" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#E6D39C" stop-opacity=".15"/></linearGradient>
     <linearGradient id="jewel" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#FFF8C8"/><stop offset=".3" stop-color="#D6A85E"/><stop offset=".68" stop-color="#765019"/><stop offset="1" stop-color="#F5CF83"/></linearGradient>
+    <linearGradient id="innerGlow" x1="0" y1="0" x2=".85" y2="1"><stop stop-color="#EFFFF2"/><stop offset=".34" stop-color="#84BCA0"/><stop offset=".72" stop-color="#174B3B"/><stop offset="1" stop-color="#061A13"/></linearGradient>
+    <radialGradient id="vignette" cx="47%" cy="40%" r="74%"><stop stop-color="#AEE3CA" stop-opacity=".13"/><stop offset=".5" stop-color="#AEE3CA" stop-opacity="0"/><stop offset=".8" stop-color="#000" stop-opacity=".12"/><stop offset="1" stop-color="#000" stop-opacity=".36"/></radialGradient>
     <clipPath id="faceClip"><rect x="6" y="6" width="308" height="44" rx="13"/></clipPath>
   </defs>
   <g id="rim">
@@ -17,10 +19,18 @@
     <rect x="3" y="3" width="314" height="50" rx="16" fill="url(#valley)"/>
     <rect x="4" y="4" width="312" height="48" rx="15" fill="url(#rise)"/>
     <rect x="5" y="5" width="310" height="46" rx="14" fill="url(#innerLine)"/>
+    <rect x="88" y="1" width="144" height="1" fill="#FFFFEA" fill-opacity=".9"/>
+    <rect x="78" y="2" width="164" height="1" fill="#361405" fill-opacity=".94"/>
+    <rect x="70" y="3" width="180" height="1" fill="#E9B87A" fill-opacity=".82"/>
+    <rect x="64" y="4" width="192" height="1" fill="#3D1705" fill-opacity=".9"/>
+    <rect x="58" y="5" width="204" height="1" fill="#F4CC91" fill-opacity=".76"/>
   </g>
   <g id="face"><rect x="6" y="6" width="308" height="44" rx="13" fill="url(#ribbonFace)"/></g>
   <g id="gloss" clip-path="url(#faceClip)">
     <path d="M7 7H313V19C224 11 96 12 7 27Z" fill="url(#ribbonGloss)"/>
+    <rect x="6" y="6" width="308" height="44" fill="url(#vignette)"/>
+    <rect x="7" y="7" width="306" height="42" rx="12" fill="none" stroke="url(#innerGlow)" stroke-width="1.6"/>
+    <path d="M48 8C105 3 220 4 272 9" fill="none" stroke="#FFF8D6" stroke-opacity=".9" stroke-width="1.9" stroke-linecap="round"/>
     <g fill="none" stroke="url(#jewel)" stroke-linejoin="round">
       <path d="M20 14 34 28 20 42 6 28Z" stroke-width="2.2"/><path d="M20 19 29 28 20 37 11 28Z" stroke-width="1"/>
       <path d="m300 14 14 14-14 14-14-14Z" stroke-width="2.2"/><path d="m300 19 9 9-9 9-9-9Z" stroke-width="1"/>
