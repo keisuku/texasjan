@@ -3,7 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<script>if(new URLSearchParams(location.search).has("calib"))document.documentElement.classList.add("calib");</script>
+<script>{const q=new URLSearchParams(location.search);const r=document.documentElement;
+if(q.has("calib"))r.classList.add("calib");
+if(q.has("still"))r.classList.add("still");}</script>
 <title>MAHJONG HOLD'EM</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -397,6 +399,16 @@ body::before,body::after{display:none}
   background:radial-gradient(circle,#16406e 0 52%,#061a2c 54%);color:#fff0b7}
 body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
 
+/* 配牌の飛翔。走らなくても最終位置に見えるよう、起点はCSS変数で与える */
+@keyframes dealIn{
+  from{transform:translate(var(--dx,0),var(--dy,0)) scale(.72) rotate(5deg);opacity:0}
+  to{transform:none;opacity:1}
+}
+.tile.dealIn{animation:dealIn .3s cubic-bezier(.2,.85,.3,1.05) backwards;animation-delay:var(--dd,0ms)}
+@media(prefers-reduced-motion:reduce){.tile.dealIn{animation:none}}
+/* ?still=1 で全ての動きを止める。視覚回帰のスクリーンショットを決定的にするため */
+html.still *,html.still *::before,html.still *::after{animation:none!important;transition:none!important}
+
 /* ===== 文字を「絵」にする =====
    Golden Visual の FOLD を横断すると 43→23→72→207→217→182→244→156→22 で、
    字の両側に暗い輪郭があり内部にも階調がある。ブラウザ既定のベタ塗りとの差がここ。
@@ -496,13 +508,13 @@ html.calib #calib{display:block}
     <div class="meSeat" id="meSeat">
       <div class="you gold-text">YOU</div>
       <div class="backs" id="myBacks"></div>
-      <div class="stack">5,870</div>
+      <div class="stack gold-text" data-num="me">5,870</div>
     </div>
     <div class="board">
       <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
       <div class="badge" id="street">PREFLOP</div>
       <button id="bNext" class="streetNext">参加する</button>
-      <div class="pot"><span class="eyebrow">POT</span><span class="val plate-num" id="pot">0</span></div>
+      <div class="pot"><span class="eyebrow">POT</span><span class="val plate-num" id="pot" data-num="pot">0</span></div>
       <div class="goldLabel labelCommon">COMMON 15</div>
       <div class="commons" id="commons"></div>
       <div class="revealRail" id="revealRail"></div>
@@ -804,7 +816,11 @@ function togglePick(src,index,id){
 }
 function removePick(seq){
   const at=picks.findIndex(function(x){return x.seq===seq;});
-  if(at>=0)picks.splice(at,1);
+  if(at>=0){
+    const p=picks[at];
+    pendingReturn={from:"r:"+seq,to:p.src+":"+p.index};
+    picks.splice(at,1);
+  }
   notice="";
   render();
 }
@@ -967,7 +983,163 @@ function isComplete14(ids){
 
 /* ===== render ===== */
 const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23","+4 III · 27"];
+
+/* ===== 動き =====
+   render() は毎回 innerHTML="" でDOMを作り直すので CSS transition が効かない。
+   FLIP法（旧位置を記録 → 再構築 → 差分を transform で打ち消してから解除）で動かす。
+   Web Animations API を使い、インラインスタイルを残さない。
+   DOMの構造と最終位置は render 直後に確定しているので、
+   クリック直後に状態を読むテストには影響しない。 */
+const REDUCED=window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+let pendingReturn=null;   /* 最終手牌から外した牌を、元牌の位置へ戻すための記録 */
+
+function captureTiles(){
+  const m=new Map();
+  document.querySelectorAll("#app .tile[data-k]").forEach(function(el){
+    m.set(el.dataset.k,el.getBoundingClientRect());
+  });
+  return m;
+}
+function captureNums(){
+  const m=new Map();
+  document.querySelectorAll("#app [data-num]").forEach(function(el){
+    m.set(el.dataset.num,parseInt(el.textContent.replace(/[^0-9-]/g,""),10)||0);
+  });
+  return m;
+}
+function countUp(el,from,to,ms){
+  if(REDUCED||from===to){return;}
+  const t0=performance.now();
+  (function step(t){
+    const p=Math.min(1,(t-t0)/ms), e=1-Math.pow(1-p,3);
+    el.textContent=Math.round(from+(to-from)*e).toLocaleString();
+    if(p<1)requestAnimationFrame(step);
+  })(t0);
+}
+function flyGhost(src,from,to,ms,easing){
+  const g=src.cloneNode(true);
+  g.classList.remove("used");
+  g.style.cssText="position:fixed;left:0;top:0;margin:0;z-index:60;pointer-events:none";
+  g.style.setProperty("--w",from.width+"px");
+  g.style.width=from.width+"px";g.style.height=from.height+"px";
+  document.body.appendChild(g);
+  const a=g.animate([
+    {transform:"translate("+from.left+"px,"+from.top+"px)"},
+    {transform:"translate("+to.left+"px,"+to.top+"px) scale("+(to.width/from.width)+","+(to.height/from.height)+")"}
+  ],{duration:ms,easing:easing||"cubic-bezier(.3,.75,.3,1)"});
+  disposeAfter(g,a,ms);
+}
+function flyChip(from,to,delay,spread){
+  const c=document.createElement("img");
+  c.src="./assets/ui/chip-single.png";c.alt="";c.className="chipFly";
+  const sz=Math.max(14,Math.min(30,from.width*.28))|0;
+  c.style.cssText="position:fixed;left:0;top:0;width:"+sz+"px;height:"+sz+"px;z-index:55;pointer-events:none";
+  document.body.appendChild(c);
+  const jx=(Math.random()-.5)*(spread||0), jy=(Math.random()-.5)*(spread||0);
+  const x0=from.left+from.width/2-sz/2, y0=from.top+from.height/2-sz/2;
+  const x1=to.left+to.width/2-sz/2+jx, y1=to.top+to.height/2-sz/2+jy;
+  const a=c.animate([
+    {transform:"translate("+x0+"px,"+y0+"px) scale(.6)",opacity:0},
+    {transform:"translate("+((x0+x1)/2)+"px,"+((y0+y1)/2-38)+"px) scale(1)",opacity:1,offset:.5},
+    {transform:"translate("+x1+"px,"+y1+"px) scale(.85)",opacity:1}
+  ],{duration:520,delay:delay||0,easing:"cubic-bezier(.3,.6,.35,1)",fill:"backwards"});
+  disposeAfter(c,a,520+(delay||0));
+}
+/* アニメーションの完了に依存せず一時要素を必ず消す。
+   タブが背面に回る等でアニメが進まないと onfinish は永久に来ない。 */
+function disposeAfter(el,anim,ms){
+  let done=false;
+  const kill=function(){if(done)return;done=true;el.remove();};
+  anim.onfinish=kill;anim.oncancel=kill;
+  setTimeout(kill,ms+400);
+}
+function seatRect(i){
+  const el=document.querySelectorAll("#rail .seat")[i];
+  return el?el.getBoundingClientRect():null;
+}
+function playFlip(prev,prevNums,dealing){
+  if(!REDUCED){
+    document.querySelectorAll("#app .tile[data-k]").forEach(function(el){
+      const k=el.dataset.k;
+      let from=prev.get(k);
+      if(!from&&k.charAt(0)==="r"){
+        /* 最終手牌に新しく現れた牌は、元牌の旧位置から飛ばす */
+        const seq=+k.slice(2);
+        for(let i=0;i<picks.length;i++)if(picks[i].seq===seq){from=prev.get(picks[i].src+":"+picks[i].index);break;}
+      }
+      if(!from){
+        /* 配牌: 旧位置が無い牌は卓の奥（POT下）から順に飛んでくる。
+           CSSアニメーションで行う。WAAPIの fill:backwards に可視性を委ねると、
+           アニメが走らない環境（描画が止まっている等）で牌が消えたままになる。 */
+        if(!dealing||k.charAt(0)==="r")return;
+        const pot=document.querySelector("#app .pot");
+        if(!pot)return;
+        const p=pot.getBoundingClientRect(), t=el.getBoundingClientRect();
+        /* 卓の奥へ向かう方向だけを borrowed し、距離は控えめにする。
+           大きく飛ばすと1フレーム落ちただけで牌が明後日の位置に見える */
+        const vx=p.left+p.width/2-t.left-t.width/2, vy=p.bottom-t.top;
+        const len=Math.hypot(vx,vy)||1, reach=Math.min(len,58);
+        el.style.setProperty("--dx",(vx/len*reach).toFixed(1)+"px");
+        el.style.setProperty("--dy",(vy/len*reach).toFixed(1)+"px");
+        el.style.setProperty("--dd",((dealSeq++)*14)+"ms");
+        el.classList.add("dealIn");
+        return;
+      }
+      const to=el.getBoundingClientRect();
+      const dx=from.left-to.left, dy=from.top-to.top;
+      const sx=from.width/to.width, sy=from.height/to.height;
+      if(Math.abs(dx)<.5&&Math.abs(dy)<.5&&Math.abs(sx-1)<.01&&Math.abs(sy-1)<.01)return;
+      el.animate([
+        {transform:"translate("+dx+"px,"+dy+"px) scale("+sx+","+sy+")"},
+        {transform:"none"}
+      ],{duration:250,easing:"cubic-bezier(.22,.85,.3,1)"});
+    });
+    /* 外した牌は、元牌の位置へゴーストを飛ばす */
+    if(pendingReturn){
+      const from=prev.get(pendingReturn.from);
+      const target=document.querySelector('#app .tile[data-k="'+pendingReturn.to+'"]');
+      if(from&&target)flyGhost(target,from,target.getBoundingClientRect(),230);
+    }
+  }
+  pendingReturn=null;
+  /* 数字はカウントアップ。増減の向きからチップの流れも決まる */
+  const now={};
+  document.querySelectorAll("#app [data-num]").forEach(function(el){
+    const key=el.dataset.num, was=prevNums.get(key);
+    const v=parseInt(el.textContent.replace(/[^0-9-]/g,""),10)||0;
+    now[key]=v;
+    if(was!==undefined&&was!==v)countUp(el,was,v,420);
+  });
+  if(REDUCED)return;
+  const potEl=document.querySelector("#app .pot"), meEl=document.querySelector("#app .meSeat");
+  if(!potEl)return;
+  const potR=potEl.getBoundingClientRect();
+  const potWas=prevNums.get("pot"), potNow=now.pot;
+  if(potWas===undefined||potNow===undefined||potWas===potNow)return;
+  const collecting=potNow>potWas;
+  let d=0;
+  for(let i=0;i<5;i++){
+    const was=prevNums.get("seat"+i), v=now["seat"+i];
+    if(was===undefined||v===undefined||was===v)continue;
+    const r=seatRect(i); if(!r)continue;
+    if(collecting&&v<was){flyChip(r,potR,d,0);d+=55;}
+    else if(!collecting&&v>was){for(let n=0;n<3;n++){flyChip(potR,r,d,26);d+=45;}}
+  }
+  const meWas=prevNums.get("me"), meNow=now.me;
+  if(meEl&&meWas!==undefined&&meNow!==undefined&&meWas!==meNow){
+    const r=meEl.getBoundingClientRect();
+    if(collecting&&meNow<meWas)flyChip(r,potR,d,0);
+    else if(!collecting&&meNow>meWas)for(let n=0;n<3;n++)flyChip(potR,r,d+n*45,26);
+  }
+}
+let dealSeq=0;
 function render(fresh){
+  const prev=captureTiles(), prevNums=captureNums(), dealing=dealAnim>0||!!fresh;
+  dealSeq=0;
+  renderCore(fresh);
+  playFlip(prev,prevNums,dealing);
+}
+function renderCore(fresh){
   const dora=doraOf(doraInd);
   document.getElementById("street").textContent=STAGE[stage];
   document.getElementById("pot").textContent=pot.toLocaleString();
@@ -990,7 +1162,7 @@ function render(fresh){
     el.appendChild(b);
     /* 数字はベット額ではなく持ち点。Golden Visual の 3,940 等と同じ意味になる。 */
     const bet=document.createElement("div");bet.className="bet";
-    bet.className="bet gold-text";bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
+    bet.className="bet gold-text";bet.dataset.num="seat"+seatIndex;bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
   const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
   me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
@@ -1001,8 +1173,8 @@ function render(fresh){
   else{
     common.slice(0,15).forEach(function(id,i){
       const isUsed=isPicked("c",i);
-      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(dealAnim===1?" deal":"");
-      const t=tile(id,cls);
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"");
+      const t=tile(id,cls);t.dataset.k="c:"+i;
       t.onclick=function(){togglePick("c",i,id);};
       c.appendChild(t);});
   }
@@ -1021,8 +1193,8 @@ function render(fresh){
     for(let k=0;k<4;k++){
       const index=15+g*4+k,id=common[index];
       if(id!==undefined){
-        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":"")+(dealAnim===g+2?"deal":""));
-        t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
+        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":""));
+        t.dataset.k="c:"+index;t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
     const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
@@ -1031,8 +1203,8 @@ function render(fresh){
   const mr=document.getElementById("myrow");mr.innerHTML="";
   my.forEach(function(id,i){
     const isUsed=isPicked("p",i);
-    const t=tile(id,(fresh?"deal ":"")+(isUsed?"used":"")+(id===dora?" doraMark":""));
-    t.onclick=function(){togglePick("p",i,id);};
+    const t=tile(id,(isUsed?"used":"")+(id===dora?" doraMark":""));
+    t.dataset.k="p:"+i;t.onclick=function(){togglePick("p",i,id);};
     mr.appendChild(t);});
   const privateCount=picks.filter(function(x){return x.src==="p";}).length;
   const commonCount=picks.length-privateCount;
@@ -1055,7 +1227,7 @@ function render(fresh){
     if(i<ordered.length){
       const pick=ordered[i];
       const t=tile(pick.id,"rk pop"+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
-      t.style.setProperty("--i",i);
+      t.dataset.k="r:"+pick.seq;t.style.setProperty("--i",i);
       t.onclick=function(){removePick(pick.seq);};
       rk.appendChild(t);
     }else{

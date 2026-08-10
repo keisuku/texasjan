@@ -1,0 +1,48 @@
+<!doctype html><meta charset="utf-8"><pre id=o>-</pre><script>
+const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
+const f=document.createElement('iframe');f.style.cssText='width:941px;height:1672px;border:0';
+f.src='../index.html';document.body.appendChild(f);
+f.onload=function(){
+ const d=f.contentDocument,w=f.contentWindow;
+ function settle(){d.getAnimations().forEach(function(a){try{a.finish();}catch(e){}});}
+ setTimeout(function(){
+  try{
+  const dealAnims=d.getAnimations().length;
+  ok(dealAnims>0,"配牌でアニメーションが生成された（"+dealAnims+"件）");
+  settle();
+  const resid=[].slice.call(d.querySelectorAll("#app .tile[data-k]")).filter(function(t){
+    const tr=w.getComputedStyle(t).transform;
+    if(!tr||tr==="none")return false;
+    const m=tr.match(/matrix\(([^)]+)\)/);
+    if(!m)return true;
+    const v=m[1].split(",").map(Number);
+    return !(Math.abs(v[0]-1)<.01&&Math.abs(v[1])<.01&&Math.abs(v[2])<.01&&Math.abs(v[3]-1)<.01&&Math.abs(v[4])<.5&&Math.abs(v[5])<.5);});
+  ok(resid.length===0,"完了後に transform が残る牌が無い（残 "+resid.length+"）");
+  const inv=[].slice.call(d.querySelectorAll("#app .tile[data-k]")).filter(function(t){
+    return parseFloat(w.getComputedStyle(t).opacity)<0.99 && !t.classList.contains("used");});
+  ok(inv.length===0,"完了後に半透明で残る牌が無い（残 "+inv.length+"）");
+  const rows=new Set([].slice.call(d.querySelectorAll("#commons .tile")).map(t=>Math.round(t.getBoundingClientRect().top)));
+  ok(rows.size===3,"共通牌が3行に整列（行数 "+rows.size+"）");
+
+  const c0=d.querySelectorAll("#commons .tile")[0];
+  c0.click();
+  ok(d.querySelectorAll("#rack .tile").length===1,"クリック直後にDOMは確定している（アニメ中でも）");
+  const running=d.getAnimations().filter(a=>a.playState==="running").length;
+  ok(running>0,"選択でアニメーションが走った（"+running+"件）");
+  settle();
+  const rt=d.querySelector("#rack .tile");
+  ok(rt&&w.getComputedStyle(rt).transform==="none","飛翔後の最終手牌に transform が残らない");
+
+  rt.click();
+  settle();
+  ok(d.querySelectorAll("#rack .tile").length===0,"解除で最終手牌が空に戻る");
+  }catch(e){log.push("THROWN "+e.message);}
+  /* 後片付けは onfinish が非同期で走るので1tick後に見る */
+  setTimeout(function(){
+    ok(d.querySelectorAll("body > .tile").length===0,"ゴーストが後片付けされている（残 "+d.querySelectorAll("body > .tile").length+"）");
+    ok(d.querySelectorAll(".chipFly").length===0,"チップの一時要素が残らない（残 "+d.querySelectorAll(".chipFly").length+"）");
+    document.getElementById("o").textContent=log.join("\n");document.title="DONE";
+  },1400);
+ },1500);
+};
+</script>
