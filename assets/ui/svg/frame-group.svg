@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 125 166">
+  <defs>
+    <linearGradient id="outer" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#8B7045"/><stop offset=".55" stop-color="#26180D"/><stop offset="1" stop-color="#080402"/></linearGradient>
+    <linearGradient id="brightBevel" x1="0" y1="0" x2=".75" y2="1"><stop stop-color="#FCE9A8"/><stop offset=".28" stop-color="#C4995B"/><stop offset=".62" stop-color="#724719"/><stop offset="1" stop-color="#2E1505"/></linearGradient>
+    <linearGradient id="valley" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4B2A11"/><stop offset=".42" stop-color="#120600"/><stop offset="1" stop-color="#030100"/></linearGradient>
+    <linearGradient id="rise" x1="0" y1="0" x2=".75" y2="1"><stop stop-color="#EFC986"/><stop offset=".42" stop-color="#86592C"/><stop offset="1" stop-color="#241005"/></linearGradient>
+    <linearGradient id="innerLine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FDE6A0"/><stop offset=".42" stop-color="#AF7E3E"/><stop offset="1" stop-color="#462409"/></linearGradient>
+    <linearGradient id="groupFace" x1="0" y1="0" x2=".76" y2="1"><stop stop-color="#063B31"/><stop offset=".28" stop-color="#021E19"/><stop offset="1" stop-color="#010F0C"/></linearGradient>
+    <linearGradient id="groupGloss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7BBCA4" stop-opacity=".2"/><stop offset=".42" stop-color="#3C7F68" stop-opacity=".03"/><stop offset="1" stop-color="#000" stop-opacity=".1"/></linearGradient>
+    <linearGradient id="labelBand" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#122C1D"/><stop offset=".25" stop-color="#08170F"/><stop offset="1" stop-color="#010805"/></linearGradient>
+    <linearGradient id="pressed" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".58"/><stop offset=".38" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#E5D292" stop-opacity=".14"/></linearGradient>
+    <clipPath id="faceClip"><rect x="8" y="8" width="109" height="150" rx="7"/></clipPath>
+  </defs>
+  <g id="rim">
+    <rect width="125" height="166" rx="15" fill="url(#outer)"/>
+    <rect x="1" y="1" width="123" height="164" rx="14" fill="url(#brightBevel)"/>
+    <rect x="4" y="4" width="117" height="158" rx="11" fill="url(#valley)"/>
+    <rect x="5" y="5" width="115" height="156" rx="10" fill="url(#rise)"/>
+    <rect x="7" y="7" width="111" height="152" rx="8" fill="url(#innerLine)"/>
+    <rect x="31" y="2" width="63" height="1" fill="#FFF3B8" fill-opacity=".78"/>
+  </g>
+  <g id="face">
+    <rect x="8" y="8" width="109" height="150" rx="7" fill="url(#groupFace)"/>
+    <path d="M8 140H117V158H8Z" fill="url(#labelBand)"/>
+    <path d="M9 140H116" stroke="#D4B26B" stroke-opacity=".48"/>
+  </g>
+  <g id="gloss" clip-path="url(#faceClip)">
+    <path d="M8 8H117V30C85 18 44 20 8 43Z" fill="url(#groupGloss)"/>
+    <path d="M13 13V133" stroke="#A9D7C2" stroke-opacity=".08"/>
+  </g>
+  <g id="press" opacity="0" clip-path="url(#faceClip)"><rect x="8" y="8" width="109" height="150" fill="url(#pressed)"/></g>
+</svg>
