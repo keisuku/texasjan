@@ -49,7 +49,9 @@ function row(cells,verdict){
 (async function(){
   const body=document.getElementById("b");body.innerHTML="";
   for(const e of EXPECT){
-    const img=await load("../assets/ui/"+e.id+".png");
+    let img=await load("../assets/ui/"+e.id+".png");
+    let where="";
+    if(!img&&e.id.indexOf("tile-")===0){img=await load("../art/rejected/round1/"+e.id+".png");if(img)where=" <small>(round1 退避分)</small>";}
     if(!img){body.appendChild(row(["<code>"+e.id+".png</code>","—","—","—"],'<span class="miss">未着</span>'));continue;}
     const W=img.naturalWidth,H=img.naturalHeight;
     const c=document.createElement("canvas");c.width=W;c.height=H;
@@ -76,6 +78,31 @@ function row(cells,verdict){
       alphaNote="加算合成用（透過不問）";
     }
 
+    /* 牌の形状ゲート: 肩の幅・面の起伏・角丸半径。round 1 はここで落ちた */
+    if(e.profile==="tile"){
+      let bx0=W,bx1=0,by0=H,by1=0;
+      for(let y=0;y<H;y++)for(let x=0;x<W;x++)if(D[(y*W+x)*4+3]>16){
+        if(x<bx0)bx0=x;if(x>bx1)bx1=x;if(y<by0)by0=y;if(y>by1)by1=y;}
+      const bw=bx1-bx0+1,bh=by1-by0+1,my=(by0+by1)>>1;
+      const lum=(x,y)=>{const i=(y*W+x)*4;return (D[i]*.299+D[i+1]*.587+D[i+2]*.114)|0;};
+      /* 面の中央値 */
+      const mid=[];for(let x=bx0+Math.round(bw*.2);x<=bx0+Math.round(bw*.8);x++)mid.push(lum(x,my));
+      mid.sort((a,b)=>a-b);const medial=mid[mid.length>>1];
+      /* 肩: 縁から面中央値の95%に達するまで */
+      let sh=0;for(let x=bx0;x<=bx1;x++){if(lum(x,my)>=medial*.95){sh=x-bx0;break;}}
+      const shPct=100*sh/bw;
+      if(shPct>2.5)problems.push("縁の肩が広すぎる（幅の"+shPct.toFixed(1)+"%、目標2%以下）。丸い塊ではなく平らな面を持つ板にする");
+      /* 面の起伏 */
+      const range=mid[mid.length-1]-mid[0];
+      if(range<12)problems.push("面が平坦すぎる（輝度レンジ"+range+"、目標12–40）。実物は26");
+      if(range>45)problems.push("面のムラが大きい（輝度レンジ"+range+"、目標12–40）");
+      /* 角丸半径 */
+      let rad=0;for(let y=by0;y<by0+bh/2;y++){let x=bx0;while(x<=bx1&&D[(y*W+x)*4+3]<=16)x++;if(x===bx0){rad=y-by0;break;}}
+      const radPct=100*rad/bw;
+      if(radPct<4.5||radPct>8)problems.push("角丸半径が範囲外（幅の"+radPct.toFixed(1)+"%、目標6.2%）");
+      e._shape="肩 "+shPct.toFixed(1)+"% / 起伏 "+range+" / 角丸 "+radPct.toFixed(1)+"%";
+    }
+
     /* 牌の明暗プロファイル */
     let profNote="—";
     if(e.profile==="tile"){
@@ -91,7 +118,7 @@ function row(cells,verdict){
         let lo=999,hi=-1;
         for(let y=top+Math.round(h*.15);y<bevelTop;y++){const L=lum(y);if(L<lo)lo=L;if(L>hi)hi=L;}
         const bStart=lum(bevelTop),bEnd=lum(bot);
-        profNote="上端 "+rim+" / 本体 "+lo+"–"+hi+" / 面取り "+bStart+"→"+bEnd;
+        profNote="上端 "+rim+" / 本体 "+lo+"–"+hi+" / 面取り "+bStart+"→"+bEnd+(e._shape?"<br>"+e._shape:"");
         if(rim<TILE_TARGET.rim-35)problems.push("上端の鏡面リムが弱い（"+rim+"、期待 "+TILE_TARGET.rim+"前後）");
         if(hi>250)problems.push("牌面が白すぎる（"+hi+"）。象牙は本体205–224");
         if(lo<170)problems.push("牌面が暗すぎる（"+lo+"）");
@@ -100,7 +127,7 @@ function row(cells,verdict){
       }
     }
     const verdict=problems.length?'<span class="ng">要修正</span><br>'+problems.join("<br>"):'<span class="ok">合格</span>';
-    body.appendChild(row(["<code>"+e.id+".png</code>",
+    body.appendChild(row(["<code>"+e.id+".png</code>"+where,
       (dimOK?'<span class="ok">':'<span class="ng">')+W+"×"+H+"</span><br><small>期待 "+e.w+"×"+e.h+"</small>",
       alphaNote,profNote],verdict));
   }
