@@ -256,7 +256,8 @@ body::before,body::after{display:none}
 /* --- gold banner labels --- */
 .goldLabel{position:absolute;left:50%;transform:translateX(-50%);z-index:11;
   display:flex;align-items:center;justify-content:center;
-  font-weight:900;letter-spacing:.13em;color:#f7e7ad;white-space:nowrap;
+  font-weight:900;letter-spacing:.13em;white-space:nowrap;color:var(--tx-gold);
+  -webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
   background:linear-gradient(180deg,rgba(13,47,38,.96),rgba(3,18,14,.96));
   border:1px solid rgba(240,214,132,.9);border-radius:.7cqw;
   box-shadow:0 .2cqw .7cqw rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.45);
@@ -310,8 +311,9 @@ body::before,body::after{display:none}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:2.4cqw;
   background:linear-gradient(180deg,rgba(255,250,226,.97),rgba(226,201,146,.97));border:.3cqw solid #c89a31;
   box-shadow:0 .55cqw 0 #896019,0 1cqw 2.2cqw rgba(0,0,0,.4),inset 0 1px 0 #fff}
-.pot .eyebrow{color:#40443b;font-size:2.1cqw;letter-spacing:.22em}
-.pot .val{font-size:5.7cqw;line-height:1.05;color:#121212;text-shadow:none}
+.pot .eyebrow{color:#4a4034;font-size:2.1cqw;letter-spacing:.22em;font-weight:900}
+.pot .val{font-size:5.7cqw;line-height:1.05;color:#0B0703;
+  text-shadow:0 .04em 0 rgba(255,255,255,.6),0 -.02em 0 rgba(120,86,26,.25),0 .06em .08em rgba(90,60,10,.28)}
 
 /* --- COMMON 15 (5 × 3) --- */
 .commons{position:absolute;left:49.68%;top:25.54%;transform:translateX(-50%);width:auto;height:13.16%;min-height:0;
@@ -348,7 +350,9 @@ body::before,body::after{display:none}
 .tile.rk .glyph .m{font-size:calc(var(--w)*.52);margin-top:calc(var(--w)*.04)}
 .tile.rk .glyph .solo{font-size:calc(var(--w)*.86)}
 .tile.rk.last,.slot.last{--w:9.1cqw;--ar:1.68;margin-left:.85cqw}
-.tile.last::before,.slot.last::before{content:"TSUMO";top:-2.5cqw;font-size:1.9cqw;letter-spacing:.1em}
+.tile.last::before,.slot.last::before{content:"TSUMO";top:-2.5cqw;font-size:1.9cqw;letter-spacing:.1em;
+  color:var(--tx-gold);-webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
+  text-shadow:0 .06em .08em rgba(0,0,0,.7)}
 .tile.last{z-index:2;box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 .28cqw #f1ca53,0 0 2cqw rgba(244,190,40,.8)}
 
 /* --- toast (14-tile limit notice) --- */
@@ -370,8 +374,11 @@ body::before,body::after{display:none}
   background:none;border:0;border-radius:0;z-index:20}
 .recMain{display:grid;grid-template-columns:1fr 1fr;gap:8.74%;height:100%}
 .recMain button{height:100%;padding:0;font-size:2.7cqw;letter-spacing:.1em;border-radius:1.5cqw}
-#bRec{background:linear-gradient(180deg,#f4e2ab,#cda850 55%,#9c711d);color:#241a06;border:.2cqw solid #f0d99b}
-#bClear{background:linear-gradient(180deg,rgba(21,55,46,.96),rgba(5,24,19,.96));color:#f6e8bf;border:.2cqw solid #e6cf8e}
+#bRec{background:linear-gradient(180deg,#f4e2ab,#cda850 55%,#9c711d);color:#241a06;border:.2cqw solid #f0d99b;
+  text-shadow:0 .045em 0 rgba(255,246,214,.6),0 .07em .09em rgba(90,60,10,.35)}
+#bClear{background:linear-gradient(180deg,rgba(21,55,46,.96),rgba(5,24,19,.96));color:var(--tx-gold);border:.2cqw solid #e6cf8e;
+  -webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
+  text-shadow:0 .045em 0 rgba(255,246,214,.2),0 .07em .09em rgba(0,0,0,.5)}
 .recModes{position:absolute;left:0;top:112%;width:100%;grid-template-columns:repeat(4,1fr);gap:.9cqw;padding-top:0}
 .recommendPanel.open .recModes{max-height:5.2cqw;padding-top:0}
 .recModes button{padding:.6cqw 0;font-size:1.9cqw;border-radius:.9cqw}
@@ -379,6 +386,7 @@ body::before,body::after{display:none}
 /* --- FOLD / CALL / RAISE / dial --- */
 .betBar{position:absolute;left:1.81%;top:87.98%;width:94.9%;height:9.87%;margin:0;z-index:20;
   display:grid;grid-template-columns:216fr 220fr 227fr 197fr;gap:1.3cqw;align-items:center}
+.betBar button>.btn-label{display:block;text-align:center;line-height:1.05}
 .betBar button{height:100%;min-height:0;padding:0;font-size:3.4cqw;line-height:1.05;letter-spacing:.04em;
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   border-radius:4cqw;border:.28cqw solid rgba(238,208,116,.85);box-shadow:0 .5cqw 1.4cqw rgba(0,0,0,.5)}
@@ -388,6 +396,26 @@ body::before,body::after{display:none}
 .betBar .dial{height:120%;aspect-ratio:1;justify-self:end;border-radius:50%;font-size:3.2cqw;
   background:radial-gradient(circle,#16406e 0 52%,#061a2c 54%);color:#fff0b7}
 body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
+
+/* ===== 文字を「絵」にする =====
+   Golden Visual の FOLD を横断すると 43→23→72→207→217→182→244→156→22 で、
+   字の両側に暗い輪郭があり内部にも階調がある。ブラウザ既定のベタ塗りとの差がここ。
+   輪郭は30px級の字に対して約1px。太くすると字が潰れるので .035em に抑える。
+   色は golden-target.webp からの実測値。 */
+:root{
+  --tx-ink:rgba(20,12,2,.9);
+  --tx-gold:#E0CB90;      /* リボン実測 #D8CB90 系 */
+  --tx-cream:#FBEEDC;     /* RAISE 実測 #FDEEDA 系 */
+}
+.gold-text,.btn-label{
+  -webkit-text-stroke:.035em var(--tx-ink);
+  paint-order:stroke fill;
+  text-shadow:0 .045em 0 rgba(255,246,214,.22),0 .075em .09em rgba(0,0,0,.55)}
+.gold-text{color:var(--tx-gold)}
+.btn-label{color:var(--tx-cream)}
+/* 明るいプレートの上の暗い文字。POTの数字は実測でほぼ黒、下に淡い光の縁 */
+.plate-num{color:#0B0703;-webkit-text-stroke:0;
+  text-shadow:0 .04em 0 rgba(255,255,255,.6),0 -.02em 0 rgba(120,86,26,.25),0 .06em .08em rgba(90,60,10,.28)}
 
 /* ===== スプライトのスロット =====
    assets/ui/ に素材が置かれると JS が html にクラスを立て、ここが CSS の描画を置き換える。
@@ -466,7 +494,7 @@ html.calib #calib{display:block}
   <div class="arena" id="arena">
     <div class="rail" id="rail"></div>
     <div class="meSeat" id="meSeat">
-      <div class="you">YOU</div>
+      <div class="you gold-text">YOU</div>
       <div class="backs" id="myBacks"></div>
       <div class="stack">5,870</div>
     </div>
@@ -474,7 +502,7 @@ html.calib #calib{display:block}
       <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
       <div class="badge" id="street">PREFLOP</div>
       <button id="bNext" class="streetNext">参加する</button>
-      <div class="pot"><span class="eyebrow">POT</span><span class="val" id="pot">0</span></div>
+      <div class="pot"><span class="eyebrow">POT</span><span class="val plate-num" id="pot">0</span></div>
       <div class="goldLabel labelCommon">COMMON 15</div>
       <div class="commons" id="commons"></div>
       <div class="revealRail" id="revealRail"></div>
@@ -511,9 +539,9 @@ html.calib #calib{display:block}
   </div>
 
   <div class="betBar">
-    <button class="fold" id="bFold">FOLD</button>
+    <button class="fold" id="bFold"><span class="btn-label">FOLD</span></button>
     <button class="call" id="bCall">CALL<br>400</button>
-    <button class="raise" id="bRaise">RAISE</button>
+    <button class="raise" id="bRaise"><span class="btn-label">RAISE</span></button>
     <button class="dial" id="bDial">400</button>
   </div>
   <div id="calib" aria-hidden="true"></div>
@@ -962,7 +990,7 @@ function render(fresh){
     el.appendChild(b);
     /* 数字はベット額ではなく持ち点。Golden Visual の 3,940 等と同じ意味になる。 */
     const bet=document.createElement("div");bet.className="bet";
-    bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
+    bet.className="bet gold-text";bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
   const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
   me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
@@ -997,7 +1025,7 @@ function render(fresh){
         t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
-    const label=document.createElement("div");label.className="revealLabel";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
+    const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
   }
 
   const mr=document.getElementById("myrow");mr.innerHTML="";
@@ -1077,10 +1105,12 @@ function render(fresh){
   document.getElementById("bClear").disabled=(stage===0);
   /* CALLボタンが局の進行役を兼ねる。+4 III まで来たらショーダウン、決着後は次の局。 */
   const call=document.getElementById("bCall");
-  if(phase==="result"){call.innerHTML="次の局";call.disabled=false;}
-  else if(stage>=4){call.innerHTML="SHOW<br>DOWN";call.disabled=false;}
-  else{call.innerHTML="CALL<br>"+Math.min(currentCall,userStack).toLocaleString();call.disabled=userStack<=0;}
-  document.getElementById("bDial").textContent=betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString();
+  const wrap=function(t){return '<span class="btn-label">'+t+'</span>';};
+  if(phase==="result"){call.innerHTML=wrap("次の局");call.disabled=false;}
+  else if(stage>=4){call.innerHTML=wrap("SHOW<br>DOWN");call.disabled=false;}
+  else{call.innerHTML=wrap("CALL<br>"+Math.min(currentCall,userStack).toLocaleString());call.disabled=userStack<=0;}
+  document.getElementById("bDial").innerHTML=
+    '<span class="gold-text">'+(betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString())+'</span>';
   document.getElementById("bFold").disabled=(phase==="result");
   document.getElementById("bRaise").disabled=userStack<=0||phase==="result"||stage>=4;
   document.getElementById("bDial").disabled=userStack<=0||phase==="result";
