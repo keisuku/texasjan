@@ -80,7 +80,9 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
       rgba(255,255,255,.08) 82%,rgba(96,78,48,.10) 96%,rgba(96,78,48,.32) 100%),
     /* 縦方向。上端の鏡面リムと中央の明部。輝度は sample-9pin.png の実測に合わせてある */
     linear-gradient(180deg,#FFFDF1 0 1.6%,#E1D1C2 7%,#EDDFCF 48%,#E1D1C2 85%,#D6C6B6 100%);
-  padding:calc(var(--w)*.055) calc(var(--w)*.06) calc(var(--w)*.135);
+  /* 牌面SVG(FluffyStuff)は全面用の余白を内蔵しているので、牌側の余白は最小限にする。
+     下だけは牌体の面取りを隠さないよう残す。 */
+  padding:calc(var(--w)*.015) calc(var(--w)*.02) calc(var(--w)*.10);
   box-shadow:0 calc(var(--w)*.055) calc(var(--w)*.09) rgba(0,0,0,.42),
     inset 0 1px 0 rgba(255,255,255,.85),inset -1px 0 0 rgba(90,72,40,.10),inset 1px 0 0 rgba(255,255,255,.35);
   flex:0 0 auto;position:relative;cursor:pointer;
@@ -115,6 +117,8 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.15;
 @keyframes pop{from{transform:translateY(-5px) scale(1.06)}to{transform:none}}
 @media (prefers-reduced-motion:reduce){.tile.deal,.tile.pop{animation:none}}
 .tile svg{width:100%;height:100%;display:block}
+.tile .tf{width:100%;height:100%;object-fit:contain;display:block;pointer-events:none;
+  -webkit-user-drag:none;user-select:none}
 .glyph{font-family:"Shippori Mincho B1",serif;font-weight:800;display:flex;flex-direction:column;
   align-items:center;justify-content:center;line-height:.95;width:100%;height:100%}
 .glyph .n{font-size:calc(var(--w)*.44);color:var(--ink)}
@@ -252,7 +256,8 @@ body::before,body::after{display:none}
 /* --- gold banner labels --- */
 .goldLabel{position:absolute;left:50%;transform:translateX(-50%);z-index:11;
   display:flex;align-items:center;justify-content:center;
-  font-weight:900;letter-spacing:.13em;color:#f7e7ad;white-space:nowrap;
+  font-weight:900;letter-spacing:.13em;white-space:nowrap;color:var(--tx-gold);
+  -webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
   background:linear-gradient(180deg,rgba(13,47,38,.96),rgba(3,18,14,.96));
   border:1px solid rgba(240,214,132,.9);border-radius:.7cqw;
   box-shadow:0 .2cqw .7cqw rgba(0,0,0,.5),inset 0 0 0 1px rgba(0,0,0,.45);
@@ -306,8 +311,9 @@ body::before,body::after{display:none}
   display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:2.4cqw;
   background:linear-gradient(180deg,rgba(255,250,226,.97),rgba(226,201,146,.97));border:.3cqw solid #c89a31;
   box-shadow:0 .55cqw 0 #896019,0 1cqw 2.2cqw rgba(0,0,0,.4),inset 0 1px 0 #fff}
-.pot .eyebrow{color:#40443b;font-size:2.1cqw;letter-spacing:.22em}
-.pot .val{font-size:5.7cqw;line-height:1.05;color:#121212;text-shadow:none}
+.pot .eyebrow{color:#4a4034;font-size:2.1cqw;letter-spacing:.22em;font-weight:900}
+.pot .val{font-size:5.7cqw;line-height:1.05;color:#0B0703;
+  text-shadow:0 .04em 0 rgba(255,255,255,.6),0 -.02em 0 rgba(120,86,26,.25),0 .06em .08em rgba(90,60,10,.28)}
 
 /* --- COMMON 15 (5 × 3) --- */
 .commons{position:absolute;left:49.68%;top:25.54%;transform:translateX(-50%);width:auto;height:13.16%;min-height:0;
@@ -344,7 +350,9 @@ body::before,body::after{display:none}
 .tile.rk .glyph .m{font-size:calc(var(--w)*.52);margin-top:calc(var(--w)*.04)}
 .tile.rk .glyph .solo{font-size:calc(var(--w)*.86)}
 .tile.rk.last,.slot.last{--w:9.1cqw;--ar:1.68;margin-left:.85cqw}
-.tile.last::before,.slot.last::before{content:"TSUMO";top:-2.5cqw;font-size:1.9cqw;letter-spacing:.1em}
+.tile.last::before,.slot.last::before{content:"TSUMO";top:-2.5cqw;font-size:1.9cqw;letter-spacing:.1em;
+  color:var(--tx-gold);-webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
+  text-shadow:0 .06em .08em rgba(0,0,0,.7)}
 .tile.last{z-index:2;box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 .28cqw #f1ca53,0 0 2cqw rgba(244,190,40,.8)}
 
 /* --- toast (14-tile limit notice) --- */
@@ -366,8 +374,11 @@ body::before,body::after{display:none}
   background:none;border:0;border-radius:0;z-index:20}
 .recMain{display:grid;grid-template-columns:1fr 1fr;gap:8.74%;height:100%}
 .recMain button{height:100%;padding:0;font-size:2.7cqw;letter-spacing:.1em;border-radius:1.5cqw}
-#bRec{background:linear-gradient(180deg,#f4e2ab,#cda850 55%,#9c711d);color:#241a06;border:.2cqw solid #f0d99b}
-#bClear{background:linear-gradient(180deg,rgba(21,55,46,.96),rgba(5,24,19,.96));color:#f6e8bf;border:.2cqw solid #e6cf8e}
+#bRec{background:linear-gradient(180deg,#f4e2ab,#cda850 55%,#9c711d);color:#241a06;border:.2cqw solid #f0d99b;
+  text-shadow:0 .045em 0 rgba(255,246,214,.6),0 .07em .09em rgba(90,60,10,.35)}
+#bClear{background:linear-gradient(180deg,rgba(21,55,46,.96),rgba(5,24,19,.96));color:var(--tx-gold);border:.2cqw solid #e6cf8e;
+  -webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
+  text-shadow:0 .045em 0 rgba(255,246,214,.2),0 .07em .09em rgba(0,0,0,.5)}
 .recModes{position:absolute;left:0;top:112%;width:100%;grid-template-columns:repeat(4,1fr);gap:.9cqw;padding-top:0}
 .recommendPanel.open .recModes{max-height:5.2cqw;padding-top:0}
 .recModes button{padding:.6cqw 0;font-size:1.9cqw;border-radius:.9cqw}
@@ -375,7 +386,9 @@ body::before,body::after{display:none}
 /* --- FOLD / CALL / RAISE / dial --- */
 .betBar{position:absolute;left:1.81%;top:87.98%;width:94.9%;height:9.87%;margin:0;z-index:20;
   display:grid;grid-template-columns:216fr 220fr 227fr 197fr;gap:1.3cqw;align-items:center}
-.betBar button{height:100%;min-height:0;padding:0;font-size:3.4cqw;line-height:1.15;letter-spacing:.04em;
+.betBar button>.btn-label{display:block;text-align:center;line-height:1.05}
+.betBar button{height:100%;min-height:0;padding:0;font-size:3.4cqw;line-height:1.05;letter-spacing:.04em;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
   border-radius:4cqw;border:.28cqw solid rgba(238,208,116,.85);box-shadow:0 .5cqw 1.4cqw rgba(0,0,0,.5)}
 .betBar .fold{background:linear-gradient(180deg,#cd4a38,#7c1512)}
 .betBar .call{background:linear-gradient(180deg,#2f7ec9,#123d74)}
@@ -384,44 +397,91 @@ body::before,body::after{display:none}
   background:radial-gradient(circle,#16406e 0 52%,#061a2c 54%);color:#fff0b7}
 body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
 
+/* ===== 文字を「絵」にする =====
+   Golden Visual の FOLD を横断すると 43→23→72→207→217→182→244→156→22 で、
+   字の両側に暗い輪郭があり内部にも階調がある。ブラウザ既定のベタ塗りとの差がここ。
+   輪郭は30px級の字に対して約1px。太くすると字が潰れるので .035em に抑える。
+   色は golden-target.webp からの実測値。 */
+:root{
+  --tx-ink:rgba(20,12,2,.9);
+  --tx-gold:#E0CB90;      /* リボン実測 #D8CB90 系 */
+  --tx-cream:#FBEEDC;     /* RAISE 実測 #FDEEDA 系 */
+}
+.gold-text,.btn-label{
+  -webkit-text-stroke:.035em var(--tx-ink);
+  paint-order:stroke fill;
+  text-shadow:0 .045em 0 rgba(255,246,214,.22),0 .075em .09em rgba(0,0,0,.55)}
+.gold-text{color:var(--tx-gold)}
+.btn-label{color:var(--tx-cream)}
+/* 明るいプレートの上の暗い文字。POTの数字は実測でほぼ黒、下に淡い光の縁 */
+.plate-num{color:#0B0703;-webkit-text-stroke:0;
+  text-shadow:0 .04em 0 rgba(255,255,255,.6),0 -.02em 0 rgba(120,86,26,.25),0 .06em .08em rgba(90,60,10,.28)}
+
 /* ===== スプライトのスロット =====
    assets/ui/ に素材が置かれると JS が html にクラスを立て、ここが CSS の描画を置き換える。
-   素材が無い間は上の実測値ベースのCSSがそのまま使われる。仕様は ASSET_BRIEF.md。 */
+   素材が無い間は上の実測値ベースのCSSがそのまま使われる。仕様は ASSET_BRIEF.md。
+
+   枠とボタンは9スライス。background-size:100% 100% で貼ると四隅の装飾が引き伸ばされて潰れるため、
+   border-image を使う。slice はソース画素値（素材は4倍解像度）、width は表示側の cqw。
+   1ソースpx = 0.25デザインpx = 0.02657cqw。 */
 html.has-tile-body-flat .commons .tile:not(.back),
 html.has-tile-body-flat .sourceZone .tile:not(.back),
 html.has-tile-body-flat .revealGroup .tile:not(.back),
 html.has-tile-body-flat .seat .tile:not(.back),
 html.has-tile-body-flat .meSeat .tile:not(.back){
-  background:url("./assets/ui/tile-body-flat.png") center/100% 100% no-repeat;
-  box-shadow:none}
+  background:url("./assets/ui/tile-body-flat.png") center/100% 100% no-repeat;box-shadow:none}
 html.has-tile-body-upright .tile.rk{
-  background:url("./assets/ui/tile-body-upright.png") center/100% 100% no-repeat;
-  box-shadow:none}
+  background:url("./assets/ui/tile-body-upright.png") center/100% 100% no-repeat;box-shadow:none}
 html.has-tile-body-flat .tile:not(.back) .face,
 html.has-tile-body-upright .tile.rk .face{background:none;box-shadow:none}
 html.has-tile-back-flat .tile.back{
   background:url("./assets/ui/tile-back-flat.png") center/100% 100% no-repeat;box-shadow:none}
 html.has-tile-back-flat .tile.back .face{background:none;box-shadow:none}
 html.has-tile-back-flat .tile.back .face::after{display:none}
-html.has-frame-gold-plate .pot{
-  border:0;background:url("./assets/ui/frame-gold-plate.png") center/100% 100% no-repeat;box-shadow:none}
-html.has-frame-gold-ribbon .goldLabel{
-  border:0;background:url("./assets/ui/frame-gold-ribbon.png") center/100% 100% no-repeat;box-shadow:none}
-html.has-frame-gold-ribbon .goldLabel::before,
-html.has-frame-gold-ribbon .goldLabel::after{display:none}
+
+/* 素材は実使用サイズの正確な4倍で発注してあるためアスペクト比が一致する。
+   等倍で貼れば歪まないので、枠とボタンは9スライスにしない。
+   幅が2倍以上変わるリボンだけ border-image で伸ばす。 */
+html.has-frame-gold-plate .pot,
 html.has-frame-seat-plate .seat .bet,
-html.has-frame-seat-plate .meSeat .stack{
-  border:0;background:url("./assets/ui/frame-seat-plate.png") center/100% 100% no-repeat;box-shadow:none}
-html.has-frame-group .revealGroup{
-  border:0;background:url("./assets/ui/frame-group.png") center/100% 100% no-repeat;box-shadow:none}
+html.has-frame-seat-plate .meSeat .stack,
+html.has-frame-group .revealGroup,
 html.has-btn-fold .betBar .fold,
 html.has-btn-call .betBar .call,
 html.has-btn-raise .betBar .raise,
-html.has-dial .betBar .dial{border:0;box-shadow:none;background-repeat:no-repeat;background-size:100% 100%;background-position:center}
+html.has-dial .betBar .dial{
+  border:0;box-shadow:none;background-repeat:no-repeat;background-size:100% 100%;background-position:center}
+html.has-frame-gold-plate .pot{background-image:url("./assets/ui/frame-gold-plate.png")}
+html.has-frame-seat-plate .seat .bet,
+html.has-frame-seat-plate .meSeat .stack{background-image:url("./assets/ui/frame-seat-plate.png")}
+html.has-frame-group .revealGroup{background-image:url("./assets/ui/frame-group.png")}
 html.has-btn-fold .betBar .fold{background-image:url("./assets/ui/btn-fold.png")}
 html.has-btn-call .betBar .call{background-image:url("./assets/ui/btn-call.png")}
 html.has-btn-raise .betBar .raise{background-image:url("./assets/ui/btn-raise.png")}
 html.has-dial .betBar .dial{background-image:url("./assets/ui/dial.png")}
+/* 生成された素材は上下非対称で、面の中心が画像中心から上にずれている。
+   実測した差分（btn-call は 97/660 = 面中心が97px上）ぶん、文字を上へ寄せる。 */
+html.has-btn-fold .betBar .fold{padding-bottom:1.0cqw}
+html.has-btn-call .betBar .call{padding-bottom:5.16cqw}
+html.has-btn-raise .betBar .raise{padding-bottom:3.16cqw}
+html.has-frame-gold-plate .pot{padding-bottom:.42cqw}
+html.has-frame-seat-plate .seat .bet{padding:.45cqw 1.6cqw 1.01cqw}
+html.has-frame-seat-plate .meSeat .stack{padding:.1cqw 1.5cqw .66cqw}
+html.has-frame-group .revealGroup.pending{filter:drop-shadow(0 0 1.2cqw rgba(238,206,120,.55))}
+html.has-frame-group .revealGroup.live{filter:drop-shadow(0 0 .9cqw rgba(226,194,91,.35))}
+
+/* リボンだけは COMMON 15 と MY FINAL HAND で幅が2.1倍違うので9スライス。
+   両端の菱形飾りが引き伸ばしに巻き込まれないよう左右80ソースpxを固定する。 */
+html.has-frame-gold-ribbon .goldLabel{
+  background:none;box-shadow:none;border-style:solid;border-width:0;border-color:transparent;
+  border-image-source:url("./assets/ui/frame-gold-ribbon.png");
+  border-image-slice:20 80 20 80 fill;
+  border-image-width:.53cqw 2.13cqw .53cqw 2.13cqw}
+html.has-frame-gold-ribbon .goldLabel::before,
+html.has-frame-gold-ribbon .goldLabel::after{display:none}
+
+/* 押下時の沈み込みは素材が1状態しか無いので変形で表現する */
+.betBar button:active{transform:translateY(.3cqw) scale(.985)}
 
 /* --- dev-only calibration overlay: ?calib puts the Golden Visual on top --- */
 #calib{display:none;position:absolute;inset:0;z-index:99;pointer-events:none;opacity:.45;
@@ -434,7 +494,7 @@ html.calib #calib{display:block}
   <div class="arena" id="arena">
     <div class="rail" id="rail"></div>
     <div class="meSeat" id="meSeat">
-      <div class="you">YOU</div>
+      <div class="you gold-text">YOU</div>
       <div class="backs" id="myBacks"></div>
       <div class="stack">5,870</div>
     </div>
@@ -442,7 +502,7 @@ html.calib #calib{display:block}
       <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
       <div class="badge" id="street">PREFLOP</div>
       <button id="bNext" class="streetNext">参加する</button>
-      <div class="pot"><span class="eyebrow">POT</span><span class="val" id="pot">0</span></div>
+      <div class="pot"><span class="eyebrow">POT</span><span class="val plate-num" id="pot">0</span></div>
       <div class="goldLabel labelCommon">COMMON 15</div>
       <div class="commons" id="commons"></div>
       <div class="revealRail" id="revealRail"></div>
@@ -479,9 +539,9 @@ html.calib #calib{display:block}
   </div>
 
   <div class="betBar">
-    <button class="fold" id="bFold">FOLD</button>
+    <button class="fold" id="bFold"><span class="btn-label">FOLD</span></button>
     <button class="call" id="bCall">CALL<br>400</button>
-    <button class="raise" id="bRaise">RAISE</button>
+    <button class="raise" id="bRaise"><span class="btn-label">RAISE</span></button>
     <button class="dial" id="bDial">400</button>
   </div>
   <div id="calib" aria-hidden="true"></div>
@@ -501,59 +561,18 @@ html.calib #calib{display:block}
 const KANJI=["一","二","三","四","五","六","七","八","九"];
 const HONOR=["東","南","西","北","白","發","中"];
 
-function pinSVG(n){
-  const L={1:[[50,68,17]],2:[[50,44,11],[50,92,11]],3:[[27,38,10],[50,68,10],[73,98,10]],
-    4:[[32,44,11],[68,44,11],[32,92,11],[68,92,11]],
-    5:[[30,40,10],[70,40,10],[50,68,10],[30,96,10],[70,96,10]],
-    6:[[32,36,10],[68,36,10],[32,68,10],[68,68,10],[32,100,10],[68,100,10]],
-    7:[[26,30,9],[50,42,9],[74,54,9],[32,86,9],[68,86,9],[32,110,9],[68,110,9]],
-    8:[[34,26,9],[66,26,9],[34,52,9],[66,52,9],[34,84,9],[66,84,9],[34,110,9],[66,110,9]],
-    9:[[26,36,9.5],[50,36,9.5],[74,36,9.5],[26,68,9.5],[50,68,9.5],[74,68,9.5],[26,100,9.5],[50,100,9.5],[74,100,9.5]]}[n];
-  const C={b:"#1D5A96",g:"#1C7444",r:"#BE2B26"};
-  const col=i=>{ if(n===2)return i===0?"g":"b"; if(n===3)return i===1?"g":"b";
-    if(n===5)return i===2?"r":(i%2?"g":"b"); if(n===7)return i<3?"r":"g";
-    if(n===9)return i<3?"g":(i<6?"b":"r"); return "b"; };
-  let s='<svg viewBox="0 0 100 136">';
-  if(n===1){const a=L[0],x=a[0],y=a[1],r=a[2];
-    s+=`<circle cx="${x}" cy="${y}" r="${r+5}" fill="#F7F2E4" stroke="#1D5A96" stroke-width="3"/>`;
-    s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="none" stroke="#BE2B26" stroke-width="4"/>`;
-    s+=`<circle cx="${x}" cy="${y}" r="${r-6}" fill="#1D5A96"/>`;
-  } else L.forEach(function(a,i){const x=a[0],y=a[1],r=a[2];
-    s+=`<circle cx="${x}" cy="${y}" r="${r}" fill="${C[col(i)]}" stroke="rgba(0,0,0,.28)" stroke-width="1"/>`;
-    s+=`<circle cx="${x}" cy="${y}" r="${r*.42}" fill="#F7F2E4"/>`;});
-  return s+"</svg>";
-}
-function bamboo(x,y,h,c){const w=h*.30;return `<g>
-  <rect x="${x-w/2}" y="${y-h/2}" width="${w}" height="${h}" rx="${w*.42}" fill="${c}" stroke="rgba(0,0,0,.25)"/>
-  <rect x="${x-w*.62}" y="${y-h*.10}" width="${w*1.24}" height="${h*.19}" rx="1.5" fill="${c}" stroke="rgba(0,0,0,.25)"/>
-  <rect x="${x-w*.16}" y="${y-h*.40}" width="${w*.3}" height="${h*.24}" rx="1" fill="rgba(255,255,255,.55)"/></g>`;}
-function souSVG(n){
-  const G="#1C7444",R="#BE2B26";
-  if(n===1) return `<svg viewBox="0 0 100 136">
-    <path d="M50 20 C34 30 28 48 34 62 C24 70 22 88 32 100 C40 110 60 112 70 102 C80 92 78 74 66 66 C74 52 68 32 50 20 Z" fill="${G}" stroke="rgba(0,0,0,.25)"/>
-    <path d="M50 26 C40 36 38 50 44 60 C50 50 54 38 50 26 Z" fill="rgba(255,255,255,.42)"/>
-    <circle cx="43" cy="40" r="3.4" fill="#F7F2E4"/><path d="M34 44 L22 40 L33 36 Z" fill="${R}"/>
-    <path d="M56 96 C64 104 58 116 48 114" stroke="${R}" stroke-width="5" fill="none" stroke-linecap="round"/>
-    <path d="M40 112 L50 124 L62 112" stroke="${R}" stroke-width="4" fill="none" stroke-linecap="round"/></svg>`;
-  const L={2:[[50,42,34,G],[50,94,34,G]],3:[[50,36,32,G],[32,96,32,G],[68,96,32,G]],
-    4:[[32,40,32,G],[68,40,32,G],[32,96,32,G],[68,96,32,G]],
-    5:[[30,36,30,G],[70,36,30,G],[50,68,30,R],[30,100,30,G],[70,100,30,G]],
-    6:[[30,34,28,G],[70,34,28,G],[30,68,28,G],[70,68,28,G],[30,102,28,G],[70,102,28,G]],
-    7:[[50,26,26,R],[30,62,26,G],[70,62,26,G],[30,92,26,G],[70,92,26,G],[30,120,24,G],[70,120,24,G]],
-    8:[[34,26,24,G],[66,26,24,G],[34,54,24,G],[66,54,24,G],[34,82,24,G],[66,82,24,G],[34,110,24,G],[66,110,24,G]],
-    9:[[26,34,28,R],[50,34,28,G],[74,34,28,R],[26,68,28,G],[50,68,28,G],[74,68,28,G],[26,102,28,R],[50,102,28,G],[74,102,28,R]]}[n];
-  let s='<svg viewBox="0 0 100 136">';
-  L.forEach(function(a){s+=bamboo(a[0],a[1],a[2],a[3]);});
-  return s+"</svg>";
-}
+/* 牌面34種は自作をやめ、CC0 の正規ベクター資産を使う。
+   出典: FluffyStuff/riichi-mahjong-tiles（CC0 1.0 / パブリックドメイン）
+   萬字の筆形・筒の輪・索の節・一索の鳥まで、麻雀牌の標準意匠がそのまま入っている。
+   以前の pinSVG/souSVG は <circle> と角丸長方形による自作で、意匠として誤りだった。 */
+const TILE_FILE=[
+  "Man1","Man2","Man3","Man4","Man5","Man6","Man7","Man8","Man9",
+  "Pin1","Pin2","Pin3","Pin4","Pin5","Pin6","Pin7","Pin8","Pin9",
+  "Sou1","Sou2","Sou3","Sou4","Sou5","Sou6","Sou7","Sou8","Sou9",
+  "Ton","Nan","Shaa","Pei","Haku","Hatsu","Chun"
+];
 function faceHTML(id){
-  if(id<9) return `<div class="glyph"><span class="n">${KANJI[id]}</span><span class="m">萬</span></div>`;
-  if(id<18) return pinSVG(id-8);
-  if(id<27) return souSVG(id-17);
-  const h=HONOR[id-27];
-  if(h==="白") return "";
-  const c=h==="中"?"var(--red)":h==="發"?"var(--green)":"var(--ink)";
-  return `<div class="glyph"><span class="solo" style="color:${c}">${h}</span></div>`;
+  return `<img class="tf" src="./assets/tiles/${TILE_FILE[id]}.svg" alt="" draggable="false">`;
 }
 function tile(id,cls){const d=document.createElement("div");d.className="tile "+(cls||"");
   d.innerHTML=`<div class="face">${faceHTML(id)}</div>`;return d;}
@@ -971,7 +990,7 @@ function render(fresh){
     el.appendChild(b);
     /* 数字はベット額ではなく持ち点。Golden Visual の 3,940 等と同じ意味になる。 */
     const bet=document.createElement("div");bet.className="bet";
-    bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
+    bet.className="bet gold-text";bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
   const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
   me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
@@ -1006,7 +1025,7 @@ function render(fresh){
         t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
-    const label=document.createElement("div");label.className="revealLabel";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
+    const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
   }
 
   const mr=document.getElementById("myrow");mr.innerHTML="";
@@ -1086,10 +1105,12 @@ function render(fresh){
   document.getElementById("bClear").disabled=(stage===0);
   /* CALLボタンが局の進行役を兼ねる。+4 III まで来たらショーダウン、決着後は次の局。 */
   const call=document.getElementById("bCall");
-  if(phase==="result"){call.innerHTML="次の局";call.disabled=false;}
-  else if(stage>=4){call.innerHTML="SHOW<br>DOWN";call.disabled=false;}
-  else{call.innerHTML="CALL<br>"+Math.min(currentCall,userStack).toLocaleString();call.disabled=userStack<=0;}
-  document.getElementById("bDial").textContent=betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString();
+  const wrap=function(t){return '<span class="btn-label">'+t+'</span>';};
+  if(phase==="result"){call.innerHTML=wrap("次の局");call.disabled=false;}
+  else if(stage>=4){call.innerHTML=wrap("SHOW<br>DOWN");call.disabled=false;}
+  else{call.innerHTML=wrap("CALL<br>"+Math.min(currentCall,userStack).toLocaleString());call.disabled=userStack<=0;}
+  document.getElementById("bDial").innerHTML=
+    '<span class="gold-text">'+(betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString())+'</span>';
   document.getElementById("bFold").disabled=(phase==="result");
   document.getElementById("bRaise").disabled=userStack<=0||phase==="result"||stage>=4;
   document.getElementById("bDial").disabled=userStack<=0||phase==="result";

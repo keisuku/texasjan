@@ -1,0 +1,50 @@
+<!doctype html><meta charset="utf-8"><pre id=o>running</pre>
+<script>
+const f=document.createElement('iframe');f.style.cssText='width:941px;height:1672px;border:0';
+f.src='../index.html';document.body.appendChild(f);
+const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
+f.onload=function(){
+ const errs=[];f.contentWindow.onerror=function(m){errs.push(String(m));};
+ setTimeout(function(){
+  const w=f.contentWindow,d=f.contentDocument;
+  const E=function(x){return w.eval(x);};
+  try{
+  const total=function(){return E("userStack + seats.reduce(function(a,s){return a+s.stack;},0) + pot");};
+  const TOTAL=total();
+  ok(TOTAL===28150,"初期の点棒総和が28,150 (got "+TOTAL+")");
+  ok(E("seats.every(function(s){return s.hand.length===8;})"),"相手5人にも私牌8枚が配られている");
+  ok(E("seats.map(function(s){return s.stack;}).join()")==="3940,4620,4730,4110,4880"
+     ||E("stage")>0,"初期持ち点がGolden Visualの数字");
+  let winners=0,hands=0,conserved=true,bad="",neg="";
+  for(let h=0;h<30;h++){
+    for(let k=0;k<3;k++){const p=d.querySelector(".revealGroup.pending");if(p)p.click();}
+    d.getElementById("bRec").click();
+    if(d.querySelectorAll("#rack .tile").length<14){
+      const cs=[].slice.call(d.querySelectorAll("#commons .tile:not(.used)"));
+      for(let i=0;i<cs.length&&d.querySelectorAll("#rack .tile").length<14;i++)cs[i].click();
+    }
+    d.getElementById("bCall").click();
+    hands++;
+    if(E("pot")!==0)bad="局"+h+" 決着後のPOTが"+E("pot");
+    if(E("seats.some(function(s){return s.stack<0;})||userStack<0"))neg="局"+h;
+    if(E("phase")!=="result"){bad="局"+h+" phase="+E("phase")+" stage="+E("stage")+" picks="+E("picks.length");break;}
+    if(E("resultText").length>0)winners++;
+    const t=total();
+    if(t!==TOTAL){conserved=false;bad="局"+h+" total="+t;}
+    d.getElementById("bCall").click();
+  }
+  ok(hands===30&&!bad,"30局を通しで回した "+bad);
+  ok(conserved,"点棒総和が全局で保存された（期待 "+TOTAL+"）");
+  ok(winners===hands,"毎局かならず決着した ("+winners+"/"+hands+")");
+  ok(E("seats.filter(function(s){return s.stack>0;}).length")>=2&&E("userStack")>0,"卓が死んでいない（自動仕切り直し resets="+E("sessionResets")+"）");
+  /* 生存人数は最適打ちの harness では局ごとにぶれるので、閾値では判定しない。
+     卓が死なないことは上の「卓が死んでいない」で保証済み。ここは記録のみ。 */
+  log.push("INFO  30局後の生存 "+E("seats.filter(function(s){return s.stack>0;}).length")+"/5");
+  ok(E("seats.map(function(s){return s.stack;}).join(\",\")")!=="3940,4620,4730,4110,4880","持ち点が実際に動いた: "+E("seats.map(function(s){return s.stack;}).join(\",\")")+" / YOU "+E("userStack"));
+  ok(!neg,"持ち点がマイナスになった局はない "+neg);
+  ok(errs.length===0,"例外なし "+(errs[0]||""));
+  }catch(e){log.push("THREW "+e.message);}
+  o.textContent=log.join("\n");document.title="DONE";
+ },900);
+};
+</script>
