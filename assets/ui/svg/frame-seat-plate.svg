@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 160 48">
+  <defs>
+    <linearGradient id="outer" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#80623B"/><stop offset=".55" stop-color="#26180D"/><stop offset="1" stop-color="#0B0603"/></linearGradient>
+    <linearGradient id="brightBevel" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#F0D69A"/><stop offset=".35" stop-color="#9B7443"/><stop offset="1" stop-color="#3B200B"/></linearGradient>
+    <linearGradient id="valley" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#4A2A11"/><stop offset=".45" stop-color="#110700"/><stop offset="1" stop-color="#030100"/></linearGradient>
+    <linearGradient id="rise" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#E5C07B"/><stop offset=".4" stop-color="#75502A"/><stop offset="1" stop-color="#211006"/></linearGradient>
+    <linearGradient id="innerLine" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#F7E4A8"/><stop offset=".45" stop-color="#A47A45"/><stop offset="1" stop-color="#3D210B"/></linearGradient>
+    <linearGradient id="seatFace" x1="0" y1="0" x2=".75" y2="1"><stop stop-color="#123C2A"/><stop offset=".32" stop-color="#092016"/><stop offset="1" stop-color="#03100B"/></linearGradient>
+    <linearGradient id="seatGloss" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#B5E0C7" stop-opacity=".2"/><stop offset=".4" stop-color="#6CAC8C" stop-opacity=".04"/><stop offset="1" stop-color="#000" stop-opacity=".08"/></linearGradient>
+    <linearGradient id="pressed" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#000" stop-opacity=".55"/><stop offset=".4" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#D8F1C8" stop-opacity=".16"/></linearGradient>
+    <clipPath id="faceClip"><rect x="5" y="5" width="150" height="38" rx="10"/></clipPath>
+  </defs>
+  <g id="rim">
+    <rect width="160" height="48" rx="15" fill="url(#outer)"/>
+    <rect x="1" y="1" width="158" height="46" rx="14" fill="url(#brightBevel)"/>
+    <rect x="2" y="2" width="156" height="44" rx="13" fill="url(#valley)"/>
+    <rect x="3" y="3" width="154" height="42" rx="12" fill="url(#rise)"/>
+    <rect x="4" y="4" width="152" height="40" rx="11" fill="url(#innerLine)"/>
+  </g>
+  <g id="face"><rect x="5" y="5" width="150" height="38" rx="10" fill="url(#seatFace)"/></g>
+  <g id="gloss" clip-path="url(#faceClip)"><path d="M6 6H154V17C111 10 52 11 6 23Z" fill="url(#seatGloss)"/></g>
+  <g id="press" opacity="0" clip-path="url(#faceClip)"><rect x="5" y="5" width="150" height="38" fill="url(#pressed)"/></g>
+</svg>
