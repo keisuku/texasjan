@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>素材の受け入れ検査 — MAHJONG HOLD'EM</title>
+<style>
+body{background:#10201b;color:#e9e2cd;font:14px/1.7 system-ui,sans-serif;margin:0;padding:24px}
+h1{font-size:20px;margin:0 0 4px}p.lead{color:#9fb6ac;margin:0 0 20px}
+table{border-collapse:collapse;width:100%;max-width:1100px}
+th,td{border-bottom:1px solid #26443a;padding:7px 10px;text-align:left;vertical-align:top}
+th{color:#e9ce7c;font-size:12px;letter-spacing:.06em}
+.ok{color:#7fe0a0}.ng{color:#ff9b84}.miss{color:#6d8880}
+code{background:#0a1814;padding:1px 5px;border-radius:3px;font-size:12px}
+canvas{display:none}
+</style></head><body>
+<h1>素材の受け入れ検査</h1>
+<p class="lead"><code>assets/ui/</code> に置かれた素材を <code>MANIFEST.json</code> と <code>art/art-bible.md</code> の
+実測値に照らして検査します。未納品のものは「未着」と表示され、エラーにはなりません。</p>
+<table id="t"><thead><tr><th>素材</th><th>寸法</th><th>アルファ</th><th>明暗プロファイル</th><th>判定</th></tr></thead>
+<tbody id="b"><tr><td colspan="5">読み込み中…</td></tr></tbody></table>
+<script>
+/* MANIFEST を fetch できない file:// でも動くよう、期待値はここに埋め込む。
+   MANIFEST.json を更新したらこの表も合わせること。 */
+const EXPECT=[
+ {id:"tile-body-flat",  w:260,h:292,alpha:true, profile:"tile"},
+ {id:"tile-body-upright",w:248,h:460,alpha:true, profile:"tile"},
+ {id:"tile-back-flat",  w:260,h:292,alpha:true, profile:null},
+ {id:"frame-gold-plate",w:560,h:268,alpha:true, profile:null},
+ {id:"frame-gold-ribbon",w:640,h:112,alpha:true,profile:null},
+ {id:"frame-seat-plate",w:320,h:96, alpha:true, profile:null},
+ {id:"frame-group",     w:500,h:664,alpha:true, profile:null},
+ {id:"btn-fold",        w:864,h:660,alpha:true, profile:null},
+ {id:"btn-call",        w:880,h:660,alpha:true, profile:null},
+ {id:"btn-raise",       w:908,h:660,alpha:true, profile:null},
+ {id:"dial",            w:792,h:792,alpha:true, profile:null},
+ {id:"chip-stack",      w:240,h:320,alpha:true, profile:null},
+ {id:"chip-single",     w:128,h:128,alpha:true, profile:null},
+ {id:"fx-glow",         w:512,h:512,alpha:false,profile:null},
+ {id:"fx-sparkle",      w:256,h:256,alpha:false,profile:null}
+];
+/* sample-9pin.png 実測: 上端リム252 / 本体205-224 / 下端11%が179→28 */
+const TILE_TARGET={rim:252,bodyLo:205,bodyHi:224,bevelStart:179,bevelEnd:28,bevelFrac:.11};
+
+function load(src){return new Promise(function(res){const i=new Image();
+  i.onload=function(){res(i);};i.onerror=function(){res(null);};i.src=src;});}
+function row(cells,verdict){
+  const tr=document.createElement("tr");
+  cells.forEach(function(c){const td=document.createElement("td");td.innerHTML=c;tr.appendChild(td);});
+  const td=document.createElement("td");td.innerHTML=verdict;tr.appendChild(td);return tr;
+}
+(async function(){
+  const body=document.getElementById("b");body.innerHTML="";
+  for(const e of EXPECT){
+    const img=await load("../assets/ui/"+e.id+".png");
+    if(!img){body.appendChild(row(["<code>"+e.id+".png</code>","—","—","—"],'<span class="miss">未着</span>'));continue;}
+    const W=img.naturalWidth,H=img.naturalHeight;
+    const c=document.createElement("canvas");c.width=W;c.height=H;
+    const g=c.getContext("2d");g.drawImage(img,0,0);
+    const D=g.getImageData(0,0,W,H).data;
+    const problems=[];
+
+    const dimOK=(W===e.w&&H===e.h);
+    const arWant=(e.h/e.w).toFixed(3), arGot=(H/W).toFixed(3);
+    if(!dimOK){
+      if(Math.abs(arGot-arWant)>0.02)problems.push("アスペクト比が違う（期待 "+arWant+" / 実際 "+arGot+"）");
+      else problems.push("寸法違い（縮尺は合っているので実装側で吸収可）");
+    }
+
+    /* アルファ: 端に透明が存在するか、内部の縁がぼけていないか */
+    let transparentEdge=false,opaqueCount=0,semi=0;
+    for(let x=0;x<W;x++){if(D[(0*W+x)*4+3]<8)transparentEdge=true;}
+    for(let i=3;i<D.length;i+=4){if(D[i]>250)opaqueCount++;else if(D[i]>8)semi++;}
+    let alphaNote;
+    if(e.alpha){
+      if(!transparentEdge){problems.push("背景が透明でない");alphaNote='<span class="ng">不透明</span>';}
+      else alphaNote='<span class="ok">透過あり</span> 半透明画素 '+(100*semi/(W*H)).toFixed(1)+"%";
+    }else{
+      alphaNote="加算合成用（透過不問）";
+    }
+
+    /* 牌の明暗プロファイル */
+    let profNote="—";
+    if(e.profile==="tile"){
+      const x=(W/2)|0;
+      function lum(y){const i=(y*W+x)*4;return (D[i]*.299+D[i+1]*.587+D[i+2]*.114)|0;}
+      let top=-1;for(let y=0;y<H;y++){if(D[(y*W+x)*4+3]>16){top=y;break;}}
+      let bot=-1;for(let y=H-1;y>=0;y--){if(D[(y*W+x)*4+3]>16){bot=y;break;}}
+      if(top<0){problems.push("中央列が全て透明");}
+      else{
+        const h=bot-top+1;
+        const rim=lum(top);
+        const bevelTop=bot-Math.round(h*TILE_TARGET.bevelFrac);
+        let lo=999,hi=-1;
+        for(let y=top+Math.round(h*.15);y<bevelTop;y++){const L=lum(y);if(L<lo)lo=L;if(L>hi)hi=L;}
+        const bStart=lum(bevelTop),bEnd=lum(bot);
+        profNote="上端 "+rim+" / 本体 "+lo+"–"+hi+" / 面取り "+bStart+"→"+bEnd;
+        if(rim<TILE_TARGET.rim-35)problems.push("上端の鏡面リムが弱い（"+rim+"、期待 "+TILE_TARGET.rim+"前後）");
+        if(hi>250)problems.push("牌面が白すぎる（"+hi+"）。象牙は本体205–224");
+        if(lo<170)problems.push("牌面が暗すぎる（"+lo+"）");
+        if(bEnd>90)problems.push("下端の面取りが浅い（末端 "+bEnd+"、期待 28前後）。厚みが出ていない");
+        if(bStart-bEnd<70)problems.push("面取りの階調が足りない（差 "+(bStart-bEnd)+"、期待 150前後）");
+      }
+    }
+    const verdict=problems.length?'<span class="ng">要修正</span><br>'+problems.join("<br>"):'<span class="ok">合格</span>';
+    body.appendChild(row(["<code>"+e.id+".png</code>",
+      (dimOK?'<span class="ok">':'<span class="ng">')+W+"×"+H+"</span><br><small>期待 "+e.w+"×"+e.h+"</small>",
+      alphaNote,profNote],verdict));
+  }
+})();
+</script></body></html>
