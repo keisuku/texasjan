@@ -495,6 +495,29 @@ html.has-frame-gold-ribbon .goldLabel::after{display:none}
 /* 押下時の沈み込みは素材が1状態しか無いので変形で表現する */
 .betBar button:active{transform:translateY(.3cqw) scale(.985)}
 
+/* ===== round 3: SVGフレーム =====
+   幾何が正確（ボタン3種の角丸は全て50pxで一致。Golden Visual自身は53/47/49とばらついていた）。
+   PNG規則の後に置いて上書きする。SVGが無ければPNGのまま。 */
+html.svg-frame-gold-plate .pot{background-image:url("./assets/ui/svg/frame-gold-plate.svg")}
+html.svg-frame-seat-plate .seat .bet,
+html.svg-frame-seat-plate .meSeat .stack{background-image:url("./assets/ui/svg/frame-seat-plate.svg")}
+html.svg-frame-group .revealGroup{background-image:url("./assets/ui/svg/frame-group.svg")}
+html.svg-btn-fold .betBar .fold{background-image:url("./assets/ui/svg/btn-fold.svg")}
+html.svg-btn-call .betBar .call{background-image:url("./assets/ui/svg/btn-call.svg")}
+html.svg-btn-raise .betBar .raise{background-image:url("./assets/ui/svg/btn-raise.svg")}
+/* リボンは幅が2.1倍変わるので9スライス。SVG座標(320×56)で菱形は両端40px以内 */
+html.svg-frame-gold-ribbon .goldLabel{
+  border-image-source:url("./assets/ui/svg/frame-gold-ribbon.svg");
+  border-image-slice:20 40 20 40 fill;
+  border-image-width:.53cqw 2.13cqw .53cqw 2.13cqw}
+/* PNG用の面ずれ補正は不要。生成PNGは面の中心が最大97pxずれていたための対症療法だった */
+html.svg-btn-fold .betBar .fold{padding-bottom:0}
+html.svg-btn-call .betBar .call{padding-bottom:0;font-size:3.4cqw}
+html.svg-btn-raise .betBar .raise{padding-bottom:0}
+html.svg-frame-gold-plate .pot{padding-bottom:0}
+html.svg-frame-seat-plate .seat .bet{padding:.45cqw 1.6cqw}
+html.svg-frame-seat-plate .meSeat .stack{padding:.1cqw 1.5cqw}
+
 /* --- dev-only calibration overlay: ?calib puts the Golden Visual on top --- */
 #calib{display:none;position:absolute;inset:0;z-index:99;pointer-events:none;opacity:.45;
   background:url("./claude-handoff/visual/golden-target.webp") center/100% 100% no-repeat}
@@ -568,6 +591,16 @@ html.calib #calib{display:block}
   const probe=new Image();
   probe.onload=function(){if(probe.naturalWidth>1)document.documentElement.classList.add("has-"+id);};
   probe.src="./assets/ui/"+id+".png";
+});
+/* round 3 の SVG。幾何は正確（ボタン3種の角丸が全て50pxで一致。Golden Visual自身は
+   53/47/49とばらついていた）が、金の厚みと階調は生成PNGの方がGolden Visualに近い。
+   既定はPNG。?svg=1 でSVGへ切り替えて比較できる。 */
+if(new URLSearchParams(location.search).has("svg"))
+["frame-gold-plate","frame-gold-ribbon","frame-seat-plate","frame-group",
+ "btn-fold","btn-call","btn-raise"].forEach(function(id){
+  const probe=new Image();
+  probe.onload=function(){if(probe.naturalWidth>1)document.documentElement.classList.add("svg-"+id);};
+  probe.src="./assets/ui/svg/"+id+".svg";
 });
 
 const KANJI=["一","二","三","四","五","六","七","八","九"];
