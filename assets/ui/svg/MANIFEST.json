@@ -1,0 +1,24 @@
+{
+  "round": 3,
+  "target": "assets/ui/svg/",
+  "spec": "art/specs/ui-frames.md",
+  "geometry": "art/ui-geometry.md",
+  "verify": "art/verify-ui.html",
+  "rules": {
+    "doNotEdit": ["index.html", "assets/ui/*.png", "assets/tiles/**"],
+    "noText": "文字を一切入れない。実装側で描画する",
+    "rimLayers": 5,
+    "lightDirection": 315,
+    "requiredIds": ["rim", "face", "gloss", "press"],
+    "noWidthHeightAttr": "viewBox のみ。width/height 属性は付けない"
+  },
+  "assets": [
+    { "id": "btn-fold",          "path": "assets/ui/svg/btn-fold.svg",          "viewBox": "0 0 216 166", "radius": 50, "rim": 20 },
+    { "id": "btn-call",          "path": "assets/ui/svg/btn-call.svg",          "viewBox": "0 0 220 166", "radius": 50, "rim": 20 },
+    { "id": "btn-raise",         "path": "assets/ui/svg/btn-raise.svg",         "viewBox": "0 0 227 166", "radius": 50, "rim": 20 },
+    { "id": "frame-gold-plate",  "path": "assets/ui/svg/frame-gold-plate.svg",  "viewBox": "0 0 280 135", "radius": 30, "rim": 13 },
+    { "id": "frame-seat-plate",  "path": "assets/ui/svg/frame-seat-plate.svg",  "viewBox": "0 0 160 48",  "radius": 10, "rim": 5  },
+    { "id": "frame-gold-ribbon", "path": "assets/ui/svg/frame-gold-ribbon.svg", "viewBox": "0 0 320 56",  "radius": 13, "rim": 6  },
+    { "id": "frame-group",       "path": "assets/ui/svg/frame-group.svg",       "viewBox": "0 0 125 166", "radius": 10, "rim": 8  }
+  ]
+}

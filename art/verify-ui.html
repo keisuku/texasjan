@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="ja"><head><meta charset="utf-8">
+<title>UIフレームSVGの受け入れ検査 — MAHJONG HOLD'EM</title>
+<style>
+body{background:#10201b;color:#e9e2cd;font:14px/1.7 system-ui,sans-serif;margin:0;padding:24px}
+h1{font-size:20px;margin:0 0 4px}p.lead{color:#9fb6ac;margin:0 0 18px;max-width:900px}
+table{border-collapse:collapse;width:100%;max-width:1200px}
+th,td{border-bottom:1px solid #26443a;padding:7px 10px;text-align:left;vertical-align:top;font-size:13px}
+th{color:#e9ce7c;font-size:12px;letter-spacing:.06em}
+.ok{color:#7fe0a0}.ng{color:#ff9b84}.miss{color:#6d8880}
+code{background:#0a1814;padding:1px 5px;border-radius:3px;font-size:12px}
+.prev{background:#16311f;padding:4px;border-radius:4px}
+</style></head><body>
+<h1>UIフレームSVGの受け入れ検査</h1>
+<p class="lead"><code>assets/ui/svg/</code> の納品物を <code>art/ui-geometry.md</code> の共有仕様に照らして検査します。
+角丸比・縁の層数・光源の向き・必須IDを機械判定します。未納品は「未着」でエラーにはなりません。</p>
+<table><thead><tr><th>素材</th><th>プレビュー</th><th>viewBox</th><th>角丸</th><th>縁の層</th><th>光源</th><th>必須ID</th><th>判定</th></tr></thead>
+<tbody id="b"><tr><td colspan="8">読み込み中…</td></tr></tbody></table>
+<script>
+const SPEC=[
+ {id:"btn-fold",          vb:"0 0 216 166", w:216,h:166, radius:50, rim:20},
+ {id:"btn-call",          vb:"0 0 220 166", w:220,h:166, radius:50, rim:20},
+ {id:"btn-raise",         vb:"0 0 227 166", w:227,h:166, radius:50, rim:20},
+ {id:"frame-gold-plate",  vb:"0 0 280 135", w:280,h:135, radius:30, rim:13},
+ {id:"frame-seat-plate",  vb:"0 0 160 48",  w:160,h:48,  radius:10, rim:5},
+ {id:"frame-gold-ribbon", vb:"0 0 320 56",  w:320,h:56,  radius:13, rim:6},
+ {id:"frame-group",       vb:"0 0 125 166", w:125,h:166, radius:10, rim:8}
+];
+const NEED_IDS=["rim","face","gloss","press"];
+
+function fetchText(u){return fetch(u).then(r=>r.ok?r.text():null).catch(()=>null);}
+function rasterize(svgText,W,H){
+  return new Promise(function(res){
+    const blob=new Blob([svgText],{type:"image/svg+xml"});
+    const url=URL.createObjectURL(blob);
+    const img=new Image();
+    img.onload=function(){
+      const c=document.createElement("canvas");c.width=W;c.height=H;
+      const g=c.getContext("2d");g.clearRect(0,0,W,H);g.drawImage(img,0,0,W,H);
+      URL.revokeObjectURL(url);res(g.getImageData(0,0,W,H).data);
+    };
+    img.onerror=function(){URL.revokeObjectURL(url);res(null);};
+    img.src=url;
+  });
+}
+function row(cells,verdict){
+  const tr=document.createElement("tr");
+  cells.concat([verdict]).forEach(function(c){const td=document.createElement("td");td.innerHTML=c;tr.appendChild(td);});
+  return tr;
+}
+(async function(){
+  const body=document.getElementById("b");body.innerHTML="";
+  for(const s of SPEC){
+    const txt=await fetchText("../assets/ui/svg/"+s.id+".svg");
+    if(!txt){body.appendChild(row(["<code>"+s.id+".svg</code>","—","—","—","—","—","—"],'<span class="miss">未着</span>'));continue;}
+    const problems=[];
+
+    /* viewBox と width/height 属性 */
+    const vbM=txt.match(/viewBox\s*=\s*"([^"]+)"/);
+    const vb=vbM?vbM[1].trim().replace(/\s+/g," "):"なし";
+    if(vb!==s.vb)problems.push("viewBox が違う（期待 "+s.vb+" / 実際 "+vb+"）");
+    if(/<svg[^>]*\swidth\s*=/.test(txt))problems.push("svg に width 属性が付いている（拡大縮小できなくなる）");
+
+    /* 必須ID */
+    const missing=NEED_IDS.filter(function(n){return txt.indexOf('id="'+n+'"')<0;});
+    if(missing.length)problems.push("必須IDが無い: "+missing.join(" "));
+
+    /* ラスタライズして幾何を測る */
+    const D=await rasterize(txt,s.w,s.h);
+    let radNote="—",layerNote="—",lightNote="—";
+    if(!D){problems.push("SVGを描画できない（構文エラーの可能性）");}
+    else{
+      const A=(x,y)=>D[(y*s.w+x)*4+3];
+      const L=(x,y)=>{const i=(y*s.w+x)*4;return (D[i]*.299+D[i+1]*.587+D[i+2]*.114)|0;};
+      /* 角丸: 上端から、左端の食い込みが0になる行 */
+      let rad=-1;
+      for(let y=0;y<s.h/2;y++){let x=0;while(x<s.w&&A(x,y)<=16)x++;if(x===0){rad=y;break;}}
+      const wantR=s.radius, gotPct=(100*rad/s.h).toFixed(1), wantPct=(100*wantR/s.h).toFixed(1);
+      radNote=rad+"px ("+gotPct+"%)<br><small>期待 "+wantR+"px ("+wantPct+"%)</small>";
+      if(rad<0)problems.push("角丸を検出できない");
+      else if(Math.abs(rad-wantR)>Math.max(2,wantR*0.12))problems.push("角丸半径が仕様と違う（"+rad+"px / 期待 "+wantR+"px）");
+
+      /* 縁の層数: 上端中央から内側へ輝度の増減の折返しを数える */
+      const cx=s.w>>1;
+      const prof=[];for(let y=0;y<Math.min(s.h>>1,s.rim*2+6);y++)prof.push(L(cx,y));
+      let turns=0;
+      for(let i=2;i<prof.length-1;i++){
+        const a=prof[i]-prof[i-1], b=prof[i+1]-prof[i];
+        if(a>3&&b<-3)turns++; else if(a<-3&&b>3)turns++;
+      }
+      layerNote="折返し "+turns+"回<br><small>5層なら3回以上</small>";
+      if(turns<3)problems.push("縁が平坦（輝度の折返し "+turns+"回、5層なら3回以上）。2段グラデになっていないか");
+
+      /* 光源: 上端の縁が下端の縁より明るいこと */
+      let top=0,bot=0,n=0;
+      for(let x=(s.w*.3)|0;x<(s.w*.7)|0;x++){top+=L(x,Math.max(1,(s.rim*.3)|0));bot+=L(x,s.h-1-Math.max(1,(s.rim*.3)|0));n++;}
+      top=(top/n)|0;bot=(bot/n)|0;
+      lightNote="上 "+top+" / 下 "+bot;
+      if(top<=bot)problems.push("光源が仕様と違う（上端 "+top+" ≤ 下端 "+bot+"）。315°なら上が明るい");
+    }
+    const prev='<span class="prev"><img src="../assets/ui/svg/'+s.id+'.svg" style="height:52px"></span>';
+    const verdict=problems.length?'<span class="ng">要修正</span><br>'+problems.join("<br>"):'<span class="ok">合格</span>';
+    body.appendChild(row(["<code>"+s.id+".svg</code>",prev,
+      (vb===s.vb?'<span class="ok">':'<span class="ng">')+vb+"</span>",
+      radNote,layerNote,lightNote,
+      missing.length?'<span class="ng">'+missing.join(" ")+" が無い</span>":'<span class="ok">揃っている</span>'],verdict));
+  }
+})();
+</script></body></html>
