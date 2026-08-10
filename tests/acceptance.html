@@ -1,0 +1,77 @@
+<!doctype html><meta charset="utf-8"><style>html,body{margin:0}iframe{width:941px;height:1672px;border:0}</style>
+<body><pre id="out" style="position:fixed;z-index:9;background:#fff;font:12px monospace">running</pre>
+<iframe id="f" src="../index.html"></iframe>
+<script>
+const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
+document.getElementById("f").onload=function(){
+ setTimeout(function(){
+  const d=document.getElementById("f").contentDocument, w=document.getElementById("f").contentWindow;
+  const commons=function(){return [].slice.call(d.querySelectorAll("#commons .tile"));};
+  const myrow=function(){return [].slice.call(d.querySelectorAll("#myrow .tile"));};
+  const rackTiles=function(){return [].slice.call(d.querySelectorAll("#rack .tile"));};
+  const rackSlots=function(){return [].slice.call(d.querySelectorAll("#rack .slot"));};
+
+  ok(commons().length===15,"criterion2: commons renders 15 tiles at load (got "+commons().length+")");
+  const cs=w.getComputedStyle(d.getElementById("commons"));
+  ok(cs.gridTemplateColumns.split(" ").length===5,"criterion2: commons grid has 5 columns ("+cs.gridTemplateColumns+")");
+  const tops=new Set(commons().map(function(t){return Math.round(t.getBoundingClientRect().top);}));
+  ok(tops.size===3,"criterion2: commons occupies 3 rows (got "+tops.size+")");
+
+  ok(myrow().length===8,"criterion3: private row renders 8 tiles (got "+myrow().length+")");
+  const ptops=new Set(myrow().map(function(t){return Math.round(t.getBoundingClientRect().top);}));
+  ok(ptops.size===1,"criterion3: private 8 on a single line (distinct tops="+ptops.size+")");
+
+  ok(rackSlots().length+rackTiles().length===14,"criterion4: final hand always has 14 positions");
+  const rk=d.getElementById("rack").getBoundingClientRect();
+  ok(rk.left<=2&&rk.right>=939,"criterion4: rack spans edge to edge ("+Math.round(rk.left)+".."+Math.round(rk.right)+")");
+  const rtops=new Set([].concat(rackTiles(),rackSlots()).map(function(t){return Math.round(t.getBoundingClientRect().top);}));
+  ok(rtops.size<=2,"criterion4: final 14 on one line (distinct tops="+rtops.size+", tsumo may differ)");
+
+  // criterion 5/6: tap a common tile
+  const c0=commons()[0]; const id0=c0.querySelector(".face").innerHTML;
+  c0.click();
+  ok(rackTiles().length===1,"criterion5: tapping a common tile adds 1 tile to the final hand (got "+rackTiles().length+")");
+  ok(rackTiles()[0].querySelector(".face").innerHTML===id0,"criterion5: the same tile face appears in the final hand");
+  ok(commons()[0].classList.contains("used"),"criterion6: the source common tile is marked .used");
+  const op=parseFloat(w.getComputedStyle(commons()[0]).opacity);
+  ok(op<1,"criterion6: the source common tile is dimmed (opacity="+op+")");
+
+  // criterion 5: tap a private tile
+  myrow()[0].click();
+  ok(rackTiles().length===2,"criterion5: tapping a private tile also adds to the final hand (got "+rackTiles().length+")");
+  ok(myrow()[0].classList.contains("used"),"criterion6: the source private tile is marked .used");
+
+  // criterion 7: tap the final hand tile to release
+  rackTiles()[0].click();
+  ok(rackTiles().length===1,"criterion7: tapping a final-hand tile removes it (got "+rackTiles().length+")");
+  const stillUsed=commons().filter(function(t){return t.classList.contains("used");}).length
+                + myrow().filter(function(t){return t.classList.contains("used");}).length;
+  ok(stillUsed===1,"criterion7: the released source tile returns to normal (used count="+stillUsed+")");
+  rackTiles()[0].click();
+  ok(rackTiles().length===0&&rackSlots().length===14,"criterion7: releasing everything restores 14 empty slots");
+
+  // 14-tile cap + no auto-swap
+  for(let i=0;i<15;i++){const t=commons()[i];if(t)t.click();}
+  ok(rackTiles().length===14,"cap: never exceeds 14 (got "+rackTiles().length+")");
+  ok(!commons()[14].classList.contains("used"),"cap: the 15th tap is refused, no old tile is swapped out");
+  ok(d.getElementById("toast").classList.contains("on"),"cap: the 'remove one first' notice is shown");
+
+  // +4 reveal must keep the selection
+  const before=rackTiles().length;
+  const pend=d.querySelector(".revealGroup.pending");
+  ok(!!pend,"street: the next +4 group is tappable");
+  if(pend)pend.click();
+  ok(rackTiles().length===before,"street: revealing +4 keeps the selected hand ("+before+"->"+rackTiles().length+")");
+  ok(d.querySelectorAll("#revealRail .revealGroup")[0].querySelectorAll(".tile:not(.back)").length===4,"street: +4 I is now face up");
+
+  // criterion 8
+  ok(d.querySelectorAll('[draggable="true"]').length===0,"criterion8: ドラッグ可能な要素が存在しない");
+  ok([].slice.call(d.querySelectorAll(".tile img")).every(function(i){return i.draggable===false;}),
+     "criterion8: 牌面画像は draggable=false で明示的にドラッグ禁止");
+  ok(w.getComputedStyle(commons()[0]).touchAction==="manipulation","criterion8: tiles use touch-action:manipulation");
+
+  document.getElementById("out").textContent=log.join("\n");
+  document.title="DONE";
+ },900);
+};
+</script>
