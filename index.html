@@ -28,9 +28,25 @@ function skinChoices(){
   try{skinMemory=JSON.parse(localStorage.getItem(SKIN_KEY))||{};}catch(e){skinMemory={};}
   return skinMemory;
 }
+/* 所持状態。manifest の owned:false は「初期状態では未所持」という意味で、
+   ガチャで入手したものはここに積む。manifest を書き換えないので、
+   ChatGPTがカタログに追記しても所持状態と衝突しない。 */
+const OWN_KEY="mh.owned";
+let ownMemory=null;
+function ownedSet(){
+  if(ownMemory)return ownMemory;
+  try{ownMemory=JSON.parse(localStorage.getItem(OWN_KEY))||[];}catch(e){ownMemory=[];}
+  return ownMemory;
+}
+function skinOwned(s){return s.owned!==false||ownedSet().indexOf(s.slot+":"+s.id)>=0;}
+function skinGrant(s){
+  const o=ownedSet(),k=s.slot+":"+s.id;
+  if(o.indexOf(k)<0){o.push(k);ownMemory=o;
+    try{localStorage.setItem(OWN_KEY,JSON.stringify(o));}catch(e){}}
+}
 function skinChosen(slot){
   const id=skinChoices()[slot];
-  const ok=skinsForSlot(slot).some(function(s){return s.id===id&&s.owned!==false;});
+  const ok=skinsForSlot(slot).some(function(s){return s.id===id&&skinOwned(s);});
   return ok?id:skinDefaultFor(slot);
 }
 function skinApplySlot(slot){
@@ -848,16 +864,94 @@ html.has-chip-single .pv-chip{background-image:var(--asset-chip-single)}
   box-shadow:0 .5cqw 1.4cqw rgba(0,0,0,.55),inset 0 .12cqw 0 rgba(255,246,214,.24)}
 .cos-play:active{transform:translateY(.3cqw) scale(.99)}
 
-.shop-body{position:absolute;left:2.4cqw;right:2.4cqw;top:12.6cqw;bottom:2.4cqw;overflow-y:auto;
-  display:grid;grid-template-columns:repeat(2,1fr);gap:2cqw;align-content:start}
-.shop-card{border-radius:1.6cqw;padding:2.2cqw;text-align:center;
+/* ---- ガチャ ---- */
+.gc-banner{position:absolute;left:2.4cqw;right:2.4cqw;top:12.6cqw;height:34cqw;border-radius:1.6cqw;
+  overflow:hidden;padding:2cqw;
+  background:radial-gradient(120% 90% at 50% 0%,rgba(90,58,140,.55),rgba(8,26,21,.92) 62%),
+    linear-gradient(180deg,rgba(14,44,36,.95),rgba(4,16,13,.96));
+  border:.18cqw solid var(--ui-line);box-shadow:inset 0 0 4cqw rgba(0,0,0,.5)}
+.gc-title{text-align:center;font-family:"Shippori Mincho B1",serif;font-size:4cqw;font-weight:800;
+  letter-spacing:.16em;
+  background:linear-gradient(180deg,#FFF7D2 8%,#F0D273 44%,#A87A1C 78%,#F3DC97 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 .22cqw .3cqw rgba(0,0,0,.8))}
+.gc-feature{display:flex;gap:1.6cqw;justify-content:center;margin-top:1.8cqw}
+.gc-feat{width:15cqw;border-radius:1.2cqw;padding:.8cqw;text-align:center;
+  background:rgba(3,14,11,.6);border:.16cqw solid rgba(232,200,100,.3)}
+.gc-feat .cos-swatch{margin-bottom:.6cqw;border-radius:.8cqw}
+.gc-feat span{display:block;font-size:2cqw;color:#F0E7CC;white-space:nowrap;overflow:hidden;
+  text-overflow:ellipsis}
+.gc-period{position:absolute;left:2cqw;right:2cqw;bottom:1.4cqw;text-align:center;
+  font-size:2.1cqw;color:#94B3A8;letter-spacing:.1em}
+.gc-period b{color:#F0E7CC}
+
+.gc-draws{position:absolute;left:2.4cqw;right:2.4cqw;top:49cqw;height:13cqw;
+  display:grid;grid-template-columns:1fr 1fr 1.16fr;gap:1.6cqw}
+.gc-draw{border-radius:1.4cqw;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:.3cqw;
+  box-shadow:0 .45cqw 1.1cqw rgba(0,0,0,.55),inset 0 .18cqw 0 rgba(255,255,255,.55)}
+.gc-draw b{font-size:3cqw;font-weight:900;letter-spacing:.04em}
+.gc-draw small{font-size:2.1cqw;font-weight:700;opacity:.86}
+.gc-draw.free{background:linear-gradient(180deg,#7FD2B4,#1C7A5C);color:#08211A}
+.gc-draw.one {background:linear-gradient(180deg,#F5B25C,#A85410);color:#22120A}
+.gc-draw.ten {background:linear-gradient(180deg,#9BE87F,#2C8A2A);color:#0C220A}
+.gc-draw:active{transform:translateY(.3cqw) scale(.99)}
+.gc-draw:disabled{opacity:.38;filter:saturate(.3)}
+.gc-note{position:absolute;left:2.4cqw;right:2.4cqw;top:63cqw;text-align:center;
+  font-size:2.2cqw;color:#94B3A8;letter-spacing:.04em}
+.gc-note.warn{color:#F0D273}
+
+.gc-pity{position:absolute;left:2.4cqw;right:2.4cqw;top:68cqw;height:9cqw;border-radius:1.4cqw;
+  padding:0 1.6cqw;display:flex;align-items:center;gap:1.4cqw;
+  background:linear-gradient(180deg,rgba(10,32,26,.92),rgba(3,14,11,.95));
+  border:.16cqw solid var(--ui-line)}
+.gc-pity span{font-size:2.4cqw;color:#B7CCC3;letter-spacing:.08em}
+.gc-pity b{font-size:3.4cqw;font-weight:900;color:var(--ui-gold);font-variant-numeric:tabular-nums}
+.gc-pity em{margin-left:auto;font-style:normal;font-size:2cqw;color:#7E9990}
+.gc-ex{padding:1cqw 3cqw;border-radius:99cqw;font-size:2.4cqw;font-weight:900;color:#12211B;
+  background:linear-gradient(180deg,#FFF0B7,#C9A227)}
+.gc-ex:disabled{opacity:.35;filter:saturate(.2)}
+
+.gc-lineuphead{position:absolute;left:2.8cqw;top:79.5cqw;font-size:2.4cqw;letter-spacing:.16em;
+  color:#94B3A8}
+
+.shop-body{position:absolute;left:2.4cqw;right:2.4cqw;top:84cqw;bottom:2.4cqw;overflow-y:auto;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1.6cqw;align-content:start}
+.shop-card{position:relative;border-radius:1.4cqw;padding:1.2cqw;text-align:center;
   background:linear-gradient(180deg,rgba(12,40,33,.92),rgba(4,18,14,.95));
   border:.18cqw solid rgba(232,200,100,.22)}
-.shop-card .cos-swatch{aspect-ratio:16/9}
-.shop-card b{display:block;font-size:3cqw;color:#F0E7CC}
-.shop-card small{display:block;margin-top:.5cqw;font-size:2.1cqw;color:#8FA79E;line-height:1.5}
-.shop-card .price{display:inline-block;margin-top:1.4cqw;padding:.8cqw 2.6cqw;border-radius:99cqw;
-  font-size:2.5cqw;font-weight:900;color:#12211B;background:linear-gradient(180deg,#FFF0B7,#C9A227)}
+.shop-card .cos-swatch{aspect-ratio:16/10;margin-bottom:.8cqw}
+.shop-card b{display:block;font-size:2.5cqw;color:#F0E7CC}
+.shop-card small{display:block;margin-top:.3cqw;font-size:1.9cqw;color:#8FA79E;line-height:1.45}
+.shop-card .price{display:inline-block;margin-top:.9cqw;padding:.5cqw 1.8cqw;border-radius:99cqw;
+  font-size:2.1cqw;font-weight:900;color:#12211B;background:linear-gradient(180deg,#FFF0B7,#C9A227)}
+.shop-card.have{border-color:rgba(127,214,160,.5)}
+.shop-card.have .price{background:linear-gradient(180deg,#A8E8C0,#2E8A56);color:#082018}
+
+/* 入手演出 */
+.gc-modal{position:absolute;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
+  background:radial-gradient(72% 48% at 50% 42%,#123528 0%,#061a14 52%,#020a08 100%)}
+.gc-modal.on{display:flex}
+.gc-modalbody{width:86cqw;text-align:center}
+.gc-modaltitle{font-family:"Shippori Mincho B1",serif;font-size:5cqw;font-weight:800;letter-spacing:.3em;
+  background:linear-gradient(180deg,#FFF7D2,#F0D273 46%,#A87A1C);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 .3cqw .4cqw rgba(0,0,0,.8));margin-bottom:2.4cqw}
+.gc-cards{display:flex;flex-wrap:wrap;gap:1.6cqw;justify-content:center;margin-bottom:3cqw}
+.gc-card{width:19.5cqw;border-radius:1.4cqw;padding:1cqw;
+  background:linear-gradient(180deg,rgba(20,58,48,.96),rgba(5,20,16,.97));
+  border:.2cqw solid var(--ui-gold);box-shadow:0 0 2.6cqw rgba(232,200,100,.4);
+  animation:gcPop .34s cubic-bezier(.2,.9,.3,1.5) both}
+.gc-card .cos-swatch{margin-bottom:.7cqw}
+.gc-card b{display:block;font-size:2.3cqw;color:#FFF3CE}
+.gc-card small{display:block;font-size:1.8cqw;color:#8FA79E;line-height:1.3}
+.gc-card.dup{border-color:rgba(159,182,172,.5);box-shadow:none}
+@keyframes gcPop{from{opacity:0;transform:translateY(2cqw) scale(.86)}to{opacity:1;transform:none}}
+html.still .gc-card{animation:none}
+@media (prefers-reduced-motion:reduce){.gc-card{animation:none}}
+.gc-ok{padding:2cqw 10cqw;border-radius:99cqw;font-size:3.4cqw;font-weight:900;letter-spacing:.2em;
+  background:linear-gradient(180deg,#2E6654,#0A2B22);border:.2cqw solid var(--ui-line);
+  box-shadow:0 .5cqw 1.4cqw rgba(0,0,0,.55),inset 0 .12cqw 0 rgba(255,246,214,.24)}
 
 /* 対局画面からロビーへ戻る小さな導線。Golden Visual との重ね合わせ時は隠す */
 .gameHome{position:absolute;left:1.6cqw;top:1.6cqw;z-index:30;
@@ -972,15 +1066,45 @@ html.calib #calib{display:block}
   </div>
 </section>
 
-<!-- ============ ショップ（外見のみ） ============ -->
+<!-- ============ 装飾品ガチャ（決済は繋がない） ============ -->
 <section id="screen-shop" class="screen">
   <div class="cos-veil"></div>
   <header class="cos-top">
     <button class="backBtn" data-go="lobby">◀</button>
-    <h2>ショップ</h2>
-    <div class="cos-hint">未実装。決済は繋がっていません</div>
+    <h2>装飾品ガチャ</h2>
+    <div class="lb-wallet">
+      <span class="lb-coin"><i class="cur cur-c"></i><b id="shCoin">0</b></span>
+      <span class="lb-coin"><i class="cur cur-g"></i><b id="shGem">0</b></span>
+    </div>
   </header>
+
+  <div class="gc-banner">
+    <div class="gc-title">装飾品ピックアップ</div>
+    <div class="gc-feature" id="gcFeature"></div>
+    <div class="gc-period">期間 <b>期間なし</b></div>
+  </div>
+
+  <div class="gc-draws">
+    <button class="gc-draw free" data-draw="free"><b>1日1回</b><small>無料</small></button>
+    <button class="gc-draw one"  data-draw="1"><b>1回引く</b><small>宝玉 200</small></button>
+    <button class="gc-draw ten"  data-draw="10"><b>10回引く</b><small>宝玉 2,000</small></button>
+  </div>
+  <div class="gc-note" id="gcNote">10連なら未所持の装飾品が必ず1つ以上出ます</div>
+
+  <div class="gc-pity"><span>天井P</span><b id="gcPity">0</b>
+    <em>200pt で好きな装飾品と交換</em>
+    <button class="gc-ex" id="bExchange">交換</button></div>
+
+  <div class="gc-lineuphead">ラインナップ</div>
   <div class="shop-body" id="shopBody"></div>
+
+  <div class="gc-modal" id="gcModal">
+    <div class="gc-modalbody">
+      <div class="gc-modaltitle" id="gcModalTitle">入手</div>
+      <div class="gc-cards" id="gcCards"></div>
+      <button class="gc-ok" id="bGachaClose"><span class="gold-text">OK</span></button>
+    </div>
+  </div>
 </section>
 
 <!-- ============ 対局（既存画面。中身は一切変えていない） ============ -->
@@ -1876,7 +2000,7 @@ function cosRender(){
   grid.innerHTML="";
   const chosen=skinChosen(cosSlot);
   skinsForSlot(cosSlot).forEach(function(s){
-    const locked=s.owned===false;
+    const locked=!skinOwned(s);
     const el=document.createElement("button");
     el.className="cos-item"+(s.id===chosen?" on":"")+(locked?" locked":"");
     el.innerHTML='<span class="cos-swatch" style="'+cosSwatchStyle(def,s)+'"></span>'+
@@ -1884,7 +2008,7 @@ function cosRender(){
       (locked?'<span class="lock">🔒</span><span class="price">'+
         (s.price?s.price.toLocaleString()+" 宝玉":"未実装")+"</span>":"");
     el.onclick=function(){
-      if(locked){cosNotice(s.price?"「"+s.name+"」は未所持です。ショップで入手できます。"
+      if(locked){cosNotice(s.price?"「"+s.name+"」は未所持です。ガチャで入手できます。"
                                   :"「"+s.name+"」はまだ素材が用意できていません。");return;}
       skinSelect(cosSlot,s.id);
       cosRender();
@@ -1893,21 +2017,127 @@ function cosRender(){
   });
 }
 
-function shopRender(){
-  const body=document.getElementById("shopBody");
-  if(body.childElementCount)return;
-  SKIN_DATA.skins.filter(function(s){return s.owned===false&&s.price;}).forEach(function(s){
-    const slot=skinSlotDef(s.slot);
-    const c=document.createElement("div");c.className="shop-card";
+/* ======================================================================
+   装飾品ガチャ
+   決済は繋がない。所持は skinGrant() が manifest ではなく localStorage 側に積むので、
+   ChatGPTがカタログへ追記しても所持状態と衝突しない。
+   引いた装飾品はそのまま装飾品設定で装備でき、対局画面に反映される。
+   ====================================================================== */
+const WALLET_KEY="mh.wallet";
+let walletMemory=null;
+function wallet(){
+  if(walletMemory)return walletMemory;
+  let w=null;try{w=JSON.parse(localStorage.getItem(WALLET_KEY));}catch(e){}
+  walletMemory=w||{coin:10000,gem:3000,pity:0,freeUsed:false};
+  return walletMemory;
+}
+function walletSave(){try{localStorage.setItem(WALLET_KEY,JSON.stringify(wallet()));}catch(e){}}
+function walletPaint(){
+  const w=wallet();
+  [["shCoin",w.coin],["lbCoin",w.coin],["shGem",w.gem],["lbGem",w.gem]].forEach(function(p){
+    const el=document.getElementById(p[0]);if(el)el.textContent=p[1].toLocaleString();
+  });
+  const p=document.getElementById("gcPity");if(p)p.textContent=w.pity;
+}
+
+const GACHA_COST={"1":200,"10":2000,"free":0};
+/* 価格の無いもの（素材待ちの予約枠）は排出対象にしない */
+function gachaPool(){return SKIN_DATA.skins.filter(function(s){return s.owned===false&&s.price;});}
+function gachaUnowned(){return gachaPool().filter(function(s){return !skinOwned(s);});}
+
+function gachaNote(text,warn){
+  const el=document.getElementById("gcNote");
+  el.textContent=text;el.classList.toggle("warn",!!warn);
+}
+
+function gachaDraw(kind){
+  const w=wallet(),n=kind==="10"?10:1,cost=GACHA_COST[kind];
+  if(kind==="free"&&w.freeUsed){gachaNote("本日の無料分は引き終わっています",true);return;}
+  if(w.gem<cost){gachaNote("宝玉が足りません（必要 "+cost.toLocaleString()+"）",true);return;}
+  if(!gachaPool().length){gachaNote("入手できる装飾品がまだ登録されていません",true);return;}
+
+  w.gem-=cost;
+  if(kind==="free")w.freeUsed=true;
+  w.pity+=n;
+
+  /* 10連は未所持を1つ以上保証する。1回引きは未所持があればそこから、
+     無ければ重複としてコインに変える。 */
+  const results=[];
+  for(let i=0;i<n;i++){
+    const un=gachaUnowned();
+    const guarantee=(kind==="10"&&i===n-1&&results.every(function(r){return r.dup;}));
+    if(un.length&&(guarantee||Math.random()<0.34)){
+      const s=un[Math.floor(Math.random()*un.length)];
+      skinGrant(s);results.push({skin:s,dup:false});
+    }else{
+      const s=gachaPool()[Math.floor(Math.random()*gachaPool().length)];
+      w.coin+=500;results.push({skin:s,dup:true});
+    }
+  }
+  walletSave();walletPaint();
+  gachaShow(results);
+  shopPaint();
+  gachaNote(results.some(function(r){return !r.dup;})
+    ? "装飾品設定から装備できます" : "重複はコインに変わりました");
+}
+
+function gachaShow(results){
+  const cards=document.getElementById("gcCards");cards.innerHTML="";
+  results.forEach(function(r){
+    const slot=skinSlotDef(r.skin.slot);
+    const c=document.createElement("div");c.className="gc-card"+(r.dup?" dup":"");
+    c.innerHTML='<span class="cos-swatch" style="'+cosSwatchStyle(slot,r.skin)+'"></span>'+
+      "<b>"+r.skin.name+"</b><small>"+(r.dup?"重複 +500 コイン":((slot&&slot.name)||""))+"</small>";
+    cards.appendChild(c);
+  });
+  const got=results.filter(function(r){return !r.dup;}).length;
+  document.getElementById("gcModalTitle").textContent=got?"入　手":"重　複";
+  document.getElementById("gcModal").classList.add("on");
+}
+
+function gachaExchange(){
+  const w=wallet();
+  if(w.pity<200){gachaNote("天井Pが足りません（200pt で交換）",true);return;}
+  const un=gachaUnowned();
+  if(!un.length){gachaNote("交換できる装飾品がありません",true);return;}
+  w.pity-=200;skinGrant(un[0]);walletSave();walletPaint();
+  gachaShow([{skin:un[0],dup:false}]);shopPaint();
+}
+
+function shopPaint(){
+  const body=document.getElementById("shopBody");body.innerHTML="";
+  gachaPool().forEach(function(s){
+    const slot=skinSlotDef(s.slot),have=skinOwned(s);
+    const c=document.createElement("div");c.className="shop-card"+(have?" have":"");
     c.innerHTML='<span class="cos-swatch" style="'+cosSwatchStyle(slot,s)+'"></span>'+
-      "<b>"+s.name+"</b><small>"+((slot&&slot.name)||"")+" ・ "+(s.note||"")+"</small>"+
-      '<span class="price">'+s.price.toLocaleString()+" 宝玉</span>";
+      "<b>"+s.name+"</b><small>"+((slot&&slot.name)||"")+"</small>"+
+      '<span class="price">'+(have?"所持":(s.price?s.price.toLocaleString()+" 宝玉":"—"))+"</span>";
     body.appendChild(c);
   });
+  const feat=document.getElementById("gcFeature");feat.innerHTML="";
+  gachaPool().slice(0,3).forEach(function(s){
+    const slot=skinSlotDef(s.slot);
+    const d=document.createElement("div");d.className="gc-feat";
+    d.innerHTML='<span class="cos-swatch" style="'+cosSwatchStyle(slot,s)+'"></span><span>'+s.name+"</span>";
+    feat.appendChild(d);
+  });
+  document.getElementById("bExchange").disabled=wallet().pity<200;
+  document.querySelector('.gc-draw[data-draw="free"]').disabled=!!wallet().freeUsed;
 }
+
+function shopRender(){walletPaint();shopPaint();}
+
+document.querySelectorAll("[data-draw]").forEach(function(b){
+  b.onclick=function(){gachaDraw(b.dataset.draw);};
+});
+document.getElementById("bExchange").onclick=gachaExchange;
+document.getElementById("bGachaClose").onclick=function(){
+  document.getElementById("gcModal").classList.remove("on");
+};
 
 /* 配牌アニメーションが走るよう、newHand() の前に対局画面を可視にしておく */
 showScreen(new URLSearchParams(location.search).get("screen")||"title");
+walletPaint();
 newHand();
 if(currentScreen==="cosmetics")cosRender();
 if(currentScreen==="shop")shopRender();

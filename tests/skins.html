@@ -125,6 +125,61 @@ f.onload=function(){setTimeout(function(){
   ok(w.eval('phase')==="play"&&w.eval("stage")===1,"「次の局へ」で新しい局が始まる");
   ok(d.querySelectorAll("#commons .tile").length===15,"新しい局でも共通15枚");
 
+  /* ---- ガチャ: 引く → 所持する → 装備できる ---- */
+  w.go("shop");
+  const pool=w.gachaPool();
+  ok(pool.length>0,"排出対象がある ("+pool.length+"件)");
+  ok(pool.every(function(s){return s.price;}),"価格の無い予約枠は排出対象に入っていない");
+  const target=pool[0];
+  ok(!w.skinOwned(target),"引く前は「"+target.name+"」は未所持");
+
+  const gem0=w.wallet().gem;
+  d.querySelector('.gc-draw[data-draw="1"]').click();
+  ok(w.wallet().gem===gem0-200,"1回引くと宝玉が200減る ("+gem0+" -> "+w.wallet().gem+")");
+  ok(w.wallet().pity===1,"天井Pが1増える");
+  ok(d.getElementById("gcModal").classList.contains("on"),"入手演出が出る");
+  ok(d.querySelectorAll("#gcCards .gc-card").length===1,"1回引きはカード1枚");
+  d.getElementById("bGachaClose").click();
+  ok(!d.getElementById("gcModal").classList.contains("on"),"OKで閉じる");
+
+  const gem1=w.wallet().gem;
+  d.querySelector('.gc-draw[data-draw="10"]').click();
+  ok(w.wallet().gem===gem1-2000,"10連で宝玉が2000減る");
+  ok(d.querySelectorAll("#gcCards .gc-card").length===10,"10連はカード10枚");
+  ok(w.gachaUnowned().length===0||w.gachaPool().some(function(s){return w.skinOwned(s);}),
+     "10連で未所持がひとつ以上入手できた");
+  d.getElementById("bGachaClose").click();
+
+  /* 入手したものが装飾品設定で選べて、対局画面に効くこと */
+  const got=w.gachaPool().filter(function(s){return w.skinOwned(s);});
+  ok(got.length>0,"入手済みの装飾品がある ("+got.map(function(s){return s.name;}).join("・")+")");
+  w.go("cosmetics");
+  /* cosSlot / ownMemory はトップレベルの let なので window のプロパティではない。
+     代入は eval を通す。w.cosSlot=... だと別物を作るだけで効かない。 */
+  w.eval("cosSlot="+JSON.stringify(got[0].slot)+";cosRender()");
+  const lockedNow=[].slice.call(d.querySelectorAll("#cosGrid .cos-item.locked")).length;
+  const itemsNow=d.querySelectorAll("#cosGrid .cos-item").length;
+  ok(lockedNow<itemsNow,"入手済みは装飾品設定で鍵が外れている ("+lockedNow+"/"+itemsNow+" が未所持)");
+  w.skinSelect(got[0].slot,got[0].id);
+  ok(w.skinChosen(got[0].slot)===got[0].id,
+     "入手した「"+got[0].name+"」を装備できた");
+  ok(root.getAttribute("data-skin-"+got[0].slot)===got[0].id,
+     "装備が html の data-skin-"+got[0].slot+" に反映された");
+
+  /* 天井交換 */
+  /* 排出対象は今4件しかなく、10連で全部そろってしまうことがある。
+     交換の検査は所持状態をまっさらに戻してから行う。 */
+  w.eval("ownMemory=[]");
+  ok(w.gachaUnowned().length===w.gachaPool().length,"所持状態を戻せた");
+  w.go("shop");
+  w.wallet().pity=200;w.shopPaint();
+  ok(!d.getElementById("bExchange").disabled,"200pt たまると交換ボタンが押せる");
+  const un0=w.gachaUnowned().length;
+  d.getElementById("bExchange").click();
+  ok(w.wallet().pity===0,"天井交換で200pt消費 (pity="+w.wallet().pity+")");
+  ok(w.gachaUnowned().length===un0-1,"天井交換で未所持が1つ減った");
+  d.getElementById("bGachaClose").click();
+
   document.getElementById("out").textContent=
     log.join("\n")+"\n\n"+log.filter(function(l){return l[0]==="F";}).length+" FAIL / "+log.length+" total";
 },700);};
