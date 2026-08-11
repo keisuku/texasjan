@@ -1,0 +1,49 @@
+<!doctype html><meta charset="utf-8">
+<title>製品フローの検査 — MAHJONG HOLD'EM</title>
+<style>html,body{margin:0}iframe{width:941px;height:1672px;border:0}
+pre{position:fixed;z-index:9;background:#fff;font:12px/1.6 monospace;padding:6px;margin:0}</style>
+<body><pre id="out">running</pre>
+<script>
+const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
+const f=document.createElement("iframe");f.src="../index.html?still=1";document.body.appendChild(f);
+f.onload=function(){setTimeout(function(){
+  const d=f.contentDocument,w=f.contentWindow;
+  const on=function(id){return d.getElementById("screen-"+id).classList.contains("on");};
+  try{
+    ok(on("title"),"起動時はタイトル画面");
+    d.getElementById("bTitleStart").click();
+    ok(on("lobby"),"タイトルからロビーへ進む");
+
+    d.querySelector('[data-match="rank"]').click();
+    ok(on("match"),"ランク戦を選ぶとマッチング画面へ進む");
+    ok(d.querySelectorAll("#mtTable .mt-seat").length===6,"対戦する6席が表示される");
+    ok(/ランク戦/.test(d.getElementById("mtMode").textContent),"選択したモードが引き継がれる");
+
+    d.getElementById("bMatchStart").click();
+    ok(on("game"),"対局開始で卓へ入る");
+    ok(w.eval("stage")===1&&d.querySelectorAll("#commons .tile").length===15,
+       "対局は共通15枚公開済みで始まる");
+
+    for(let k=0;k<3;k++)d.getElementById("bNext").click();
+    d.getElementById("bRec").click();
+    if(w.eval("picks.length")<14){
+      [].slice.call(d.querySelectorAll("#commons .tile:not(.used)")).some(function(t){
+        t.click();return w.eval("picks.length")===14;
+      });
+    }
+    ok(w.eval("stage")===4&&w.eval("picks.length")===14,"ショーダウン可能な状態まで進む");
+    d.getElementById("bNext").click();
+    ok(w.eval('phase')==="result","ショーダウンで勝敗が確定する");
+    d.getElementById("bNext").click();
+    ok(on("result"),"卓上の決着確認後に独立した結果画面へ進む");
+    ok(d.querySelectorAll("#rsRanking .rs-rankrow").length===6,"結果画面に6人の順位がある");
+    ok(d.getElementById("rsDelta").textContent.length>0,"ランクポイント増減が表示される");
+
+    d.getElementById("bResultLobby").click();
+    ok(on("lobby"),"結果画面からロビーへ戻れる");
+  }catch(e){log.push("THREW "+e.message);}
+  document.getElementById("out").textContent=log.join("\n")+"\n\n"+
+    log.filter(function(x){return x.indexOf("FAIL")===0||x.indexOf("THREW")===0;}).length+" FAIL / "+log.length+" total";
+  document.title="DONE";
+},900);};
+</script>

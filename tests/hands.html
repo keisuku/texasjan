@@ -31,7 +31,8 @@ f.onload=function(){
     if(E("resultText").length>0)winners++;
     const t=total();
     if(t!==TOTAL){conserved=false;bad="局"+h+" total="+t;}
-    d.getElementById("bNext").click();   /* 次の局へ */
+    d.getElementById("bNext").click();   /* 結果画面へ */
+    d.getElementById("bResultAgain").click(); /* 次の局へ */
   }
   ok(hands===30&&!bad,"30局を通しで回した "+bad);
   ok(conserved,"点棒総和が全局で保存された（期待 "+TOTAL+"）");

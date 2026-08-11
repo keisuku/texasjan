@@ -626,7 +626,7 @@ html[data-skin-frame="sharp"] .betBar .call{font-size:3.4cqw}
    新しい画面だけそれを打ち消す。#screen-game には効かせない。
    :where() で詳細度を0にしてあるので、この下の .cos-item などの指定は全て素通しで勝つ。
    :is() だとID分の詳細度を持ち込んで各部品の指定を潰してしまう。 */
-:where(#screen-title,#screen-lobby,#screen-cosmetics,#screen-shop) button{
+:where(#screen-title,#screen-lobby,#screen-match,#screen-result,#screen-cosmetics,#screen-shop) button{
   flex:0 0 auto;font:inherit;font-weight:inherit;letter-spacing:normal;color:inherit;
   border:0;background:none;padding:0;border-radius:0;cursor:pointer;text-align:inherit}
 
@@ -778,6 +778,79 @@ html.has-character .lb-standee .lb-standeecap{display:none}
 .lb-navbtn.on{background:linear-gradient(180deg,rgba(232,200,100,.22),rgba(232,200,100,.06));
   box-shadow:inset 0 0 0 .14cqw var(--ui-line)}
 .lb-navbtn:active{transform:scale(.96)}
+
+/* ---------------- マッチング ----------------
+   ロビーから卓へ瞬間移動させない。対戦相手と席が確定する一呼吸を独立画面にし、
+   「誰と戦うのか」を見せてから既存の対局画面へ渡す。 */
+#screen-match{background:#04120E var(--asset-arena,url("./assets/arena-with-characters-v1.webp"))
+  center/145% 145% no-repeat}
+.mt-veil{position:absolute;inset:0;background:radial-gradient(82% 58% at 50% 43%,rgba(13,64,51,.64),rgba(2,14,11,.94) 76%)}
+.mt-top{position:absolute;left:3cqw;right:3cqw;top:3cqw;height:8cqw;display:flex;align-items:center;gap:2cqw}
+.mt-top h2{font-family:"Shippori Mincho B1",serif;font-size:4.3cqw;color:#F6E9C2;letter-spacing:.14em}
+.mt-top span{margin-left:auto;font-size:2.2cqw;color:#79B7A1;letter-spacing:.18em}
+.mt-copy{position:absolute;left:8cqw;right:8cqw;top:15cqw;text-align:center}
+.mt-copy .eyebrow{font-size:2.2cqw;color:#86DBC8;letter-spacing:.38em}
+.mt-copy h3{margin-top:1.1cqw;font-family:"Shippori Mincho B1",serif;font-size:6.4cqw;color:#FFF0B7;letter-spacing:.12em;
+  text-shadow:0 .35cqw .8cqw rgba(0,0,0,.75)}
+.mt-copy p{margin-top:1cqw;font-size:2.5cqw;color:#9BB8AE;letter-spacing:.08em}
+.mt-table{position:absolute;left:50%;top:54%;width:76cqw;height:76cqw;transform:translate(-50%,-50%);border-radius:50%;
+  background:radial-gradient(ellipse at center,#174F40 0 37%,#0B3328 38% 58%,#031B15 59% 100%);
+  border:.38cqw solid #B98C2B;box-shadow:0 0 0 .8cqw rgba(39,22,5,.72),0 2cqw 6cqw rgba(0,0,0,.68),
+    inset 0 0 4cqw rgba(101,210,173,.16)}
+.mt-table::after{content:"6-MAX";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
+  font-family:"Shippori Mincho B1",serif;font-size:5cqw;font-weight:800;letter-spacing:.22em;color:rgba(240,216,143,.58)}
+.mt-seat{position:absolute;width:22cqw;transform:translate(-50%,-50%);text-align:center;animation:mtJoin .42s both;
+  animation-delay:calc(var(--i)*80ms)}
+@keyframes mtJoin{from{opacity:0;transform:translate(-50%,-50%) scale(.72)}to{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.mt-seat:nth-child(1){left:50%;top:4%}.mt-seat:nth-child(2){left:94%;top:31%}.mt-seat:nth-child(3){left:90%;top:78%}
+.mt-seat:nth-child(4){left:50%;top:98%}.mt-seat:nth-child(5){left:10%;top:78%}.mt-seat:nth-child(6){left:6%;top:31%}
+.mt-face{width:9cqw;height:9cqw;margin:0 auto .8cqw;border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-family:"Shippori Mincho B1",serif;font-size:4cqw;font-weight:800;color:#10251E;
+  background:linear-gradient(145deg,#FFF0B7,#C9A227 58%,#765612);border:.2cqw solid #FFF0B7;
+  box-shadow:0 .35cqw 1cqw rgba(0,0,0,.62)}
+.mt-seat.you .mt-face{background:linear-gradient(145deg,#B6FAF4,#55CFC4 54%,#167369);box-shadow:0 0 2.2cqw rgba(90,239,224,.64)}
+.mt-seat b{display:block;font-size:2.4cqw;color:#F3E6C5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mt-seat small{display:block;margin-top:.25cqw;font-size:1.8cqw;color:#79A496;letter-spacing:.08em}
+.mt-start{position:absolute;left:12cqw;right:12cqw;bottom:8cqw;height:11cqw;border-radius:99cqw;
+  display:flex;align-items:center;justify-content:center;gap:1.4cqw;font-size:3.6cqw;font-weight:900;letter-spacing:.16em;
+  color:#1B1508;background:linear-gradient(180deg,#FFF3CE,#E6BD52 45%,#9A6815);
+  box-shadow:0 .7cqw 1.8cqw rgba(0,0,0,.58),0 0 3cqw rgba(232,200,100,.32),inset 0 .18cqw 0 rgba(255,255,255,.72)}
+.mt-start::after{content:"▶";font-size:2.6cqw}.mt-start:active{transform:translateY(.3cqw) scale(.99)}
+
+/* ---------------- 対局結果 ---------------- */
+#screen-result{background:#04120E var(--asset-arena,url("./assets/arena-with-characters-v1.webp")) center/150% 150% no-repeat}
+.rs-veil{position:absolute;inset:0;background:linear-gradient(180deg,rgba(2,13,10,.91),rgba(7,34,27,.78) 43%,#02100C 100%)}
+.rs-top{position:absolute;left:3cqw;right:3cqw;top:3cqw;height:8cqw;display:flex;align-items:center;justify-content:center}
+.rs-top span{font-size:2.3cqw;color:#8CCDBB;letter-spacing:.38em}
+.rs-hero{position:absolute;left:7cqw;right:7cqw;top:13cqw;height:28cqw;text-align:center;border-radius:2.2cqw;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:radial-gradient(85% 130% at 50% 0%,rgba(229,191,79,.34),rgba(9,39,31,.94) 70%);
+  border:.2cqw solid rgba(240,214,132,.72);box-shadow:0 1.2cqw 3cqw rgba(0,0,0,.58)}
+.rs-crown{font-size:5.5cqw;line-height:1;color:#F4D675;text-shadow:0 0 2cqw rgba(244,205,95,.7)}
+.rs-title{margin-top:1cqw;font-family:"Shippori Mincho B1",serif;font-size:8cqw;color:#FFF3CE;letter-spacing:.18em;
+  text-shadow:0 .4cqw .6cqw rgba(0,0,0,.75)}
+.rs-title.lose{color:#B8CAC3}.rs-summary{margin-top:1cqw;font-size:2.4cqw;color:#A8C2B8;letter-spacing:.06em}
+.rs-pot{margin-top:1.2cqw;font-family:"Shippori Mincho B1",serif;font-size:4.4cqw;color:#F0D273;font-weight:800}
+.rs-handbox{position:absolute;left:3cqw;right:3cqw;top:44cqw;height:16cqw;padding:2cqw;border-radius:1.6cqw;
+  background:rgba(3,20,16,.9);border:.16cqw solid var(--ui-line)}
+.rs-label{font-size:2cqw;color:#8FA79E;letter-spacing:.2em;margin-bottom:1.3cqw}
+.rs-tiles{display:flex;justify-content:center;gap:.25cqw}.rs-tiles .tile{--w:5.7cqw;cursor:default}
+.rs-ranking{position:absolute;left:3cqw;right:3cqw;top:63cqw;height:49cqw;padding:1.4cqw 2cqw;border-radius:1.6cqw;
+  background:rgba(3,20,16,.92);border:.16cqw solid var(--ui-line);overflow:hidden}
+.rs-rankrow{height:7.5cqw;display:grid;grid-template-columns:7cqw 1fr 20cqw;align-items:center;border-bottom:.1cqw solid rgba(232,200,100,.12)}
+.rs-rankrow:last-child{border-bottom:0}.rs-rankrow.you{background:linear-gradient(90deg,rgba(91,221,199,.16),transparent)}
+.rs-pos{font-family:"Shippori Mincho B1",serif;font-size:3.3cqw;color:#E8C864}.rs-name{font-size:2.6cqw;color:#E8EEE9;font-weight:700}
+.rs-stack{text-align:right;font-size:2.6cqw;color:#F0D273;font-variant-numeric:tabular-nums}
+.rs-reward{position:absolute;left:8cqw;right:8cqw;top:115cqw;height:12cqw;border-radius:1.5cqw;
+  display:flex;align-items:center;justify-content:center;gap:2cqw;background:rgba(8,37,29,.94);border:.18cqw solid var(--ui-line)}
+.rs-reward span{font-size:2.4cqw;color:#9BB8AE;letter-spacing:.08em}.rs-reward b{font-size:4cqw;color:#83E3C9}.rs-reward b.down{color:#E58C78}
+.rs-actions{position:absolute;left:4cqw;right:4cqw;bottom:5cqw;height:11cqw;display:grid;grid-template-columns:1.35fr 1fr;gap:2cqw}
+.rs-actions button{border-radius:1.6cqw;display:flex;align-items:center;justify-content:center;font-size:3.2cqw;font-weight:900;letter-spacing:.12em}
+.rs-again{color:#1B1508;background:linear-gradient(180deg,#FFF3CE,#D7A937 60%,#8A5E12);box-shadow:0 .55cqw 1.3cqw rgba(0,0,0,.5)}
+.rs-lobby{color:#E8D9AD;background:linear-gradient(180deg,rgba(24,60,49,.96),rgba(5,24,19,.96));border:.18cqw solid var(--ui-line)!important}
+.rs-actions button:active{transform:translateY(.3cqw) scale(.99)}
+html.still .mt-seat{animation:none}
+@media(prefers-reduced-motion:reduce){.mt-seat{animation:none}}
 
 /* ---------------- 装飾品設定 / ショップ ---------------- */
 #screen-cosmetics,#screen-shop{background:#04120E}
@@ -1016,9 +1089,9 @@ html.calib #calib{display:block}
   </button>
 
   <div class="lb-modes">
-    <button class="lb-mode primary" data-go="game">
+    <button class="lb-mode primary" data-match="rank">
       <b>ランク戦</b><small>RANK MATCH</small></button>
-    <button class="lb-mode" data-go="game">
+    <button class="lb-mode" data-match="ring">
       <b>リング戦</b><small>RING GAME</small></button>
     <button class="lb-mode soon" disabled>
       <b>大　会</b><small>TOURNAMENT</small></button>
@@ -1042,6 +1115,23 @@ html.calib #calib{display:block}
   </nav>
 </section>
 
+<!-- ============ マッチング／卓入場 ============ -->
+<section id="screen-match" class="screen">
+  <div class="mt-veil"></div>
+  <header class="mt-top">
+    <button class="backBtn" data-go="lobby">◀</button>
+    <h2 id="mtMode">ランク戦</h2>
+    <span>6 / 6 READY</span>
+  </header>
+  <div class="mt-copy">
+    <div class="eyebrow">TABLE FOUND</div>
+    <h3>対戦相手が揃いました</h3>
+    <p id="mtRule">6人戦・持ち点制・共通15枚</p>
+  </div>
+  <div class="mt-table" id="mtTable"></div>
+  <button class="mt-start" id="bMatchStart">対局開始</button>
+</section>
+
 <!-- ============ 装飾品設定 ============ -->
 <section id="screen-cosmetics" class="screen">
   <div class="cos-veil"></div>
@@ -1062,7 +1152,7 @@ html.calib #calib{display:block}
   </div>
 
   <div class="cos-foot">
-    <button class="cos-play" data-go="game"><span class="gold-text">この装いで対局する</span></button>
+    <button class="cos-play" data-go="match"><span class="gold-text">この装いで対局する</span></button>
   </div>
 </section>
 
@@ -1104,6 +1194,28 @@ html.calib #calib{display:block}
       <div class="gc-cards" id="gcCards"></div>
       <button class="gc-ok" id="bGachaClose"><span class="gold-text">OK</span></button>
     </div>
+  </div>
+</section>
+
+<!-- ============ 独立した対局結果 ============ -->
+<section id="screen-result" class="screen">
+  <div class="rs-veil"></div>
+  <header class="rs-top"><span>MATCH RESULT</span></header>
+  <div class="rs-hero">
+    <div class="rs-crown" id="rsCrown">◆</div>
+    <div class="rs-title" id="rsTitle">RESULT</div>
+    <div class="rs-summary" id="rsSummary"></div>
+    <div class="rs-pot" id="rsPot"></div>
+  </div>
+  <div class="rs-handbox">
+    <div class="rs-label">MY FINAL HAND</div>
+    <div class="rs-tiles" id="rsTiles"></div>
+  </div>
+  <div class="rs-ranking" id="rsRanking"></div>
+  <div class="rs-reward"><span>ランクポイント</span><b id="rsDelta">+0</b><span id="rsRankNow">1,240 pt</span></div>
+  <div class="rs-actions">
+    <button class="rs-again" id="bResultAgain">もう一局</button>
+    <button class="rs-lobby" id="bResultLobby">ロビーへ</button>
   </div>
 </section>
 
@@ -1213,7 +1325,13 @@ let picks=[],pickSeq=0,notice="";
 let activeSeat=0,recOpen=false,recMode="total",wasComplete=false,dealAnim=0;
 let userStack=5870,betAmount=400,currentCall=400;
 let phase="play",userFolded=false,resultText="";
+let matchMode="rank",lastResult=null;
+let rankPoints=(function(){
+  try{const n=Number(localStorage.getItem("mh.rankPoints"));return Number.isFinite(n)&&n>=0?n:1240;}catch(e){return 1240;}
+})();
 const recCursor={total:0,sequence:0,pairs:0,triplet:0,flush:0};
+
+function saveRankPoints(){try{localStorage.setItem("mh.rankPoints",String(rankPoints));}catch(e){}}
 
 function cnt(a){const c=new Array(34).fill(0);a.forEach(function(t){c[t]++;});return c;}
 function doraOf(i){ if(i<27) return (i%9===8)? i-8 : i+1;
@@ -1339,10 +1457,9 @@ function showdown(){
   if(!userFolded&&picks.length<MAX_HAND){
     flashToast("14枚そろえてからショーダウンしてください。");return;
   }
-  const entries=[];
+  const entries=[],finalHand=picks.map(function(x){return x.id;});
   if(!userFolded){
-    const ids=picks.map(function(x){return x.id;});
-    entries.push({who:"あなた",seat:null,ids:ids,score:handScore(ids)});
+    entries.push({who:"あなた",seat:null,ids:finalHand,score:handScore(finalHand)});
   }
   seats.forEach(function(s){
     if(s.folded){s.best=null;return;}
@@ -1351,8 +1468,12 @@ function showdown(){
   });
 
   phase="result";
+  const settledPot=pot;
   if(!entries.length){                       /* 全員降りた。POTは自分へ戻す */
     userStack+=pot;pot=0;resultText="全員フォールド。POTを回収しました。";
+    const delta=matchMode==="rank"?8:0;rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
+    lastResult={userWon:true,userFolded:userFolded,winners:["あなた"],pot:settledPot,
+      detail:"全員フォールド",hand:userFolded?[]:finalHand,delta:delta,mode:matchMode,summary:resultText};
     render();return;
   }
   let top=-1;entries.forEach(function(e){if(e.score>top)top=e.score;});
@@ -1367,6 +1488,11 @@ function showdown(){
   const detail=(w.score>=10000?"完成形":"面子"+quickMelds(cnt(w.ids))+"組")
     +(doraCount(w.ids)?" ドラ"+doraCount(w.ids):"");
   resultText=winners.map(function(e){return e.who;}).join("・")+" の勝ち（"+detail+"） "+won.toLocaleString();
+  const userWon=winners.some(function(e){return e.seat===null;});
+  const delta=matchMode!=="rank"?0:(userWon?(winners.length>1?12:24):(userFolded?-14:-8));
+  rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
+  lastResult={userWon:userWon,userFolded:userFolded,winners:winners.map(function(e){return e.who;}),
+    pot:settledPot,detail:detail,hand:userFolded?[]:finalHand.slice(),delta:delta,mode:matchMode,summary:resultText};
   render();
 }
 
@@ -1875,7 +2001,7 @@ function renderCore(fresh){
   const bn=document.getElementById("bNext");
   const ROMAN=["Ⅰ","Ⅱ","Ⅲ"];
   bn.classList.remove("hot","afterResult");bn.disabled=false;
-  if(phase==="result"){bn.innerHTML='<span class="btn-label">次の局へ</span>';
+  if(phase==="result"){bn.innerHTML='<span class="btn-label">結果を見る</span>';
     bn.classList.add("hot","afterResult");}
   else if(stage===0)bn.innerHTML='<span class="btn-label">対局を始める</span>';
   else if(stage<4)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
@@ -1906,12 +2032,12 @@ function renderCore(fresh){
 document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("total");};
 document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=function(){
-  if(phase==="result"){newHand();return;}
+  if(phase==="result"){go("result");return;}
   nextStreet();
 };
 document.getElementById("bFold").onclick=function(){playerAction("fold");};
 document.getElementById("bCall").onclick=function(){
-  if(phase==="result"){newHand();return;}
+  if(phase==="result"){go("result");return;}
   playerAction("call");
 };
 document.getElementById("bRaise").onclick=function(){playerAction("raise");};
@@ -1921,7 +2047,7 @@ document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=funct
 /* ======================================================================
    画面遷移
    ====================================================================== */
-const SCREEN_IDS=["title","lobby","cosmetics","shop","game"];
+const SCREEN_IDS=["title","lobby","match","cosmetics","shop","game","result"];
 let currentScreen=null;
 function showScreen(name){
   if(SCREEN_IDS.indexOf(name)<0)name="title";
@@ -1935,14 +2061,72 @@ function go(name){
   showScreen(name);
   /* 非表示中は要素の矩形が全て0になるので、戻ってきたらFLIPを挟まずに描き直す */
   if(currentScreen==="game"){dealSeq=0;renderCore();}
+  if(currentScreen==="match")matchRender();
+  if(currentScreen==="result")resultRender();
   if(currentScreen==="cosmetics")cosRender();
   if(currentScreen==="shop")shopRender();
+  if(currentScreen==="lobby"){
+    document.getElementById("lbRank").textContent="四段 ・ "+rankPoints.toLocaleString()+"pt";
+    walletPaint();
+  }
 }
 document.addEventListener("click",function(ev){
+  const m=ev.target.closest("[data-match]");
+  if(m&&!m.disabled){matchMode=m.dataset.match||"rank";go("match");return;}
   const b=ev.target.closest("[data-go]");
   if(b&&!b.disabled)go(b.dataset.go);
 });
 document.getElementById("bTitleStart").onclick=function(){go("lobby");};
+
+/* ロビーと対局の間に、対戦相手が確定する独立した入場画面を置く。 */
+function matchRender(){
+  const rank=matchMode==="rank";
+  document.getElementById("mtMode").textContent=rank?"ランク戦":"リング戦";
+  document.getElementById("mtRule").textContent=rank
+    ?"6人戦・レート変動あり・共通15枚"
+    :"6人戦・持ち点制・共通15枚";
+  const table=document.getElementById("mtTable");table.innerHTML="";
+  const roster=[seats[0],seats[1],seats[2],{n:"YOU",mode:"四段",you:true},seats[3],seats[4]];
+  roster.forEach(function(s,i){
+    const el=document.createElement("div");el.className="mt-seat"+(s.you?" you":"");el.style.setProperty("--i",i);
+    const mark=s.you?"雀":s.n.slice(0,1);
+    el.innerHTML='<div class="mt-face">'+mark+'</div><b>'+(s.you?"keisuku":s.n)+'</b><small>'+
+      (s.you?(rank?"四段・"+rankPoints.toLocaleString()+"pt":"PLAYER"):(s.mode||"PLAYER").toUpperCase())+'</small>';
+    table.appendChild(el);
+  });
+}
+
+function resultRender(){
+  const r=lastResult||{userWon:false,userFolded:false,winners:[],pot:0,detail:"未決着",hand:[],delta:0,summary:"対局結果がありません"};
+  const title=document.getElementById("rsTitle");
+  title.textContent=r.userWon?"WIN":"RESULT";title.classList.toggle("lose",!r.userWon);
+  document.getElementById("rsCrown").textContent=r.userWon?"♛":"◆";
+  document.getElementById("rsSummary").textContent=r.userFolded&&!r.userWon?"FOLD / "+r.summary:r.summary;
+  document.getElementById("rsPot").textContent="POT "+Number(r.pot||0).toLocaleString();
+
+  const tiles=document.getElementById("rsTiles");tiles.innerHTML="";
+  (r.hand||[]).slice(0,14).sort(function(a,b){return a-b;}).forEach(function(id){tiles.appendChild(tile(id));});
+  if(!tiles.childElementCount){
+    const empty=document.createElement("div");empty.className="rs-summary";empty.textContent="FOLD — 手牌は公開されません";tiles.appendChild(empty);
+  }
+
+  const ranking=[{n:"keisuku",stack:userStack,you:true}].concat(seats.map(function(s){return {n:s.n,stack:s.stack,you:false};}));
+  ranking.sort(function(a,b){return b.stack-a.stack;});
+  const box=document.getElementById("rsRanking");box.innerHTML="";
+  ranking.forEach(function(p,i){
+    const row=document.createElement("div");row.className="rs-rankrow"+(p.you?" you":"");
+    row.innerHTML='<span class="rs-pos">'+(i+1)+'</span><span class="rs-name">'+p.n+
+      '</span><span class="rs-stack">'+p.stack.toLocaleString()+'</span>';
+    box.appendChild(row);
+  });
+  const delta=document.getElementById("rsDelta"),n=Number(r.delta||0);
+  delta.textContent=(n>0?"+":"")+n;delta.classList.toggle("down",n<0);
+  document.getElementById("rsRankNow").textContent=r.mode==="rank"?rankPoints.toLocaleString()+" pt":"レート変動なし";
+}
+
+document.getElementById("bMatchStart").onclick=function(){newHand();go("game");};
+document.getElementById("bResultAgain").onclick=function(){newHand();go("game");};
+document.getElementById("bResultLobby").onclick=function(){go("lobby");};
 
 /* ======================================================================
    装飾品設定
@@ -2139,6 +2323,8 @@ document.getElementById("bGachaClose").onclick=function(){
 showScreen(new URLSearchParams(location.search).get("screen")||"title");
 walletPaint();
 newHand();
+if(currentScreen==="match")matchRender();
+if(currentScreen==="result")resultRender();
 if(currentScreen==="cosmetics")cosRender();
 if(currentScreen==="shop")shopRender();
 </script>

@@ -74,7 +74,7 @@ f.onload=function(){setTimeout(function(){
   ok(/btn-call\.png/.test(bg(".betBar .call")),"既定へ戻せる");
 
   /* ---- 画面遷移 ---- */
-  const screens=["title","lobby","cosmetics","shop","game"];
+  const screens=["title","lobby","match","cosmetics","shop","game","result"];
   screens.forEach(function(s){
     w.go(s);
     const on=d.querySelectorAll(".screen.on");
@@ -116,13 +116,18 @@ f.onload=function(){setTimeout(function(){
 
   bn.click();
   ok(w.eval('phase')==="result","ショーダウンで決着した");
-  ok(/次の局へ/.test(bn.textContent),"決着後は「次の局へ」になる ("+bn.textContent+")");
+  ok(/結果を見る/.test(bn.textContent),"決着後は「結果を見る」になる ("+bn.textContent+")");
   const nb2=bn.getBoundingClientRect();
   ok(!overlap(nb2,R(".winRibbon.result")),"決着表示と進行ボタンが重なっていない");
   ok(!overlap(nb2,R(".labelFinal")),"決着時も見出しと重なっていない");
 
   bn.click();
-  ok(w.eval('phase')==="play"&&w.eval("stage")===1,"「次の局へ」で新しい局が始まる");
+  ok(d.getElementById("screen-result").classList.contains("on"),"「結果を見る」で独立した結果画面へ進む");
+  ok(d.querySelectorAll("#rsRanking .rs-rankrow").length===6,"結果画面に6人の順位が表示される");
+  ok(d.getElementById("rsTiles").children.length>0,"結果画面に最終手牌またはFOLD状態が表示される");
+  d.getElementById("bResultAgain").click();
+  ok(w.eval('phase')==="play"&&w.eval("stage")===1,"「もう一局」で新しい局が始まる");
+  ok(d.getElementById("screen-game").classList.contains("on"),"再戦で対局画面へ戻る");
   ok(d.querySelectorAll("#commons .tile").length===15,"新しい局でも共通15枚");
 
   /* ---- ガチャ: 引く → 所持する → 装備できる ---- */

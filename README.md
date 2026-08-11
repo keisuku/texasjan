@@ -4,10 +4,12 @@
 
 - 941 × 1672 のデザイン解像度。完成見本は `claude-handoff/visual/golden-target.webp`
 - `index.html?calib=1` で完成見本を半透明で重ねた位置合わせモードになります
+- タイトル → ロビー → 6人マッチング → 対局 → ショーダウン → 結果 → 再戦まで一周できます
+- `index.html?screen=game` のように `title` `lobby` `match` `game` `result` `cosmetics` `shop` を直接開けます
 
 ## 画像生成AIの方へ
 
-**→ [`ASSET_BRIEF.md`](ASSET_BRIEF.md) を読んでください。** 冒頭の「★ round 3」が最新の依頼です。
+**→ [`ASSET_BRIEF.md`](ASSET_BRIEF.md) を読んでください。** 冒頭の「★ round 4」が最新の依頼です。
 
 牌面はCC0の正規資産（`assets/tiles/`）で完了済みです。**牌の作業は不要**です。
 

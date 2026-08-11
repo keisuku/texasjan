@@ -7,6 +7,10 @@ f.onload=function(){
  function settle(){d.getAnimations().forEach(function(a){try{a.finish();}catch(e){}});}
  setTimeout(function(){
   try{
+  /* 初回配牌はページ読込から1.5秒後には正常に完了していることがある。
+     検査直前に新しい局を配り、生成されたばかりのアニメーションを決定的に測る。 */
+  ["rail","commons","revealRail","myrow","rack"].forEach(function(id){d.getElementById(id).innerHTML="";});
+  w.newHand();
   const dealAnims=d.getAnimations().length;
   ok(dealAnims>0,"配牌でアニメーションが生成された（"+dealAnims+"件）");
   settle();
