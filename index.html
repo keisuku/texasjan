@@ -7,6 +7,64 @@
 if(q.has("calib"))r.classList.add("calib");
 if(q.has("still"))r.classList.add("still");}</script>
 <title>MAHJONG HOLD'EM</title>
+<script src="./skins/manifest.js"></script>
+<script>
+/* ===== スキンの適用 =====
+   skins/manifest.js の選択中スキンを CSS 変数 --asset-<ロール> に流し込む。
+   素材の存在確認に成功したロールだけ html.has-<ロール> が立ち、CSSの描画を置き換える。
+   立たなかったロールは今までどおり実測値ベースのCSS手描きにフォールバックする。
+   描画前に走らせるので、背景やボタンが一瞬入れ替わることがない。 */
+const SKIN_DATA=window.MH_SKINS||{slots:[],skins:[]};
+const SKIN_KEY="mh.skins";
+const skinProbeGen={};
+function skinSlotDef(slot){return SKIN_DATA.slots.filter(function(s){return s.id===slot;})[0]||null;}
+function skinsForSlot(slot){return SKIN_DATA.skins.filter(function(s){return s.slot===slot;});}
+function skinDefaultFor(slot){const l=skinsForSlot(slot);return l.length?l[0].id:null;}
+/* localStorage が使えない環境（file:// やプライベートモード）でも切り替え自体は動くよう、
+   メモリ上の控えを必ず持つ。保存できないだけで、体験は壊さない。 */
+let skinMemory=null;
+function skinChoices(){
+  if(skinMemory)return skinMemory;
+  try{skinMemory=JSON.parse(localStorage.getItem(SKIN_KEY))||{};}catch(e){skinMemory={};}
+  return skinMemory;
+}
+function skinChosen(slot){
+  const id=skinChoices()[slot];
+  const ok=skinsForSlot(slot).some(function(s){return s.id===id&&s.owned!==false;});
+  return ok?id:skinDefaultFor(slot);
+}
+function skinApplySlot(slot){
+  const def=skinSlotDef(slot); if(!def)return;
+  const id=skinChosen(slot);
+  const skin=skinsForSlot(slot).filter(function(s){return s.id===id;})[0]||{assets:{}};
+  const root=document.documentElement;
+  root.setAttribute("data-skin-"+slot,id||"");
+  def.roles.forEach(function(role){
+    const url=(skin.assets||{})[role]||null;
+    const gen=(skinProbeGen[role]=(skinProbeGen[role]||0)+1);
+    if(!url){root.style.removeProperty("--asset-"+role);root.classList.remove("has-"+role);return;}
+    root.style.setProperty("--asset-"+role,'url("'+url+'")');
+    const probe=new Image();
+    probe.onload=function(){if(skinProbeGen[role]===gen&&probe.naturalWidth>1)root.classList.add("has-"+role);};
+    probe.onerror=function(){if(skinProbeGen[role]===gen)root.classList.remove("has-"+role);};
+    probe.src=url;
+  });
+}
+function skinSelect(slot,id){
+  const c=skinChoices();c[slot]=id;skinMemory=c;
+  try{localStorage.setItem(SKIN_KEY,JSON.stringify(c));}catch(e){}
+  skinApplySlot(slot);
+}
+function skinApplyAll(){SKIN_DATA.slots.forEach(function(s){skinApplySlot(s.id);});}
+
+/* 検証用: ?skin=frame:sharp,arena:empty で保存せずに一時的なスキンを当てる。
+   スクリーンショットの撮り比べに使う。 */
+{const q=new URLSearchParams(location.search).get("skin");
+ if(q){skinMemory=skinChoices();
+   q.split(",").forEach(function(pair){
+     const kv=pair.split(":");if(kv.length===2)skinMemory[kv[0].trim()]=kv[1].trim();});}}
+skinApplyAll();
+</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;800&family=Zen+Kaku+Gothic+New:wght@400;500;700;900&display=swap" rel="stylesheet">
@@ -233,9 +291,17 @@ body{align-items:flex-start;background:#061c17;overflow-x:hidden}
 body::before,body::after{display:none}
 #app{--gold:#e8c864;position:relative;display:block;overflow:hidden;padding:0;margin:0 auto;
   width:min(100vw,calc(100dvh * 941 / 1672));max-width:none;height:auto;min-height:0;
-  aspect-ratio:941/1672;container-type:inline-size;
-  background:#073126 url("./assets/arena-with-characters-v1.webp") center/100% 100% no-repeat;
+  aspect-ratio:941/1672;container-type:inline-size;background:#061c17;
   box-shadow:0 0 55px rgba(0,0,0,.78)}
+
+/* ===== 画面スタック =====
+   #app の直下に .screen を1枚挟む。#screen-game は position:absolute;inset:0 なので、
+   中のブロックが基準にする箱は今までの #app と完全に同一で、%座標は1つも変わらない。
+   cqw も #app が唯一のコンテナのままなので変わらない。 */
+.screen{position:absolute;inset:0;display:none;overflow:hidden}
+.screen.on{display:block}
+#screen-game{background:#073126 var(--asset-arena,url("./assets/arena-with-characters-v1.webp"))
+  center/100% 100% no-repeat}
 
 .arena{position:absolute;inset:0;margin:0;padding:0;min-height:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
 .arena::before{display:none}
@@ -429,25 +495,23 @@ html.still *,html.still *::before,html.still *::after{animation:none!important;t
 .plate-num{color:#0B0703;-webkit-text-stroke:0;
   text-shadow:0 .04em 0 rgba(255,255,255,.6),0 -.02em 0 rgba(120,86,26,.25),0 .06em .08em rgba(90,60,10,.28)}
 
-/* ===== スプライトのスロット =====
-   assets/ui/ に素材が置かれると JS が html にクラスを立て、ここが CSS の描画を置き換える。
-   素材が無い間は上の実測値ベースのCSSがそのまま使われる。仕様は ASSET_BRIEF.md。
-
-   枠とボタンは9スライス。background-size:100% 100% で貼ると四隅の装飾が引き伸ばされて潰れるため、
-   border-image を使う。slice はソース画素値（素材は4倍解像度）、width は表示側の cqw。
-   1ソースpx = 0.25デザインpx = 0.02657cqw。 */
+/* ===== スキンのスロット =====
+   URL はここに書かない。選択中のスキンが head のランタイムで --asset-<ロール> に流し込む。
+   素材の存在確認に成功したロールだけ html.has-<ロール> が立ち、ここが CSS の描画を置き換える。
+   立たなかったロールは上の実測値ベースのCSS手描きがそのまま使われる。
+   カタログは skins/manifest.js。 */
 html.has-tile-body-flat .commons .tile:not(.back),
 html.has-tile-body-flat .sourceZone .tile:not(.back),
 html.has-tile-body-flat .revealGroup .tile:not(.back),
 html.has-tile-body-flat .seat .tile:not(.back),
 html.has-tile-body-flat .meSeat .tile:not(.back){
-  background:url("./assets/ui/tile-body-flat.png") center/100% 100% no-repeat;box-shadow:none}
+  background:var(--asset-tile-body-flat) center/100% 100% no-repeat;box-shadow:none}
 html.has-tile-body-upright .tile.rk{
-  background:url("./assets/ui/tile-body-upright.png") center/100% 100% no-repeat;box-shadow:none}
+  background:var(--asset-tile-body-upright) center/100% 100% no-repeat;box-shadow:none}
 html.has-tile-body-flat .tile:not(.back) .face,
 html.has-tile-body-upright .tile.rk .face{background:none;box-shadow:none}
 html.has-tile-back-flat .tile.back{
-  background:url("./assets/ui/tile-back-flat.png") center/100% 100% no-repeat;box-shadow:none}
+  background:var(--asset-tile-back-flat) center/100% 100% no-repeat;box-shadow:none}
 html.has-tile-back-flat .tile.back .face{background:none;box-shadow:none}
 html.has-tile-back-flat .tile.back .face::after{display:none}
 
@@ -463,22 +527,23 @@ html.has-btn-call .betBar .call,
 html.has-btn-raise .betBar .raise,
 html.has-dial .betBar .dial{
   border:0;box-shadow:none;background-repeat:no-repeat;background-size:100% 100%;background-position:center}
-html.has-frame-gold-plate .pot{background-image:url("./assets/ui/frame-gold-plate.png")}
+html.has-frame-gold-plate .pot{background-image:var(--asset-frame-gold-plate)}
 html.has-frame-seat-plate .seat .bet,
-html.has-frame-seat-plate .meSeat .stack{background-image:url("./assets/ui/frame-seat-plate.png")}
-html.has-frame-group .revealGroup{background-image:url("./assets/ui/frame-group.png")}
-html.has-btn-fold .betBar .fold{background-image:url("./assets/ui/btn-fold.png")}
-html.has-btn-call .betBar .call{background-image:url("./assets/ui/btn-call.png")}
-html.has-btn-raise .betBar .raise{background-image:url("./assets/ui/btn-raise.png")}
-html.has-dial .betBar .dial{background-image:url("./assets/ui/dial.png")}
-/* 生成された素材は上下非対称で、面の中心が画像中心から上にずれている。
-   実測した差分（btn-call は 97/660 = 面中心が97px上）ぶん、文字を上へ寄せる。 */
-html.has-btn-fold .betBar .fold{padding-bottom:1.0cqw}
-html.has-btn-call .betBar .call{padding-bottom:5.16cqw}
-html.has-btn-raise .betBar .raise{padding-bottom:3.16cqw}
-html.has-frame-gold-plate .pot{padding-bottom:.42cqw}
-html.has-frame-seat-plate .seat .bet{padding:.45cqw 1.6cqw 1.01cqw}
-html.has-frame-seat-plate .meSeat .stack{padding:.1cqw 1.5cqw .66cqw}
+html.has-frame-seat-plate .meSeat .stack{background-image:var(--asset-frame-seat-plate)}
+html.has-frame-group .revealGroup{background-image:var(--asset-frame-group)}
+html.has-btn-fold .betBar .fold{background-image:var(--asset-btn-fold)}
+html.has-btn-call .betBar .call{background-image:var(--asset-btn-call)}
+html.has-btn-raise .betBar .raise{background-image:var(--asset-btn-raise)}
+html.has-dial .betBar .dial{background-image:var(--asset-dial)}
+/* スキン「重厚」の生成PNGは上下非対称で、面の中心が画像中心から上にずれている。
+   実測した差分（btn-call は 97/660 = 面中心が97px上）ぶん、文字を上へ寄せる。
+   この補正はそのスキン固有なので、他のスキンには持ち込まない。 */
+html[data-skin-frame="heavy"] .betBar .fold{padding-bottom:1.0cqw}
+html[data-skin-frame="heavy"] .betBar .call{padding-bottom:5.16cqw}
+html[data-skin-frame="heavy"] .betBar .raise{padding-bottom:3.16cqw}
+html[data-skin-frame="heavy"] .pot{padding-bottom:.42cqw}
+html[data-skin-frame="heavy"] .seat .bet{padding:.45cqw 1.6cqw 1.01cqw}
+html[data-skin-frame="heavy"] .meSeat .stack{padding:.1cqw 1.5cqw .66cqw}
 html.has-frame-group .revealGroup.pending{filter:drop-shadow(0 0 1.2cqw rgba(238,206,120,.55))}
 html.has-frame-group .revealGroup.live{filter:drop-shadow(0 0 .9cqw rgba(226,194,91,.35))}
 
@@ -486,7 +551,7 @@ html.has-frame-group .revealGroup.live{filter:drop-shadow(0 0 .9cqw rgba(226,194
    両端の菱形飾りが引き伸ばしに巻き込まれないよう左右80ソースpxを固定する。 */
 html.has-frame-gold-ribbon .goldLabel{
   background:none;box-shadow:none;border-style:solid;border-width:0;border-color:transparent;
-  border-image-source:url("./assets/ui/frame-gold-ribbon.png");
+  border-image-source:var(--asset-frame-gold-ribbon);
   border-image-slice:20 80 20 80 fill;
   border-image-width:.53cqw 2.13cqw .53cqw 2.13cqw}
 html.has-frame-gold-ribbon .goldLabel::before,
@@ -495,28 +560,289 @@ html.has-frame-gold-ribbon .goldLabel::after{display:none}
 /* 押下時の沈み込みは素材が1状態しか無いので変形で表現する */
 .betBar button:active{transform:translateY(.3cqw) scale(.985)}
 
-/* ===== round 3: SVGフレーム =====
-   幾何が正確（ボタン3種の角丸は全て50pxで一致。Golden Visual自身は53/47/49とばらついていた）。
-   PNG規則の後に置いて上書きする。SVGが無ければPNGのまま。 */
-html.svg-frame-gold-plate .pot{background-image:url("./assets/ui/svg/frame-gold-plate.svg")}
-html.svg-frame-seat-plate .seat .bet,
-html.svg-frame-seat-plate .meSeat .stack{background-image:url("./assets/ui/svg/frame-seat-plate.svg")}
-html.svg-frame-group .revealGroup{background-image:url("./assets/ui/svg/frame-group.svg")}
-html.svg-btn-fold .betBar .fold{background-image:url("./assets/ui/svg/btn-fold.svg")}
-html.svg-btn-call .betBar .call{background-image:url("./assets/ui/svg/btn-call.svg")}
-html.svg-btn-raise .betBar .raise{background-image:url("./assets/ui/svg/btn-raise.svg")}
-/* リボンは幅が2.1倍変わるので9スライス。SVG座標(320×56)で菱形は両端40px以内 */
-html.svg-frame-gold-ribbon .goldLabel{
-  border-image-source:url("./assets/ui/svg/frame-gold-ribbon.svg");
-  border-image-slice:20 40 20 40 fill;
-  border-image-width:.53cqw 2.13cqw .53cqw 2.13cqw}
-/* PNG用の面ずれ補正は不要。生成PNGは面の中心が最大97pxずれていたための対症療法だった */
-html.svg-btn-fold .betBar .fold{padding-bottom:0}
-html.svg-btn-call .betBar .call{padding-bottom:0;font-size:3.4cqw}
-html.svg-btn-raise .betBar .raise{padding-bottom:0}
-html.svg-frame-gold-plate .pot{padding-bottom:0}
-html.svg-frame-seat-plate .seat .bet{padding:.45cqw 1.6cqw}
-html.svg-frame-seat-plate .meSeat .stack{padding:.1cqw 1.5cqw}
+/* ===== スキン「シャープ」固有の調整 =====
+   ベクター版は幾何が正確（ボタン3種の角丸が全て50pxで一致。Golden Visual 自身は
+   53/47/49 とばらついていた）。生成PNG向けの面ずれ補正は不要なので打ち消す。
+   リボンだけは幅が2.1倍変わるので9スライス。SVG座標(320×56)で菱形は両端40px以内。 */
+html[data-skin-frame="sharp"] .goldLabel{
+  border-image-slice:20 40 20 40 fill}
+html[data-skin-frame="sharp"] .betBar .call{font-size:3.4cqw}
+
+/* ======================================================================
+   ロビー・タイトル・装飾品設定
+   全て cqw（100cqw = 941px のデザイン幅）で書く。#app と一緒に等比で縮む。
+   ====================================================================== */
+:root{
+  --ui-gold:#E8C864; --ui-gold-hi:#FFF0B7; --ui-gold-lo:#8A6E17;
+  --ui-ink:#07130F; --ui-panel:rgba(6,22,18,.80); --ui-line:rgba(232,200,100,.34);
+}
+/* 対局画面のボタンは既存の button{flex:1;padding:12px 0;background:…} を前提に組んであるので、
+   新しい画面だけそれを打ち消す。#screen-game には効かせない。
+   :where() で詳細度を0にしてあるので、この下の .cos-item などの指定は全て素通しで勝つ。
+   :is() だとID分の詳細度を持ち込んで各部品の指定を潰してしまう。 */
+:where(#screen-title,#screen-lobby,#screen-cosmetics,#screen-shop) button{
+  flex:0 0 auto;font:inherit;font-weight:inherit;letter-spacing:normal;color:inherit;
+  border:0;background:none;padding:0;border-radius:0;cursor:pointer;text-align:inherit}
+
+/* 金の縁を持つ暗いパネル。全画面で共有する1つの型 */
+.panel{background:linear-gradient(180deg,rgba(10,32,26,.90),rgba(4,16,13,.94));
+  border:.16cqw solid var(--ui-line);border-radius:1.6cqw;
+  box-shadow:inset 0 .1cqw 0 rgba(255,246,214,.16),0 .8cqw 2.4cqw rgba(0,0,0,.5)}
+
+.backBtn{width:7.4cqw;height:7.4cqw;border-radius:50%;flex:0 0 auto;
+  background:linear-gradient(180deg,#F0D98C,#A97F1E);color:#12211B;
+  font-size:3.2cqw;font-weight:900;line-height:7.4cqw;text-align:center;
+  box-shadow:0 .3cqw .7cqw rgba(0,0,0,.55),inset 0 .16cqw 0 rgba(255,255,255,.6)}
+.backBtn:active{transform:translateY(.25cqw) scale(.97)}
+
+/* ---------------- タイトル ---------------- */
+#screen-title{background:#061c17 var(--asset-arena,url("./assets/arena-with-characters-v1.webp"))
+  center/135% 135% no-repeat}
+.ttl-veil{position:absolute;inset:0;
+  background:radial-gradient(75% 48% at 50% 40%,rgba(6,26,20,.55) 0%,rgba(3,14,11,.93) 62%,#02100C 100%)}
+.ttl-body{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:1.2cqw;text-align:center;padding:0 8cqw}
+.ttl-kicker{font-size:2.7cqw;letter-spacing:.5em;text-indent:.5em;color:#8FE6D2;font-weight:700}
+.ttl-logo{display:flex;flex-direction:column;line-height:.98;font-family:"Shippori Mincho B1",serif}
+.ttl-logo span{font-size:9.6cqw;font-weight:800;letter-spacing:.1em;
+  background:linear-gradient(180deg,#FFF7D2 6%,#F0D273 38%,#A87A1C 62%,#F3DC97 92%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 .3cqw .35cqw rgba(0,0,0,.75))}
+.ttl-logo em{font-size:13.4cqw;font-weight:800;font-style:normal;letter-spacing:.05em;
+  background:linear-gradient(180deg,#FFFAE4 4%,#F5D77C 34%,#9C6E14 60%,#FBE9AE 94%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 .4cqw .45cqw rgba(0,0,0,.8))}
+.ttl-rule{width:44cqw;height:.22cqw;margin:1.6cqw 0 .4cqw;
+  background:linear-gradient(90deg,transparent,var(--ui-gold),transparent)}
+.ttl-lead{font-size:2.9cqw;color:#CFE6DC;letter-spacing:.09em;line-height:1.9}
+.ttl-start{margin-top:6cqw;padding:2.5cqw 9cqw;border-radius:99cqw;font-size:3.8cqw;font-weight:900;
+  letter-spacing:.24em;text-indent:.24em;
+  background:linear-gradient(180deg,rgba(232,200,100,.20),rgba(232,200,100,.05));
+  border:.22cqw solid var(--ui-line);
+  box-shadow:0 0 3cqw rgba(232,200,100,.22),inset 0 .1cqw 0 rgba(255,246,214,.3);
+  animation:ttlPulse 2.1s ease-in-out infinite}
+@keyframes ttlPulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.035)}}
+.ttl-ver{position:absolute;bottom:3.4cqw;font-size:2.1cqw;letter-spacing:.24em;color:#5E7A70}
+
+/* ---------------- ロビー ---------------- */
+#screen-lobby{background:#04120E var(--asset-arena,url("./assets/arena-with-characters-v1.webp"))
+  center/150% 150% no-repeat}
+.lb-veil{position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(3,15,12,.90) 0%,rgba(4,20,16,.66) 30%,
+    rgba(3,14,11,.80) 72%,#02100C 100%)}
+
+.lb-top{position:absolute;left:2.4cqw;right:2.4cqw;top:2.4cqw;height:8.6cqw;
+  display:flex;align-items:center;justify-content:space-between;gap:2cqw}
+.lb-id{display:flex;align-items:center;gap:1.6cqw;padding:.9cqw 3cqw .9cqw .9cqw;border-radius:99cqw;
+  background:linear-gradient(180deg,rgba(10,32,26,.92),rgba(4,16,13,.95));
+  border:.16cqw solid var(--ui-line)}
+.lb-avatar{width:6.4cqw;height:6.4cqw;border-radius:50%;flex:0 0 auto;
+  display:flex;align-items:center;justify-content:center;
+  font-family:"Shippori Mincho B1",serif;font-size:3.4cqw;font-weight:800;color:#12211B;
+  background:linear-gradient(160deg,#FFF0B7,#C9A227 55%,#8A6E17)}
+.lb-idtext{display:flex;flex-direction:column;line-height:1.25}
+.lb-idtext b{font-size:3.1cqw;color:#F4E7C4;letter-spacing:.04em}
+.lb-idtext span{font-size:2.2cqw;color:#8FA79E;letter-spacing:.08em}
+.lb-wallet{display:flex;gap:1.2cqw}
+.lb-coin{display:flex;align-items:center;gap:.9cqw;padding:1.1cqw 2.2cqw;border-radius:99cqw;
+  background:rgba(3,14,11,.88);border:.16cqw solid var(--ui-line);
+  font-size:2.7cqw;font-weight:900;color:#F4E7C4;font-variant-numeric:tabular-nums}
+.cur{width:2.9cqw;height:2.9cqw;border-radius:50%;display:block}
+.cur-c{background:radial-gradient(circle at 34% 30%,#FFF0B7,#C9A227 55%,#7A5F12)}
+.cur-g{background:radial-gradient(circle at 34% 30%,#BFF6FF,#3FA9D8 52%,#1B4E86)}
+
+.lb-banner{position:absolute;left:2.4cqw;right:2.4cqw;top:13.4cqw;height:11.4cqw;border-radius:1.4cqw;
+  padding:0 2.2cqw;display:flex;flex-direction:column;justify-content:center;gap:.3cqw;
+  background:linear-gradient(100deg,rgba(24,72,58,.94),rgba(6,24,19,.92) 62%);
+  border:.16cqw solid var(--ui-line);overflow:hidden}
+.lb-banner::before{content:"NEW";position:absolute;right:16cqw;top:1.1cqw;
+  padding:.3cqw 1.2cqw;border-radius:.5cqw;font-size:1.9cqw;font-weight:900;letter-spacing:.12em;
+  color:#2A0F0C;background:linear-gradient(180deg,#FFD9A0,#E0743A)}
+.lb-banner b{font-size:3.1cqw;color:#F6E9C2;letter-spacing:.05em}
+.lb-banner small{font-size:2.1cqw;color:#94B3A8;letter-spacing:.04em}
+.lb-bannergo{position:absolute;right:2.2cqw;top:50%;transform:translateY(-50%);
+  padding:1cqw 2.6cqw;border-radius:99cqw;font-size:2.4cqw;font-weight:900;color:#12211B;
+  background:linear-gradient(180deg,#FFF0B7,#C9A227);cursor:pointer}
+
+/* キャラクターの立ち絵はまだ素材が無い。空白のまま放置せず、
+   「ここに立ち絵が入る枠」であること自体を見せて装飾品設定への導線にする。 */
+.lb-standee{position:absolute;left:2.4cqw;bottom:13.4cqw;width:44cqw;height:86cqw;border-radius:2cqw;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  padding-bottom:2.6cqw;text-align:center;overflow:hidden;
+  background:var(--asset-character,linear-gradient(180deg,rgba(10,34,28,.30),rgba(6,22,18,.72)));
+  background-size:cover;background-position:bottom center;background-repeat:no-repeat;
+  border:.16cqw dashed rgba(232,200,100,.20)}
+.lb-silhouette{position:absolute;left:50%;bottom:9cqw;transform:translateX(-50%);
+  width:30cqw;height:58cqw;border-radius:50% 50% 44% 44%/38% 38% 62% 62%;
+  background:radial-gradient(62% 46% at 50% 26%,rgba(70,150,124,.34),rgba(8,26,21,0) 74%);
+  box-shadow:0 0 6cqw rgba(60,132,110,.16)}
+.lb-silhouette::after{content:"雀";position:absolute;left:50%;top:26%;transform:translate(-50%,-50%);
+  font-family:"Shippori Mincho B1",serif;font-size:11cqw;font-weight:800;
+  color:rgba(190,222,208,.09)}
+.lb-standeecap{position:relative;display:flex;flex-direction:column;gap:.4cqw}
+.lb-standeecap b{font-size:2.5cqw;font-weight:700;letter-spacing:.1em;color:rgba(214,232,224,.62)}
+.lb-standeecap small{font-size:2.1cqw;letter-spacing:.14em;color:var(--ui-gold);opacity:.8}
+.lb-standee:active{transform:scale(.99)}
+html.has-character .lb-standee{border-style:none}
+html.has-character .lb-standee .lb-silhouette,
+html.has-character .lb-standee .lb-standeecap{display:none}
+
+.lb-modes{position:absolute;right:3cqw;top:29cqw;width:52cqw;display:flex;flex-direction:column;gap:2.4cqw}
+
+.lb-daily{position:absolute;right:3cqw;bottom:14.6cqw;width:52cqw;padding:2cqw 2.2cqw;border-radius:1.4cqw;
+  background:linear-gradient(180deg,rgba(10,32,26,.90),rgba(3,14,11,.94));
+  border:.16cqw solid var(--ui-line)}
+.lb-dailyhead{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:1.1cqw}
+.lb-dailyhead b{font-size:2.7cqw;color:#F0E7CC;letter-spacing:.06em}
+.lb-dailyhead span{font-size:2.3cqw;font-weight:900;color:var(--ui-gold);font-variant-numeric:tabular-nums}
+.lb-bar{height:.9cqw;border-radius:99cqw;background:rgba(0,0,0,.5);overflow:hidden;margin-bottom:1.4cqw}
+.lb-bar i{display:block;height:100%;border-radius:99cqw;
+  background:linear-gradient(90deg,#8A6E17,#FFF0B7)}
+.lb-tasks{list-style:none;display:flex;flex-direction:column;gap:.8cqw}
+.lb-tasks li{position:relative;padding-left:3.4cqw;font-size:2.3cqw;color:#B7CCC3;letter-spacing:.03em}
+.lb-tasks li::before{content:"○";position:absolute;left:0;top:0;color:#5E7A70;font-size:2.3cqw}
+.lb-tasks li.done{color:#7FB6A4}
+.lb-tasks li.done::before{content:"●";color:var(--ui-gold)}
+.lb-mode{position:relative;height:15.5cqw;border-radius:1.4cqw;padding:0 3cqw;text-align:right;
+  display:flex;flex-direction:column;justify-content:center;gap:.5cqw;
+  background:linear-gradient(160deg,rgba(20,58,48,.94),rgba(5,20,16,.96));
+  border:.18cqw solid var(--ui-line);
+  box-shadow:0 .6cqw 1.6cqw rgba(0,0,0,.55),inset 0 .12cqw 0 rgba(255,246,214,.18)}
+.lb-mode::before{content:"";position:absolute;left:0;top:12%;bottom:12%;width:.55cqw;border-radius:99cqw;
+  background:linear-gradient(180deg,#FFF0B7,#C9A227,#7A5F12)}
+.lb-mode b{font-family:"Shippori Mincho B1",serif;font-size:5.2cqw;font-weight:800;letter-spacing:.14em;
+  color:#F6E9C2;text-shadow:0 .2cqw .3cqw rgba(0,0,0,.7)}
+.lb-mode small{font-size:2.2cqw;letter-spacing:.26em;color:#7FB6A4}
+.lb-mode.primary{background:linear-gradient(160deg,rgba(46,102,84,.96),rgba(8,30,24,.96));
+  box-shadow:0 .6cqw 1.8cqw rgba(0,0,0,.6),0 0 2.4cqw rgba(232,200,100,.18),
+    inset 0 .12cqw 0 rgba(255,246,214,.26)}
+.lb-mode.primary b{color:#FFF3CE}
+.lb-mode:active{transform:translateY(.3cqw) scale(.99)}
+.lb-mode.soon{opacity:.45}
+.lb-mode.soon::after{content:"準備中";position:absolute;left:3cqw;top:50%;transform:translateY(-50%);
+  font-size:2.1cqw;letter-spacing:.2em;color:#8FA79E}
+
+.lb-nav{position:absolute;left:2.4cqw;right:2.4cqw;bottom:2.4cqw;height:9.4cqw;
+  display:grid;grid-template-columns:repeat(4,1fr);gap:.9cqw;padding:.8cqw;border-radius:1.6cqw;
+  background:linear-gradient(180deg,rgba(10,32,26,.92),rgba(3,14,11,.96));
+  border:.16cqw solid var(--ui-line)}
+.lb-navbtn{border-radius:1.2cqw;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:.4cqw}
+.lb-navbtn i{font-style:normal;font-size:3.2cqw;color:var(--ui-gold);line-height:1}
+.lb-navbtn span{font-size:2.2cqw;letter-spacing:.1em;color:#B7CCC3}
+.lb-navbtn.on{background:linear-gradient(180deg,rgba(232,200,100,.22),rgba(232,200,100,.06));
+  box-shadow:inset 0 0 0 .14cqw var(--ui-line)}
+.lb-navbtn:active{transform:scale(.96)}
+
+/* ---------------- 装飾品設定 / ショップ ---------------- */
+#screen-cosmetics,#screen-shop{background:#04120E}
+.cos-veil{position:absolute;inset:0;
+  background:radial-gradient(90% 55% at 50% 0%,#12362C 0%,#08211B 45%,#03100D 100%)}
+
+.cos-top{position:absolute;left:2.4cqw;right:2.4cqw;top:2.4cqw;height:8.6cqw;
+  display:flex;align-items:center;gap:2.2cqw}
+.cos-top h2{font-family:"Shippori Mincho B1",serif;font-size:4.4cqw;font-weight:800;letter-spacing:.14em;
+  color:#F6E9C2;text-shadow:0 .2cqw .3cqw rgba(0,0,0,.7)}
+.cos-hint{margin-left:auto;font-size:2.2cqw;letter-spacing:.06em;color:#8FA79E;text-align:right}
+.cos-hint.warn{color:#F0D273}
+
+.cos-preview{position:absolute;left:2.4cqw;right:2.4cqw;top:12.6cqw;height:32cqw;border-radius:1.6cqw;
+  overflow:hidden;background:#052018 var(--asset-arena,none) center/cover no-repeat;
+  border:.18cqw solid var(--ui-line);box-shadow:inset 0 0 3cqw rgba(0,0,0,.65)}
+.cos-prevlabel{position:absolute;right:1.6cqw;bottom:1.1cqw;z-index:2;font-size:1.9cqw;letter-spacing:.24em;
+  color:rgba(232,231,196,.55);text-shadow:0 .12cqw .3cqw rgba(0,0,0,.9)}
+.cos-prevstage{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  gap:2.4cqw;background:linear-gradient(180deg,rgba(3,16,13,.34) 0%,rgba(3,16,13,.72) 34%,
+    rgba(3,16,13,.72) 74%,rgba(3,16,13,.40) 100%)}
+.cos-prevtiles{display:flex;gap:.7cqw;align-items:flex-end}
+.cos-prevstage .tile{--w:7.4cqw;cursor:default}
+.cos-prevbtns{display:flex;gap:1.2cqw;align-items:center}
+.pv-btn{width:15cqw;height:9cqw;border-radius:1.4cqw;font-size:2.7cqw;font-weight:900;letter-spacing:.06em;
+  display:flex;align-items:center;justify-content:center;color:#FBEEDC;
+  background-repeat:no-repeat;background-size:100% 100%;background-position:center}
+.pv-btn.fold{background-image:linear-gradient(180deg,#CD4A38,#7C1512)}
+.pv-btn.call{background-image:linear-gradient(180deg,#2F7EC9,#123D74)}
+.pv-btn.raise{background-image:linear-gradient(180deg,#E8B74C,#94590F);color:#1B1508}
+html.has-btn-fold  .pv-btn.fold {background-image:var(--asset-btn-fold)}
+html.has-btn-call  .pv-btn.call {background-image:var(--asset-btn-call)}
+html.has-btn-raise .pv-btn.raise{background-image:var(--asset-btn-raise)}
+.pv-chip{width:7cqw;height:7cqw;border-radius:50%;background-repeat:no-repeat;background-size:contain;
+  background-position:center;
+  background-image:conic-gradient(#D63A2E 0 25%,#F3ECE0 0 50%,#D63A2E 0 75%,#F3ECE0 0)}
+html.has-chip-single .pv-chip{background-image:var(--asset-chip-single)}
+
+.cos-main{position:absolute;left:2.4cqw;right:2.4cqw;top:46.6cqw;bottom:13.4cqw;display:flex;gap:2cqw}
+.cos-rail{width:29cqw;flex:0 0 auto;display:flex;flex-direction:column;gap:1.1cqw;
+  overflow-y:auto;padding-right:.4cqw}
+.cos-cat{height:9.6cqw;flex:0 0 auto;border-radius:1.2cqw;padding:0 1.4cqw;
+  display:flex;align-items:center;gap:1.2cqw;text-align:left;
+  background:linear-gradient(180deg,rgba(12,40,33,.9),rgba(4,18,14,.94));
+  border:.16cqw solid rgba(232,200,100,.20)}
+.cos-cat b{font-size:2.6cqw;font-weight:700;color:#DCEDE6;letter-spacing:.02em;line-height:1.2}
+.cos-cat i{width:5cqw;height:5cqw;border-radius:.8cqw;flex:0 0 auto;
+  box-shadow:inset 0 0 0 .14cqw rgba(0,0,0,.45)}
+.cos-cat.on{background:linear-gradient(180deg,rgba(232,200,100,.26),rgba(232,200,100,.08));
+  border-color:var(--ui-gold)}
+.cos-cat.on b{color:#FFF3CE}
+.cos-cat:active{transform:scale(.98)}
+
+.cos-gridwrap{flex:1 1 auto;min-width:0;overflow-y:auto}
+.cos-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:2cqw;padding:1.6cqw .2cqw 1cqw}
+.cos-item{position:relative;border-radius:1.4cqw;padding:1.4cqw 1.4cqw 1.8cqw;text-align:center;
+  background:linear-gradient(180deg,rgba(12,40,33,.92),rgba(4,18,14,.95));
+  border:.18cqw solid rgba(232,200,100,.22);
+  box-shadow:0 .4cqw 1cqw rgba(0,0,0,.45)}
+.cos-swatch{display:block;width:100%;aspect-ratio:1;border-radius:1cqw;margin-bottom:1cqw;
+  box-shadow:inset 0 0 0 .16cqw rgba(0,0,0,.4),inset 0 .2cqw .6cqw rgba(255,255,255,.16)}
+.cos-item b{display:block;font-size:2.7cqw;font-weight:800;color:#F0E7CC;letter-spacing:.05em}
+.cos-item small{display:block;margin-top:.4cqw;font-size:2cqw;line-height:1.45;color:#8FA79E}
+.cos-item.on{border-color:var(--ui-gold);
+  box-shadow:0 0 2.2cqw rgba(232,200,100,.34),inset 0 0 0 .16cqw rgba(232,200,100,.35)}
+.cos-item.on::after{content:"選択中";position:absolute;left:50%;top:-1.3cqw;transform:translateX(-50%);
+  padding:.35cqw 1.6cqw;border-radius:99cqw;font-size:2cqw;font-weight:900;letter-spacing:.1em;
+  color:#12211B;background:linear-gradient(180deg,#FFF0B7,#C9A227);white-space:nowrap;
+  box-shadow:0 .2cqw .5cqw rgba(0,0,0,.5)}
+.cos-item.locked{opacity:.55}
+.cos-item.locked .cos-swatch{filter:saturate(.3) brightness(.72)}
+.cos-item .price{display:block;margin-top:.7cqw;font-size:2.1cqw;font-weight:900;color:#F0D273;
+  font-variant-numeric:tabular-nums}
+.cos-item .lock{position:absolute;right:1cqw;top:1cqw;width:4cqw;height:4cqw;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:2.1cqw;
+  background:rgba(3,14,11,.85);border:.14cqw solid rgba(232,200,100,.4);color:#F0D273}
+.cos-item:active{transform:scale(.98)}
+
+.cos-foot{position:absolute;left:2.4cqw;right:2.4cqw;bottom:2.4cqw;height:9.4cqw;display:flex}
+.cos-play{flex:1 1 auto;border-radius:1.6cqw;font-size:3.4cqw;font-weight:900;letter-spacing:.16em;
+  display:flex;align-items:center;justify-content:center;
+  background:linear-gradient(180deg,#2E6654,#0A2B22);
+  border:.2cqw solid var(--ui-line);
+  box-shadow:0 .5cqw 1.4cqw rgba(0,0,0,.55),inset 0 .12cqw 0 rgba(255,246,214,.24)}
+.cos-play:active{transform:translateY(.3cqw) scale(.99)}
+
+.shop-body{position:absolute;left:2.4cqw;right:2.4cqw;top:12.6cqw;bottom:2.4cqw;overflow-y:auto;
+  display:grid;grid-template-columns:repeat(2,1fr);gap:2cqw;align-content:start}
+.shop-card{border-radius:1.6cqw;padding:2.2cqw;text-align:center;
+  background:linear-gradient(180deg,rgba(12,40,33,.92),rgba(4,18,14,.95));
+  border:.18cqw solid rgba(232,200,100,.22)}
+.shop-card .cos-swatch{aspect-ratio:16/9}
+.shop-card b{display:block;font-size:3cqw;color:#F0E7CC}
+.shop-card small{display:block;margin-top:.5cqw;font-size:2.1cqw;color:#8FA79E;line-height:1.5}
+.shop-card .price{display:inline-block;margin-top:1.4cqw;padding:.8cqw 2.6cqw;border-radius:99cqw;
+  font-size:2.5cqw;font-weight:900;color:#12211B;background:linear-gradient(180deg,#FFF0B7,#C9A227)}
+
+/* 対局画面からロビーへ戻る小さな導線。Golden Visual との重ね合わせ時は隠す */
+.gameHome{position:absolute;left:1.6cqw;top:1.6cqw;z-index:30;
+  width:6.4cqw;height:6.4cqw;border-radius:50%;font-size:2.8cqw;font-weight:900;line-height:6.4cqw;
+  text-align:center;color:#F0E7CC;background:rgba(3,14,11,.55);
+  border:.14cqw solid rgba(232,200,100,.34);box-shadow:0 .2cqw .6cqw rgba(0,0,0,.5)}
+.gameHome:active{transform:scale(.94)}
+html.calib .gameHome{display:none}
+
+/* 装飾品設定のプレビュー内の牌にも、対局画面と同じスキンを効かせる */
+html.has-tile-body-flat .cos-prevstage .tile:not(.back){
+  background:var(--asset-tile-body-flat) center/100% 100% no-repeat;box-shadow:none}
+
+@media (prefers-reduced-motion:reduce){.ttl-start{animation:none;opacity:1}}
+html.still .ttl-start{animation:none;opacity:1}
 
 /* --- dev-only calibration overlay: ?calib puts the Golden Visual on top --- */
 #calib{display:none;position:absolute;inset:0;z-index:99;pointer-events:none;opacity:.45;
@@ -526,6 +852,109 @@ html.calib #calib{display:block}
 </head>
 <body>
 <div id="app">
+
+<!-- ============ タイトル ============ -->
+<section id="screen-title" class="screen">
+  <div class="ttl-veil"></div>
+  <div class="ttl-body">
+    <div class="ttl-kicker">麻雀 × ホールデム</div>
+    <h1 class="ttl-logo"><span>MAHJONG</span><em>HOLD'EM</em></h1>
+    <div class="ttl-rule"></div>
+    <p class="ttl-lead">共通の15枚から、あなただけの14枚を組み上げろ。</p>
+    <button class="ttl-start" id="bTitleStart"><span class="gold-text">TAP TO START</span></button>
+    <div class="ttl-ver">prototype build</div>
+  </div>
+</section>
+
+<!-- ============ ロビー ============ -->
+<section id="screen-lobby" class="screen">
+  <div class="lb-veil"></div>
+  <header class="lb-top">
+    <div class="lb-id">
+      <div class="lb-avatar">雀</div>
+      <div class="lb-idtext"><b id="lbName">keisuku</b><span id="lbRank">四段 ・ 1,240pt</span></div>
+    </div>
+    <div class="lb-wallet">
+      <span class="lb-coin"><i class="cur cur-c"></i><b id="lbCoin">10,000</b></span>
+      <span class="lb-coin"><i class="cur cur-g"></i><b id="lbGem">70</b></span>
+    </div>
+  </header>
+
+  <div class="lb-banner">
+    <b>新スキン「夜想」入荷</b>
+    <small>装飾品設定から卓と背景を差し替えられます</small>
+    <span class="lb-bannergo" data-go="cosmetics">見る</span>
+  </div>
+
+  <button class="lb-standee" id="lbStandee" data-go="cosmetics">
+    <span class="lb-silhouette"></span>
+    <span class="lb-standeecap"><b>キャラクター未設定</b><small>タップして選ぶ</small></span>
+  </button>
+
+  <div class="lb-modes">
+    <button class="lb-mode primary" data-go="game">
+      <b>ランク戦</b><small>RANK MATCH</small></button>
+    <button class="lb-mode" data-go="game">
+      <b>リング戦</b><small>RING GAME</small></button>
+    <button class="lb-mode soon" disabled>
+      <b>大　会</b><small>TOURNAMENT</small></button>
+  </div>
+
+  <div class="lb-daily">
+    <div class="lb-dailyhead"><b>デイリーミッション</b><span>2 / 3</span></div>
+    <div class="lb-bar"><i style="width:66%"></i></div>
+    <ul class="lb-tasks">
+      <li class="done">対局を1回行う</li>
+      <li class="done">14枚を組み上げる</li>
+      <li>ランク戦で勝利する</li>
+    </ul>
+  </div>
+
+  <nav class="lb-nav">
+    <button class="lb-navbtn on"><i>◆</i><span>ホーム</span></button>
+    <button class="lb-navbtn" data-go="cosmetics"><i>❖</i><span>装飾品</span></button>
+    <button class="lb-navbtn" data-go="shop"><i>✦</i><span>ショップ</span></button>
+    <button class="lb-navbtn" data-go="shop"><i>✧</i><span>ガチャ</span></button>
+  </nav>
+</section>
+
+<!-- ============ 装飾品設定 ============ -->
+<section id="screen-cosmetics" class="screen">
+  <div class="cos-veil"></div>
+  <header class="cos-top">
+    <button class="backBtn" data-go="lobby">◀</button>
+    <h2>装飾品設定</h2>
+    <div class="cos-hint">選ぶとすぐ対局画面に反映されます</div>
+  </header>
+
+  <div class="cos-preview" id="cosPreview">
+    <div class="cos-prevlabel">プレビュー</div>
+    <div class="cos-prevstage" id="cosPrevStage"></div>
+  </div>
+
+  <div class="cos-main">
+    <div class="cos-rail" id="cosRail"></div>
+    <div class="cos-gridwrap"><div class="cos-grid" id="cosGrid"></div></div>
+  </div>
+
+  <div class="cos-foot">
+    <button class="cos-play" data-go="game"><span class="gold-text">この装いで対局する</span></button>
+  </div>
+</section>
+
+<!-- ============ ショップ（外見のみ） ============ -->
+<section id="screen-shop" class="screen">
+  <div class="cos-veil"></div>
+  <header class="cos-top">
+    <button class="backBtn" data-go="lobby">◀</button>
+    <h2>ショップ</h2>
+    <div class="cos-hint">未実装。決済は繋がっていません</div>
+  </header>
+  <div class="shop-body" id="shopBody"></div>
+</section>
+
+<!-- ============ 対局（既存画面。中身は一切変えていない） ============ -->
+<section id="screen-game" class="screen">
   <div class="arena" id="arena">
     <div class="rail" id="rail"></div>
     <div class="meSeat" id="meSeat">
@@ -579,29 +1008,15 @@ html.calib #calib{display:block}
     <button class="raise" id="bRaise"><span class="btn-label">RAISE</span></button>
     <button class="dial" id="bDial">400</button>
   </div>
+
+  <button class="gameHome" id="bHome" title="ロビーへ" data-go="lobby">◀</button>
+</section>
+
   <div id="calib" aria-hidden="true"></div>
 </div>
 
 <script>
-/* assets/ui/ に素材が置かれていれば html にクラスを立て、CSSのスプライト版へ切り替える。
-   1点ずつ納品されても壊れないよう、存在するものだけを個別に有効化する。
-   一覧は assets/ui/MANIFEST.json、仕様は ASSET_BRIEF.md。 */
-["tile-body-flat","tile-body-upright","tile-back-flat","frame-gold-plate","frame-gold-ribbon",
- "frame-seat-plate","frame-group","btn-fold","btn-call","btn-raise","dial"].forEach(function(id){
-  const probe=new Image();
-  probe.onload=function(){if(probe.naturalWidth>1)document.documentElement.classList.add("has-"+id);};
-  probe.src="./assets/ui/"+id+".png";
-});
-/* round 3 の SVG。幾何は正確（ボタン3種の角丸が全て50pxで一致。Golden Visual自身は
-   53/47/49とばらついていた）が、金の厚みと階調は生成PNGの方がGolden Visualに近い。
-   既定はPNG。?svg=1 でSVGへ切り替えて比較できる。 */
-if(new URLSearchParams(location.search).has("svg"))
-["frame-gold-plate","frame-gold-ribbon","frame-seat-plate","frame-group",
- "btn-fold","btn-call","btn-raise"].forEach(function(id){
-  const probe=new Image();
-  probe.onload=function(){if(probe.naturalWidth>1)document.documentElement.classList.add("svg-"+id);};
-  probe.src="./assets/ui/svg/"+id+".svg";
-});
+/* 素材の差し替えは head のスキンランタイムが済ませている（skins/manifest.js）。 */
 
 const KANJI=["一","二","三","四","五","六","七","八","九"];
 const HONOR=["東","南","西","北","白","發","中"];
@@ -1333,7 +1748,124 @@ document.getElementById("bCall").onclick=function(){
 document.getElementById("bRaise").onclick=function(){playerAction("raise");};
 document.getElementById("bDial").onclick=cycleBet;
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
+
+/* ======================================================================
+   画面遷移
+   ====================================================================== */
+const SCREEN_IDS=["title","lobby","cosmetics","shop","game"];
+let currentScreen=null;
+function showScreen(name){
+  if(SCREEN_IDS.indexOf(name)<0)name="title";
+  SCREEN_IDS.forEach(function(id){
+    const el=document.getElementById("screen-"+id);
+    if(el)el.classList.toggle("on",id===name);
+  });
+  currentScreen=name;
+}
+function go(name){
+  showScreen(name);
+  /* 非表示中は要素の矩形が全て0になるので、戻ってきたらFLIPを挟まずに描き直す */
+  if(currentScreen==="game"){dealSeq=0;renderCore();}
+  if(currentScreen==="cosmetics")cosRender();
+  if(currentScreen==="shop")shopRender();
+}
+document.addEventListener("click",function(ev){
+  const b=ev.target.closest("[data-go]");
+  if(b&&!b.disabled)go(b.dataset.go);
+});
+document.getElementById("bTitleStart").onclick=function(){go("lobby");};
+
+/* ======================================================================
+   装飾品設定
+   スキンを選ぶと skinSelect() が CSS 変数を差し替えるので、対局画面は
+   再読込なしでその場で変わる。プレビューも同じ変数を見ているので即座に追従する。
+   ====================================================================== */
+let cosSlot=(SKIN_DATA.slots[0]||{}).id||"tile";
+const COS_HINT="選ぶとすぐ対局画面に反映されます";
+let cosNoticeTimer=0;
+function cosNotice(text){
+  const el=document.querySelector("#screen-cosmetics .cos-hint");
+  el.textContent=text;el.classList.add("warn");
+  window.clearTimeout(cosNoticeTimer);
+  cosNoticeTimer=window.setTimeout(function(){el.textContent=COS_HINT;el.classList.remove("warn");},2600);
+}
+
+function cosPreviewBuild(){
+  const st=document.getElementById("cosPrevStage");
+  if(st.childElementCount)return;
+  const tiles=document.createElement("div");tiles.className="cos-prevtiles";
+  [0,4,13,22,28,31].forEach(function(id){tiles.appendChild(tile(id));});
+  tiles.appendChild(backTile());
+  const btns=document.createElement("div");btns.className="cos-prevbtns";
+  btns.innerHTML='<div class="pv-btn fold">FOLD</div><div class="pv-btn call">CALL</div>'+
+                 '<div class="pv-btn raise">RAISE</div><div class="pv-chip"></div>';
+  st.appendChild(tiles);st.appendChild(btns);
+}
+
+/* 見本は色のグラデーションではなく、可能なかぎり実物の絵を出す。
+   そのスキンが見本用ロールの素材を持っていれば画像、無ければ色見本にする。 */
+function cosSwatchStyle(def,s){
+  const p=def&&def.preview;
+  const url=p&&s.assets&&s.assets[p.role];
+  /* innerHTML の style 属性に入るので、URLは必ずシングルクォートで囲む */
+  if(url)return "background:rgba(0,0,0,.28) url('"+url+"') center/"+p.fit+" no-repeat";
+  return "background:"+(s.swatch||"#1c3a33");
+}
+
+function cosRender(){
+  cosPreviewBuild();
+
+  const rail=document.getElementById("cosRail");
+  rail.innerHTML="";
+  SKIN_DATA.slots.forEach(function(def){
+    const cur=skinsForSlot(def.id).filter(function(s){return s.id===skinChosen(def.id);})[0];
+    const b=document.createElement("button");
+    b.className="cos-cat"+(def.id===cosSlot?" on":"");
+    b.innerHTML='<i style="'+cosSwatchStyle(def,cur||{})+'"></i><b>'+def.name+"</b>";
+    b.onclick=function(){cosSlot=def.id;cosRender();};
+    rail.appendChild(b);
+  });
+
+  const def=skinSlotDef(cosSlot);
+  const grid=document.getElementById("cosGrid");
+  grid.innerHTML="";
+  const chosen=skinChosen(cosSlot);
+  skinsForSlot(cosSlot).forEach(function(s){
+    const locked=s.owned===false;
+    const el=document.createElement("button");
+    el.className="cos-item"+(s.id===chosen?" on":"")+(locked?" locked":"");
+    el.innerHTML='<span class="cos-swatch" style="'+cosSwatchStyle(def,s)+'"></span>'+
+      "<b>"+s.name+"</b><small>"+(s.note||"")+"</small>"+
+      (locked?'<span class="lock">🔒</span><span class="price">'+
+        (s.price?s.price.toLocaleString()+" 宝玉":"未実装")+"</span>":"");
+    el.onclick=function(){
+      if(locked){cosNotice(s.price?"「"+s.name+"」は未所持です。ショップで入手できます。"
+                                  :"「"+s.name+"」はまだ素材が用意できていません。");return;}
+      skinSelect(cosSlot,s.id);
+      cosRender();
+    };
+    grid.appendChild(el);
+  });
+}
+
+function shopRender(){
+  const body=document.getElementById("shopBody");
+  if(body.childElementCount)return;
+  SKIN_DATA.skins.filter(function(s){return s.owned===false&&s.price;}).forEach(function(s){
+    const slot=skinSlotDef(s.slot);
+    const c=document.createElement("div");c.className="shop-card";
+    c.innerHTML='<span class="cos-swatch" style="'+cosSwatchStyle(slot,s)+'"></span>'+
+      "<b>"+s.name+"</b><small>"+((slot&&slot.name)||"")+" ・ "+(s.note||"")+"</small>"+
+      '<span class="price">'+s.price.toLocaleString()+" 宝玉</span>";
+    body.appendChild(c);
+  });
+}
+
+/* 配牌アニメーションが走るよう、newHand() の前に対局画面を可視にしておく */
+showScreen(new URLSearchParams(location.search).get("screen")||"title");
 newHand();
+if(currentScreen==="cosmetics")cosRender();
+if(currentScreen==="shop")shopRender();
 </script>
 </body>
 </html>
