@@ -36,10 +36,21 @@ f.onload=function(){
   ok(hands===30&&!bad,"30局を通しで回した "+bad);
   ok(conserved,"点棒総和が全局で保存された（期待 "+TOTAL+"）");
   ok(winners===hands,"毎局かならず決着した ("+winners+"/"+hands+")");
-  ok(E("seats.filter(function(s){return s.stack>0;}).length")>=2&&E("userStack")>0,"卓が死んでいない（自動仕切り直し resets="+E("sessionResets")+"）");
-  /* 生存人数は最適打ちの harness では局ごとにぶれるので、閾値では判定しない。
-     卓が死なないことは上の「卓が死んでいない」で保証済み。ここは記録のみ。 */
-  log.push("INFO  30局後の生存 "+E("seats.filter(function(s){return s.stack>0;}).length")+"/5");
+  /* 卓の生死は「その瞬間の生存数」では測れない。
+     newHand() は ensureTable() → postAnte() → openCommon15() の順に走るので、
+     ループ直後の状態はもう ante と初手のベットを引いたあとで、
+     ぎりぎりの席が一時的に0になる。ここを閾値で見ると稀に落ちる（実測 約1/10）。
+
+     ensureTable() が保証しているのは「次の局が必ず始められること」なので、
+     そちらを直接確かめる。31局目を開始して、遊べる状態になっているかを見る。 */
+  log.push("INFO  30局終了時点の生存 "+E("seats.filter(function(s){return s.stack>0;}).length")
+    +"/5（ante 差引後）");
+  /* ループの最後の bNext で31局目はもう始まっている。ここでは押さずに状態を見る。 */
+  ok(E("stage")===1&&E("common.length")===15&&E("phase")==="play",
+     "何局続けても次の局が必ず始まる（stage="+E("stage")+" common="+E("common.length")+"）");
+  ok(E("userStack")>0,"自分の点棒が尽きたまま次局へ入らない (YOU="+E("userStack")+")");
+  ok(E("seats.filter(function(s){return !s.folded;}).length")>=1,
+     "相手が全滅したまま次局へ入らない（仕切り直し "+E("sessionResets")+"回）");
   ok(E("seats.map(function(s){return s.stack;}).join(\",\")")!=="3940,4620,4730,4110,4880","持ち点が実際に動いた: "+E("seats.map(function(s){return s.stack;}).join(\",\")")+" / YOU "+E("userStack"));
   ok(!neg,"持ち点がマイナスになった局はない "+neg);
   ok(errs.length===0,"例外なし "+(errs[0]||""));
