@@ -23,7 +23,7 @@ f.onload=function(){
       const cs=[].slice.call(d.querySelectorAll("#commons .tile:not(.used)"));
       for(let i=0;i<cs.length&&d.querySelectorAll("#rack .tile").length<14;i++)cs[i].click();
     }
-    d.getElementById("bCall").click();
+    d.getElementById("bNext").click();   /* ショーダウン */
     hands++;
     if(E("pot")!==0)bad="局"+h+" 決着後のPOTが"+E("pot");
     if(E("seats.some(function(s){return s.stack<0;})||userStack<0"))neg="局"+h;
@@ -31,7 +31,7 @@ f.onload=function(){
     if(E("resultText").length>0)winners++;
     const t=total();
     if(t!==TOTAL){conserved=false;bad="局"+h+" total="+t;}
-    d.getElementById("bCall").click();
+    d.getElementById("bNext").click();   /* 次の局へ */
   }
   ok(hands===30&&!bad,"30局を通しで回した "+bad);
   ok(conserved,"点棒総和が全局で保存された（期待 "+TOTAL+"）");

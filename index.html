@@ -306,8 +306,10 @@ body::before,body::after{display:none}
 .arena{position:absolute;inset:0;margin:0;padding:0;min-height:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
 .arena::before{display:none}
 .board{position:absolute;inset:0;margin:0;padding:0;min-height:0;border:0;border-radius:0;background:none;box-shadow:none;overflow:visible}
-/* Golden Visual carries no dora slot, no street badge, no street button and no status line. */
-.dora,.badge,.streetNext,.status{display:none}
+/* Golden Visual carries no dora slot, no street badge and no status line.
+   進行ボタン(.streetNext)だけは残す。局を進める操作が +4 枠タップという
+   隠れた挙動しか無いのは、モックには無くても製品としては欠落なので。 */
+.dora,.badge,.status{display:none}
 
 /* 伏せ牌はGolden Visualと同じ紺地＋金の菱形。 */
 .tile.back{background:linear-gradient(165deg,#f6efdc,#cfba8d)}
@@ -432,12 +434,40 @@ body::before,body::after{display:none}
 .winRibbon{position:absolute;left:19%;right:19%;top:63.2%;z-index:20;margin:0;padding:.6cqw;
   border-radius:1cqw;background:rgba(20,50,42,.96)}
 .winRibbon strong{font-size:3cqw}.winRibbon span{font-size:1.9cqw}
-.winRibbon.result{display:block;top:61.4%;left:22%;right:22%;text-align:center;
-  font-size:2.3cqw;font-weight:900;color:#ffe9a8;
-  padding:.9cqw .8cqw;border-color:#f0d489;background:rgba(12,42,34,.97);
+/* 決着表示と進行ボタンは同じ帯（私牌の下 58.2% 〜 見出し 67.1%）に入るので、
+   決着時は結果を上、進行ボタンを下に積む。重ならないよう両方をこの帯に収める。 */
+.winRibbon.result{display:block;top:58.7%;left:9%;right:9%;text-align:center;
+  font-size:2.2cqw;font-weight:900;color:#ffe9a8;
+  /* 勝者が複数だと文章が伸びる。折り返すと下の進行ボタンに被るので1行に固定する。 */
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  padding:.9cqw 1.6cqw;border-color:#f0d489;background:rgba(12,42,34,.97);
   box-shadow:0 .4cqw 1.6cqw rgba(0,0,0,.6),0 0 2.4cqw rgba(240,200,90,.35)}
 
 /* --- おすすめ / クリア --- */
+/* 局の進行ボタン。私牌8枚(〜58.2%)と MY FINAL HAND の見出し(67.1%)の間が空いているので、
+   ここに置く。牌を選び終えて視線が落ちてくる位置でもある。 */
+.streetNext{position:absolute;left:50%;top:59.7%;transform:translateX(-50%);z-index:16;
+  width:52cqw;height:5.5%;margin:0;padding:0;border:0;border-radius:99cqw;
+  font-size:3.1cqw;font-weight:900;letter-spacing:.14em;color:#1B1508;
+  background:linear-gradient(180deg,#FFF3CE 0%,#F0D273 26%,#C9942A 62%,#8A5E12 100%);
+  box-shadow:0 .45cqw 1.1cqw rgba(0,0,0,.55),0 0 2.2cqw rgba(232,200,100,.28),
+    inset 0 .18cqw 0 rgba(255,255,255,.72),inset 0 -.22cqw 0 rgba(90,58,10,.45);
+  display:flex;align-items:center;justify-content:center;gap:1cqw}
+.streetNext::after{content:"▶";font-size:2.2cqw;opacity:.7}
+.streetNext:active{transform:translateX(-50%) translateY(.3cqw) scale(.99)}
+.streetNext:disabled{opacity:.34;filter:saturate(.3)}
+/* ショーダウン待ちは一番強い誘導にする */
+.streetNext.hot{background:linear-gradient(180deg,#FFE7C0 0%,#F3A94E 30%,#D2661C 68%,#8A3708 100%);
+  color:#25100A;animation:nextPulse 1.5s ease-in-out infinite}
+@keyframes nextPulse{0%,100%{box-shadow:0 .45cqw 1.1cqw rgba(0,0,0,.55),0 0 1.6cqw rgba(240,150,60,.30),
+    inset 0 .18cqw 0 rgba(255,255,255,.7)}
+  50%{box-shadow:0 .45cqw 1.1cqw rgba(0,0,0,.55),0 0 3.6cqw rgba(240,150,60,.62),
+    inset 0 .18cqw 0 rgba(255,255,255,.7)}}
+html.still .streetNext.hot{animation:none}
+@media (prefers-reduced-motion:reduce){.streetNext.hot{animation:none}}
+/* 決着時は結果表示が上に入るので、進行ボタンを下段へ寄せて少し細くする */
+.streetNext.afterResult{top:62.5%;height:4.0%;font-size:2.8cqw}
+
 .recommendPanel{position:absolute;left:21.25%;top:79.07%;width:54.73%;height:3.89%;margin:0;padding:0;
   background:none;border:0;border-radius:0;z-index:20}
 .recMain{display:grid;grid-template-columns:1fr 1fr;gap:8.74%;height:100%}
@@ -1716,19 +1746,31 @@ function renderCore(fresh){
     }
   }
 
+  /* 局の進行はこのボタンが持つ。+4 枠のタップも従来どおり効くが、
+     そちらは隠れた操作なので、明示的な導線をこちらに置く。 */
   const bn=document.getElementById("bNext");
-  bn.textContent=stage===0?"参加する":stage<4?"次の＋4":"配り直す";
+  const ROMAN=["Ⅰ","Ⅱ","Ⅲ"];
+  bn.classList.remove("hot","afterResult");bn.disabled=false;
+  if(phase==="result"){bn.innerHTML='<span class="btn-label">次の局へ</span>';
+    bn.classList.add("hot","afterResult");}
+  else if(stage===0)bn.innerHTML='<span class="btn-label">対局を始める</span>';
+  else if(stage<4)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
+  else if(!userFolded&&picks.length<MAX_HAND){
+    /* 14枚そろわないとショーダウンできない。押してから叱るのではなく、先に何が足りないかを見せる。 */
+    bn.innerHTML='<span class="btn-label">あと '+(MAX_HAND-picks.length)+' 枚えらぶ</span>';
+    bn.disabled=true;}
+  else{bn.innerHTML='<span class="btn-label">ショーダウン</span>';bn.classList.add("hot");}
   document.getElementById("recommendPanel").classList.toggle("open",recOpen);
   document.getElementById("bRec").textContent=recOpen?"総合おすすめ":"おすすめ";
   document.querySelectorAll("[data-mode]").forEach(function(btn){btn.classList.toggle("selected",recOpen&&btn.dataset.mode===recMode);});
   document.getElementById("bRec").disabled=(stage===0);
   document.getElementById("bClear").disabled=(stage===0);
-  /* CALLボタンが局の進行役を兼ねる。+4 III まで来たらショーダウン、決着後は次の局。 */
+  /* CALLは賭けの行為だけを持つ。局の進行は上の進行ボタンが持つ。
+     以前はCALLがショーダウンと次局を兼ねていたが、2つの意味が1つのボタンに乗っていた。 */
   const call=document.getElementById("bCall");
   const wrap=function(t){return '<span class="btn-label">'+t+'</span>';};
-  if(phase==="result"){call.innerHTML=wrap("次の局");call.disabled=false;}
-  else if(stage>=4){call.innerHTML=wrap("SHOW<br>DOWN");call.disabled=false;}
-  else{call.innerHTML=wrap("CALL<br>"+Math.min(currentCall,userStack).toLocaleString());call.disabled=userStack<=0;}
+  call.innerHTML=wrap("CALL<br>"+Math.min(currentCall,userStack).toLocaleString());
+  call.disabled=userStack<=0||phase==="result"||stage>=4;
   document.getElementById("bDial").innerHTML=
     '<span class="gold-text">'+(betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString())+'</span>';
   document.getElementById("bFold").disabled=(phase==="result");
@@ -1739,7 +1781,10 @@ function renderCore(fresh){
 
 document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("total");};
 document.getElementById("bClear").onclick=clearRack;
-document.getElementById("bNext").onclick=nextStreet;
+document.getElementById("bNext").onclick=function(){
+  if(phase==="result"){newHand();return;}
+  nextStreet();
+};
 document.getElementById("bFold").onclick=function(){playerAction("fold");};
 document.getElementById("bCall").onclick=function(){
   if(phase==="result"){newHand();return;}
