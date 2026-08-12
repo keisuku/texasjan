@@ -58,6 +58,7 @@ document.getElementById("f").onload=function(){
 
   // +4 reveal must keep the selection
   const before=rackTiles().length;
+  w.fastForwardBetting();
   const pend=d.querySelector(".revealGroup.pending");
   ok(!!pend,"street: the next +4 group is tappable");
   if(pend)pend.click();

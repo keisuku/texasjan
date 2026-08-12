@@ -1,12 +1,16 @@
 # MAHJONG HOLD'EM — Claude Code bootstrap
 
+## 恒久的な制作規約
+
+作業前に必ずルートの `PRODUCTION_NORTH_STAR.md` を全文読んでください。大きな配置・割合・技術基盤を変える前に人間の承認を取り、CSS/SVGの仮部品を積み重ねて商用品質へ近づいたと判断してはいけません。Golden Visualを先に承認し、そこから素材・技術・実装へ逆算することが最優先です。
+
 最初に `claude-handoff/START_HERE.md` と `claude-handoff/ASSET_MANIFEST.json` を全文読んでください。
 
-## 現在の最優先課題
+## 現在の位置づけと最優先課題
 
-既存の `index.html` を基礎に、次の一操作をGolden Visualの見た目で成立させること。
+`index.html` は高速ルール・数学・入力UX検証機です。牌選択、14枚上限、役・待ち判定、6人のベッティング一巡は実装済みです。HTMLへCSS製の装飾を足して製品画へ近づけようとしないでください。
 
-> 共通牌または私牌をタップすると、同じ牌が最下部の最終14枚へ追加され、元牌は薄くなる。最終手牌をタップすると解除される。
+次の大方向は人間の承認待ちです。承認後に `PRODUCTION_NORTH_STAR.md` の GV-0（製品相当の構図3案）から開始し、Golden Visualを承認してからUnity 6.3 LTSの縦切りへ分解します。承認前にUnity移行や大規模な配置変更を独断で始めないでください。
 
 ## 重要な禁止事項
 

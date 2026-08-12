@@ -24,7 +24,8 @@ f.onload=function(){setTimeout(function(){
     ok(w.eval("stage")===1&&d.querySelectorAll("#commons .tile").length===15,
        "対局は共通15枚公開済みで始まる");
 
-    for(let k=0;k<3;k++)d.getElementById("bNext").click();
+    for(let k=0;k<3;k++){w.fastForwardBetting();d.getElementById("bNext").click();}
+    w.fastForwardBetting();
     d.getElementById("bRec").click();
     if(w.eval("picks.length")<14){
       [].slice.call(d.querySelectorAll("#commons .tile:not(.used)")).some(function(t){

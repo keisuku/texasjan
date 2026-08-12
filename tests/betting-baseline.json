@@ -1,0 +1,29 @@
+{
+  "generatedBy": "node tests/simulate-betting.js 100000",
+  "seed": "0x5eed1234",
+  "hands": 100000,
+  "potMedian": {
+    "common15": 1634,
+    "plus4I": 2534,
+    "plus4II": 3134,
+    "plus4III": 4934
+  },
+  "potP90": {
+    "common15": 2234,
+    "plus4I": 3134,
+    "plus4II": 4634,
+    "plus4III": 7034
+  },
+  "potMaxObserved": 22334,
+  "orbitActionsMedian": 6,
+  "orbitActionsP90": 10,
+  "actions": {
+    "checks": 1480475,
+    "calls": 1101963,
+    "raises": 234077,
+    "folds": 26884,
+    "allins": 0
+  },
+  "conservationFailures": 0,
+  "interpretation": "CALL/CHECK固定のユーザーに対するBOT基準値。勝率・役分布の完成基準ではなく、賭けテンポの回帰検査用。"
+}

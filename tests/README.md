@@ -27,6 +27,11 @@
 | `?skin=frame:sharp,arena:empty` | 保存せずに一時的なスキンを当てる。撮り比べ用 |
 | `?calib=1` | Golden Visual を半透明で重ねる |
 
+`betting.html` は描画非依存のベッティング状態機械を検査します。通常の一巡、途中レイズによる手番の戻り、全員フォールド、ショートオールインを対象にします。
+
+`node tests/simulate-betting.js 100000` は固定seedで10万局のBOTベッティングを再現し、ストリート別POT分布、行動数、点棒保存違反をJSON出力します。
+採用中の基準値は `betting-baseline.json` に保存しています。これは賭けテンポの回帰基準で、役・エクイティの完成基準ではありません。
+
 Chromium で自動実行する場合:
 
 ```

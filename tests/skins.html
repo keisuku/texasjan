@@ -98,16 +98,17 @@ f.onload=function(){setTimeout(function(){
   ok(!overlap(nb,R(".sourceZone")),"進行ボタンが私牌8枚と重なっていない");
   ok(!overlap(nb,R(".labelFinal")),"進行ボタンが MY FINAL HAND の見出しと重なっていない");
   ok(!overlap(nb,R("#rack")),"進行ボタンが最終手牌と重なっていない");
+  w.fastForwardBetting();
   ok(/を公開/.test(bn.textContent),"進行ボタンが次に開く枠を示している ("+bn.textContent+")");
 
   const st0=w.eval("stage");
   bn.click();
   ok(w.eval("stage")===st0+1,"進行ボタンで局が進む ("+st0+" -> "+w.eval("stage")+")");
-  bn.click();bn.click();
+  w.fastForwardBetting();bn.click();w.fastForwardBetting();bn.click();w.fastForwardBetting();
   ok(w.eval("stage")===4,"+4 を3つ開くと stage=4 (got "+w.eval("stage")+")");
   ok(/あと \d+ 枚えらぶ/.test(bn.textContent)&&bn.disabled,
      "14枚そろう前は残り枚数を示して押せない ("+bn.textContent+")");
-  ok(d.getElementById("bCall").disabled,"stage4 では CALL は無効（進行はボタンが持つ）");
+  ok(d.getElementById("bCall").disabled,"ベッティング完了後は CALL が無効");
 
   d.getElementById("bRec").click();          /* おすすめで14枚そろえる */
   ok(w.eval("picks.length")===14,"おすすめで14枚そろった (got "+w.eval("picks.length")+")");

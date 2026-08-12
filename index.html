@@ -381,6 +381,21 @@ html.still .tile.waitCandidate{animation:none}
 .seat.active{box-shadow:none}
 .seat.active::after{display:none}
 .seat.active .bet{border-color:#7ff2f5;box-shadow:0 0 .9cqw rgba(89,228,235,.75)}
+.seatAction{position:absolute;left:50%;top:-2.55cqw;transform:translateX(-50%);z-index:5;
+  min-width:7.6cqw;min-height:2.2cqw;padding:.25cqw .8cqw;border-radius:99cqw;
+  display:flex;align-items:center;justify-content:center;white-space:nowrap;
+  font-size:1.45cqw;font-weight:900;letter-spacing:.08em;color:#fff1bc;
+  background:linear-gradient(180deg,rgba(10,45,37,.97),rgba(2,18,15,.98));
+  border:1px solid rgba(238,208,116,.74);box-shadow:0 .25cqw .8cqw rgba(0,0,0,.6);opacity:0}
+.seatAction:not(:empty){opacity:1}
+.seatAction.thinking{color:#8ef4ed;border-color:#73e9e7}
+.seatAction.thinking::after{content:"";width:.6cqw;height:.6cqw;margin-left:.55cqw;border-radius:50%;
+  background:#75f0e7;box-shadow:1cqw 0 #75f0e7,2cqw 0 #75f0e7;animation:thinkDots .9s ease-in-out infinite}
+@keyframes thinkDots{50%{opacity:.32;transform:translateY(-.25cqw)}}
+.meSeat .seatAction{top:-2.8cqw}
+.meSeat .seatAction.yourTurn{opacity:1;color:#071b18;background:linear-gradient(180deg,#b9fff7,#5be2d7);
+  border-color:#e7fffb;box-shadow:0 0 1.8cqw rgba(85,238,225,.82)}
+.meSeat.folded{opacity:.35}
 .seat:nth-child(1){left:9.68%;top:21.44%}
 .seat:nth-child(2){left:86.64%;top:19.88%}
 .seat:nth-child(3){left:9.12%;top:44.60%}
@@ -423,6 +438,7 @@ html.still .tile.waitCandidate{animation:none}
 .revealGroup.live{border-color:#e4c564;box-shadow:0 0 1.2cqw rgba(226,194,91,.22)}
 .revealGroup.pending{cursor:pointer;border-color:rgba(244,220,150,.95);box-shadow:0 0 1.4cqw rgba(238,206,120,.35)}
 .revealGroup.pending:active{transform:translateY(1px)}
+.revealGroup.locked{opacity:.58;filter:saturate(.55)}
 
 /* --- MY PRIVATE 8 --- */
 .sourceZone{position:absolute;left:49.36%;top:53.11%;transform:translateX(-50%);width:auto;height:5.08%;
@@ -1242,13 +1258,14 @@ html.calib #calib{display:block}
   </div>
 </section>
 
-<!-- ============ 対局（既存画面。中身は一切変えていない） ============ -->
+<!-- ============ 対局（高速ルール・入力UX検証画面） ============ -->
 <section id="screen-game" class="screen">
   <div class="arena" id="arena">
     <div class="rail" id="rail"></div>
     <div class="meSeat" id="meSeat">
       <div class="you gold-text">YOU</div>
       <div class="backs" id="myBacks"></div>
+      <div class="seatAction" id="meAction"></div>
       <div class="stack gold-text" data-num="me">5,870</div>
     </div>
     <div class="board">
@@ -1305,6 +1322,8 @@ html.calib #calib{display:block}
 </div>
 
 <script src="./mahjong-score.js"></script>
+<script src="./betting-engine.js"></script>
+<script src="./betting-ai.js"></script>
 <script>
 /* 素材の差し替えは head のスキンランタイムが済ませている（skins/manifest.js）。 */
 
@@ -1338,18 +1357,21 @@ const START_STACKS=[3940,4620,4730,4110,4880];
 /* 相手ごとの打ち筋。showdown で solveFlexible に渡す。 */
 const SEAT_MODES=["sequence","flush","triplet","pairs","total"];
 const seats=NAMES.map(function(n,i){
-  return {n:n,stack:START_STACKS[i],mode:SEAT_MODES[i],bet:0,folded:false,hand:[],best:null,won:false};
+  return {n:n,stack:START_STACKS[i],mode:SEAT_MODES[i],bet:0,folded:false,hand:[],best:null,won:false,
+    action:"",thinking:false};
 });
 /* ベットは持ち点に対する割合で決める。固定額だと数局で全員飛ぶ。
    Golden Visual の POT 22,200 は総額28,150のほぼ全部が中央にある山場の絵であって、
    毎局の定常状態ではない。 */
-const ANTE=300, STREET_FRACTION=[.06,.10,.16,.24], MIN_BET=100;
+const ANTE=300, MIN_BET=100;
 let sessionResets=0;
 let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
 let picks=[],pickSeq=0,notice="";
 let activeSeat=0,recOpen=false,recMode="total",wasComplete=false,dealAnim=0;
 let userStack=5870,betAmount=400,currentCall=400;
 let phase="play",userFolded=false,resultText="";
+let betting=null,dealerSeat=5,userAction="",aiTimer=0;
+const IS_STILL=document.documentElement.classList.contains("still");
 let matchMode="rank",lastResult=null;
 let rankPoints=(function(){
   try{const n=Number(localStorage.getItem("mh.rankPoints"));return Number.isFinite(n)&&n>=0?n:1240;}catch(e){return 1240;}
@@ -1371,12 +1393,14 @@ function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i)
 
 function newHand(){
   ensureTable();
+  window.clearTimeout(aiTimer);
   shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
   phase="play";userFolded=false;resultText="";
+  betting=null;userAction="";dealerSeat=(dealerSeat+1)%6;
   Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
   seats.forEach(function(s){
-    s.best=null;s.won=false;s.bet=0;
+    s.best=null;s.won=false;s.bet=0;s.action="";s.thinking=false;
     s.hand=wall.splice(0,8).sort(function(a,b){return a-b;});
     s.folded=s.stack<=0;            /* 点棒が尽きた席はその局を降りる */
   });
@@ -1384,6 +1408,7 @@ function newHand(){
   postAnte();
   openCommon15();
   render(true);
+  continueBetting();
 }
 /* ポットは全て誰かの持ち点から出る。合計（全席+自分+POT）は常に保存される。 */
 function anteFor(stack){return Math.min(Math.max(50,Math.floor(stack*.06)),ANTE,stack);}
@@ -1393,22 +1418,6 @@ function postAnte(){
     const paid=Math.min(anteFor(s.stack),s.stack);s.stack-=paid;s.bet=paid;pot+=paid;
   });
   const mine=Math.min(anteFor(userStack),userStack);userStack-=mine;pot+=mine;
-}
-/* 下限を先に効かせてから持ち点で頭打ちにする。順序を逆にすると持ち点を超えて払う。 */
-function streetBetFor(stack){
-  return Math.min(Math.max(MIN_BET,Math.floor(stack*STREET_FRACTION[Math.max(0,stage-1)])),stack);
-}
-function postStreet(){
-  let high=MIN_BET;
-  seats.forEach(function(s){
-    if(s.folded||s.stack<=0){s.bet=0;s.folded=true;return;}
-    if(seatWillFold(s)){s.folded=true;s.bet=0;return;}
-    const paid=streetBetFor(s.stack);s.stack-=paid;s.bet=paid;pot+=paid;
-    if(paid>high)high=paid;
-  });
-  /* コール額はテーブルの最高ベットに合わせる。自分の持ち点にも自動で追従する。 */
-  currentCall=Math.min(high,userStack);
-  if(betAmount<currentCall)betAmount=currentCall;
 }
 /* 誰も相手がいなくなったらセッションを仕切り直す。 */
 function ensureTable(){
@@ -1421,15 +1430,113 @@ function ensureTable(){
 /* 共通15枚の公開。開始直後の画面がGolden Visualと同じ構図になるよう newHand から直接呼ぶ。 */
 function openCommon15(){
   common=wall.splice(0,15);stage=1;dealAnim=1;
-  postStreet();
+  beginBettingRound();
 }
 function nextStreet(){
   if(phase!=="play")return;
+  if(betting&&betting.phase!=="complete"){
+    flashToast(activeSeat===5?"あなたのアクションを選んでください。":"相手のアクションを待っています。");return;
+  }
   if(stage===0){openCommon15();}
-  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;postStreet();}
+  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;beginBettingRound();}
   else{showdown();return;}
-  activeSeat=(activeSeat+1)%6;
   notice="";
+  render();
+  continueBetting();
+}
+
+/* ===== real betting orbit =====
+   描画とは分離した betting-engine.js が正本。ここはDOMとAI演出を接続する薄い層だけを持つ。 */
+function tableStacks(){return seats.map(function(s){return s.stack;}).concat(userStack);}
+function tableFolded(){return seats.map(function(s){return s.folded;}).concat(userFolded);}
+function beginBettingRound(){
+  window.clearTimeout(aiTimer);
+  seats.forEach(function(s){s.action="";s.thinking=false;s.bet=0;});
+  userAction="";
+  betting=MahjongBetting.startRound({playerCount:6,userIndex:5,dealerIndex:dealerSeat,street:stage,
+    stacks:tableStacks(),folded:tableFolded(),minRaise:MIN_BET});
+  syncBettingState();
+  const l=MahjongBetting.legal(betting,5);
+  const min=l?Math.min(l.maxTarget,l.minRaiseTarget):MIN_BET;
+  betAmount=Math.max(MIN_BET,min||MIN_BET);
+}
+function syncBettingState(){
+  if(!betting)return;
+  seats.forEach(function(s,i){
+    s.stack=betting.stacks[i];s.folded=betting.folded[i];s.bet=betting.roundBets[i];
+  });
+  userStack=betting.stacks[5];userFolded=betting.folded[5];activeSeat=betting.currentActor;
+  const legal=MahjongBetting.legal(betting,5);
+  currentCall=legal?legal.toCall:0;
+}
+function setActionLabel(i,action){
+  const amount=action.paid>0?" "+action.paid.toLocaleString():"";
+  const text=action.type+amount;
+  if(i===5)userAction=text;
+  else{seats[i].thinking=false;seats[i].action=text;}
+}
+function applyBetAction(i,kind,target){
+  const result=MahjongBetting.act(betting,i,kind,target);
+  pot+=result.action.paid;setActionLabel(i,result.action);syncBettingState();
+  return result;
+}
+/* 完成役そのものを覗かず、私牌の寄与・面子・対子・ドラ・連結だけでAIの自信を作る。
+   強い席も弱いブラフも残しつつ、ポットオッズに反応するため賭けに意味が生まれる。 */
+function aiConfidence(s){
+  return MahjongBettingAI.confidence({hand:s.hand,common:common,dora:doraOf(doraInd),mode:s.mode,street:stage});
+}
+function chooseAiAction(i){
+  const s=seats[i],l=MahjongBetting.legal(betting,i);
+  return MahjongBettingAI.choose({legal:l,confidence:aiConfidence(s),pot:pot,street:stage,
+    mode:s.mode,state:betting,player:i});
+}
+function settleUncontested(winner){
+  if(phase!=="play")return;
+  const won=pot;
+  if(winner===5)userStack+=pot;else{seats[winner].stack+=pot;seats[winner].won=true;}
+  pot=0;phase="result";activeSeat=-1;
+  const name=winner===5?"あなた":seats[winner].n;
+  resultText=name+" の勝ち（全員フォールド） "+won.toLocaleString();
+  const userWon=winner===5,delta=matchMode!=="rank"?0:(userWon?16:-12);
+  rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
+  lastResult={userWon:userWon,userFolded:userFolded,winners:[name],pot:won,detail:"全員フォールド",
+    hand:[],delta:delta,mode:matchMode,summary:resultText};
+}
+function finishBettingRound(){
+  syncBettingState();activeSeat=-1;
+  if(betting.uncontestedWinner!==null){settleUncontested(betting.uncontestedWinner);return;}
+}
+function continueBetting(){
+  if(!betting||phase!=="play")return;
+  syncBettingState();
+  if(betting.phase==="complete"){finishBettingRound();render();return;}
+  const i=betting.currentActor;
+  if(i===5){
+    const l=MahjongBetting.legal(betting,5);
+    currentCall=l?l.toCall:0;
+    if(l&&betAmount<l.minRaiseTarget)betAmount=Math.min(l.maxTarget,l.minRaiseTarget);
+    render();return;
+  }
+  seats[i].thinking=true;seats[i].action="THINKING";render();
+  const run=function(){
+    if(!betting||phase!=="play"||betting.currentActor!==i)return;
+    const choice=chooseAiAction(i);applyBetAction(i,choice.kind,choice.target);render();continueBetting();
+  };
+  if(IS_STILL)run();else aiTimer=window.setTimeout(run,420+Math.random()*360);
+}
+/* ブラウザ受け入れテストと数百局シミュレーション用。通常UIからは呼ばない。 */
+function fastForwardBetting(userKind){
+  let guard=0;
+  while(betting&&betting.phase==="acting"&&guard++<80){
+    const i=betting.currentActor;
+    if(i===5){
+      const l=MahjongBetting.legal(betting,5);
+      applyBetAction(5,userKind||"call",l&&l.minRaiseTarget);
+    }else{
+      const choice=chooseAiAction(i);applyBetAction(i,choice.kind,choice.target);
+    }
+  }
+  if(betting&&betting.phase==="complete")finishBettingRound();
   render();
 }
 
@@ -1459,13 +1566,6 @@ function handScore(ids,winTile){
   const c=cnt(ids);
   let hasPair=false;for(let t=0;t<34;t++)if(c[t]>=2){hasPair=true;break;}
   return quickMelds(c)*100+(hasPair?50:0)+doraCount(ids)*10;
-}
-/* 私牌がどれだけ手を伸ばしたかで降りるか決める。乱数だけの判断はやめる。 */
-function seatWillFold(s){
-  const gain=quickMelds(cnt(s.hand.concat(common)))-quickMelds(cnt(common));
-  const strength=gain*3+doraCount(s.hand)*2;
-  const bar=[-1,0,1,2][Math.max(0,stage-1)];
-  return strength<=bar&&Math.random()<.45;
 }
 /* solveFlexible が完成形を見つけられなかったときの14枚。私牌を優先して埋める。 */
 function bestFallback(priv){
@@ -1535,28 +1635,24 @@ function showdown(){
 }
 
 function cycleBet(){
-  const levels=[400,800,1200,2400,Math.max(0,userStack)];
-  const unique=levels.filter(function(v,i,a){return v>0&&a.indexOf(v)===i&&v<=userStack;});
+  if(!betting)return;
+  const l=MahjongBetting.legal(betting,5);if(!l)return;
+  const floor=Math.min(l.maxTarget,l.minRaiseTarget),half=Math.ceil((pot*.5)/100)*100;
+  const levels=[floor,Math.max(floor,half),Math.max(floor,Math.ceil(pot/100)*100),l.maxTarget];
+  const unique=levels.filter(function(v,i,a){return v>betting.highestBet&&a.indexOf(v)===i&&v<=l.maxTarget;});
   if(!unique.length)return;
   const at=unique.indexOf(betAmount);
   betAmount=unique[(at+1+unique.length)%unique.length];
   render();
 }
 function playerAction(kind){
-  if(phase==="result")return;
-  if(kind==="fold"){
-    /* 降りても局は続く。POTは残った誰かが取る。 */
-    userFolded=true;flashToast("FOLD。POTは残った相手が争います。");
-    showdown();return;
+  if(phase!=="play"||!betting||betting.phase!=="acting"||betting.currentActor!==5){
+    flashToast("現在はあなたの手番ではありません。");return;
   }
-  if(kind==="call"&&stage>=4){showdown();return;}
-  const requested=kind==="call"?currentCall:betAmount;
-  const paid=Math.min(requested,userStack);
-  if(paid<=0)return;
-  userStack-=paid;pot+=paid;activeSeat=(activeSeat+1)%6;
-  if(kind==="raise")currentCall=paid;
-  notice=(kind==="call"?"CALL ":"RAISE ")+paid.toLocaleString()+"。POTは "+pot.toLocaleString()+"。";
-  render();
+  const l=MahjongBetting.legal(betting,5);if(!l)return;
+  if(kind==="raise"&&!l.canRaise){flashToast("これ以上レイズできません。");return;}
+  applyBetAction(5,kind==="call"&&l.toCall===0?"check":kind,kind==="raise"?betAmount:0);
+  render();continueBetting();
 }
 
 /* ===== selection + flexible 14-tile solver ===== */
@@ -1905,10 +2001,16 @@ function renderCore(fresh){
       for(let i=0;i<4;i++)b.appendChild(backTile("sm"));
     }
     el.appendChild(b);
+    const action=document.createElement("div");action.className="seatAction"+(s.thinking?" thinking":"");
+    action.textContent=s.action||"";el.appendChild(action);
     /* 数字はベット額ではなく持ち点。Golden Visual の 3,940 等と同じ意味になる。 */
     const bet=document.createElement("div");bet.className="bet";
     bet.className="bet gold-text";bet.dataset.num="seat"+seatIndex;bet.textContent=s.stack.toLocaleString();el.appendChild(bet);rail.appendChild(el);});
   const me=document.getElementById("meSeat");me.classList.toggle("active",activeSeat===5);
+  me.classList.toggle("folded",userFolded);
+  const meAction=document.getElementById("meAction");
+  meAction.className="seatAction"+(activeSeat===5&&!userFolded?" yourTurn":"");
+  meAction.textContent=activeSeat===5&&!userFolded?"YOUR TURN":userAction;
   me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
   for(let i=0;i<4;i++)myBacks.appendChild(backTile("sm"));
@@ -1925,9 +2027,10 @@ function renderCore(fresh){
   }
   const rr=document.getElementById("revealRail");rr.innerHTML="";
   for(let g=0;g<3;g++){
-    const revealed=stage>=g+2, isNext=!revealed&&g===stage-1;
+    const revealed=stage>=g+2, wantsNext=!revealed&&g===stage-1;
+    const isNext=wantsNext&&(!betting||betting.phase==="complete");
     const group=document.createElement("div");
-    group.className="revealGroup"+(revealed?" live":"")+(isNext?" pending":"");
+    group.className="revealGroup"+(revealed?" live":"")+(isNext?" pending":"")+(wantsNext&&!isNext?" locked":"");
     if(isNext){
       /* 次の+4はこの枠自体をタップして公開する。picksには触らないので選択済みの手牌は保持される。 */
       group.setAttribute("role","button");group.tabIndex=0;
@@ -2034,6 +2137,9 @@ function renderCore(fresh){
   if(phase==="result"){bn.innerHTML='<span class="btn-label">結果を見る</span>';
     bn.classList.add("hot","afterResult");}
   else if(stage===0)bn.innerHTML='<span class="btn-label">対局を始める</span>';
+  else if(betting&&betting.phase==="acting"){
+    const who=activeSeat===5?"YOUR TURN":(activeSeat>=0?seats[activeSeat].n+" THINKING":"BETTING");
+    bn.innerHTML='<span class="btn-label">'+who+'</span>';bn.disabled=true;}
   else if(stage<4)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
   else if(!userFolded&&picks.length<MAX_HAND){
     /* 14枚そろわないとショーダウンできない。押してから叱るのではなく、先に何が足りないかを見せる。 */
@@ -2049,13 +2155,15 @@ function renderCore(fresh){
      以前はCALLがショーダウンと次局を兼ねていたが、2つの意味が1つのボタンに乗っていた。 */
   const call=document.getElementById("bCall");
   const wrap=function(t){return '<span class="btn-label">'+t+'</span>';};
-  call.innerHTML=wrap("CALL<br>"+Math.min(currentCall,userStack).toLocaleString());
-  call.disabled=userStack<=0||phase==="result"||stage>=4;
+  const yourTurn=phase==="play"&&betting&&betting.phase==="acting"&&betting.currentActor===5&&!userFolded;
+  call.innerHTML=wrap(currentCall>0?"CALL<br>"+Math.min(currentCall,userStack).toLocaleString():"CHECK");
+  call.disabled=!yourTurn||userStack<=0;
   document.getElementById("bDial").innerHTML=
-    '<span class="gold-text">'+(betAmount>=userStack&&userStack>0?"ALL IN":betAmount.toLocaleString())+'</span>';
-  document.getElementById("bFold").disabled=(phase==="result");
-  document.getElementById("bRaise").disabled=userStack<=0||phase==="result"||stage>=4;
-  document.getElementById("bDial").disabled=userStack<=0||phase==="result";
+    '<span class="gold-text">'+(betting&&betAmount>=((betting.roundBets[5]||0)+userStack)&&userStack>0?"ALL IN":"TO "+betAmount.toLocaleString())+'</span>';
+  document.getElementById("bFold").disabled=!yourTurn;
+  const legal=yourTurn?MahjongBetting.legal(betting,5):null;
+  document.getElementById("bRaise").disabled=!yourTurn||!legal||!legal.canRaise;
+  document.getElementById("bDial").disabled=!yourTurn||!legal||!legal.canRaise;
   dealAnim=0;
 }
 
