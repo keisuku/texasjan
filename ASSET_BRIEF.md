@@ -2,7 +2,77 @@
 
 ---
 
-# ★ round 3（最新の依頼）— UIフレームをSVGで構築する
+# ★ round 4（最新の依頼）— 「スキン1式」を丸ごと作る
+
+**発注の単位が変わりました。** これまでは「ボタン1点」「牌1点」という部品単位でしたが、
+これからは **スキン1式** が単位です。1式がそのまま商品になります。
+
+## 何が変わったのか
+
+見た目が**差し替え可能なスキン**になりました。カタログは **`skins/manifest.js`** の1ファイルです。
+実装側（`index.html`）はこのファイルしか読みません。
+
+つまり **既存の絵を上書きする必要がもう無い** ということです。
+新しい絵は `skins` 配列に1件足すだけで、選択肢として増えます。前の絵は残ります。
+「どっちが正解か」で止まる必要がなくなりました。
+
+## スキン1式とは
+
+`skins/manifest.js` の `slots` にカテゴリとロールが定義されています。
+
+| スロット | ロール |
+|---|---|
+| `tile` | `tile-body-flat` `tile-body-upright` `tile-back-flat` |
+| `arena` | `arena` |
+| `frame` | `frame-gold-plate` `frame-gold-ribbon` `frame-seat-plate` `frame-group` `btn-fold` `btn-call` `btn-raise` `dial` |
+| `chip` | `chip-single` `chip-stack` |
+| `effect` | `fx-glow` `fx-sparkle` |
+| `character` | `character` |
+| `nameplate` | `nameplate` |
+
+**1つの世界観で全スロットを通して作ってください。** 部品ごとに空気が違うと、
+並べた瞬間に破綻します。逆に統一されていれば、それ自体が商品価値になります。
+
+## 追加の手順
+
+1. 画像を `assets/skins/<スキンID>/` に置く（例 `assets/skins/night/btn-call.png`）
+2. `skins/manifest.js` の `skins` 配列に追記する
+
+```js
+{ slot:"frame", id:"night", name:"夜想", note:"深夜のラウンジ",
+  owned:true, swatch:"linear-gradient(160deg,#6A5BC4,#140F30)",
+  assets:{
+    "btn-call":"./assets/skins/night/btn-call.png",
+    /* … ロールを埋めていく。埋めなかったロールはCSS手描きに落ちます … */
+  } },
+```
+
+3. `tests/skins.html` をブラウザで開く。カタログの整合が自動判定されます
+
+**既存の項目は書き換えないでください。追記だけしてください。**
+
+## 寸法・光源・色
+
+これまでと同じです。`art/ui-geometry.md` と `art/art-bible.md` に従ってください。
+寸法（何pxで作るか）は `assets/ui/MANIFEST.json` の `size` をそのまま使ってください。
+
+## 厳守事項
+
+- **`index.html` を編集しないでください。** 実装側が同じファイルを編集中で、衝突します
+- `assets/ui/*.png` `assets/ui/svg/*.svg` `assets/tiles/` は**既に使われている商品**です。変更しないでください
+- 触ってよいのは `assets/skins/**` と `skins/manifest.js` への**追記**だけです
+- 全ロールで光源は左上（315°）に統一
+
+## 今いちばん欲しいもの
+
+1. **キャラクターの立ち絵**（`character` ロール）。ロビーの左半分が空いています。
+   縦長・背景透過・腰から上。ここが埋まるとロビーが一気に製品に見えます
+2. **タイトルロゴ**（`assets/ui/logo-title.png`）。今はWebフォントで組んでいます
+3. スキン1式（`night`「夜想」を想定。`skins/manifest.js` に未所持で予約済み）
+
+---
+
+# round 3（完了）— UIフレームをSVGで構築する
 
 **これが今お願いしたい作業です。** 画像生成ではなく **SVGを書く作業** です。
 

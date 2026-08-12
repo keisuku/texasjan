@@ -1,12 +1,16 @@
 <!doctype html><meta charset="utf-8"><pre id=o>-</pre><script>
 const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
 const f=document.createElement('iframe');f.style.cssText='width:941px;height:1672px;border:0';
-f.src='../index.html';document.body.appendChild(f);
+f.src='../index.html?screen=game';document.body.appendChild(f);
 f.onload=function(){
  const d=f.contentDocument,w=f.contentWindow;
  function settle(){d.getAnimations().forEach(function(a){try{a.finish();}catch(e){}});}
  setTimeout(function(){
   try{
+  /* 初回配牌はページ読込から1.5秒後には正常に完了していることがある。
+     検査直前に新しい局を配り、生成されたばかりのアニメーションを決定的に測る。 */
+  ["rail","commons","revealRail","myrow","rack"].forEach(function(id){d.getElementById(id).innerHTML="";});
+  w.newHand();
   const dealAnims=d.getAnimations().length;
   ok(dealAnims>0,"配牌でアニメーションが生成された（"+dealAnims+"件）");
   settle();
