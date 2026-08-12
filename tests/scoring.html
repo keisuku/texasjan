@@ -1,0 +1,58 @@
+<!doctype html><meta charset="utf-8">
+<title>役・点数・待ち表示の検査 — MAHJONG HOLD'EM</title>
+<style>html,body{margin:0}iframe{width:941px;height:1672px;border:0}
+pre{position:fixed;z-index:9;background:#fff;font:12px/1.6 monospace;padding:6px;margin:0;max-width:930px}</style>
+<body><pre id="out">running</pre>
+<script>
+const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
+const f=document.createElement("iframe");f.src="../index.html?still=1&screen=game";document.body.appendChild(f);
+f.onload=function(){setTimeout(function(){
+  const d=f.contentDocument,w=f.contentWindow,M=w.MahjongScore;
+  function names(r){return r.yakuNames.join("・");}
+  try{
+    let hand=[0,1,2,3,4,5,15,16,17,19,20,13,13,21];
+    let r=M.evaluate(hand,21,{dora:30});
+    ok(r.complete,"平和例が完成形");
+    ok(names(r).includes("平和"),"両面待ちの平和を判定: "+names(r));
+    ok(r.han===3&&r.fu===20,"リーチ+ツモ+平和 = 3翻20符 (got "+r.han+"翻"+r.fu+"符)");
+    ok(r.points===2700,"非親ツモ合計は2700点 (got "+r.points+")");
+
+    hand=[0,0,1,1,11,11,12,12,22,22,23,23,27,27];
+    r=M.evaluate(hand,27,{dora:30});
+    ok(names(r).includes("七対子"),"七対子を判定: "+names(r));
+    ok(r.fu===25,"七対子は25符固定");
+
+    hand=[0,0,0,1,1,1,9,9,9,18,18,18,27,27];
+    r=M.evaluate(hand,27,{dora:30});
+    ok(names(r).includes("四暗刻")&&r.points===32000,"四暗刻を役満評価");
+
+    hand=[0,8,9,17,18,26,27,28,29,30,31,32,33,0];
+    r=M.evaluate(hand,0,{dora:5});
+    ok(names(r).includes("国士無双")&&r.limit==="役満","国士無双を役満評価");
+
+    const base=[0,1,2,3,4,5,15,16,17,19,20,13,13];
+    const waits=M.findWaits(base,{dora:30}).map(function(x){return x.tile;});
+    ok(waits.length===2&&waits.includes(18)&&waits.includes(21),"13枚の両面待ちは1索・4索: "+waits.join(","));
+    const high=M.findWaits([2,3,10,10,15,16,17,19,20,21,23,24,25],{dora:4});
+    ok(high.length===2&&high[0].tile===4&&high[0].result.points>high[1].result.points,
+      "点数差のある待ちは高めから並ぶ: "+high.map(function(x){return x.tile+"="+x.result.points;}).join(","));
+
+    w.eval("my=[18,7,8,10,11,12,24,25];common=[0,1,2,3,4,5,15,16,17,19,20,13,13,21,30];stage=1;picks=[];pickSeq=0");
+    w.eval("setPicksFromCounts(MahjongScore.counts([0,1,2,3,4,5,15,16,17,19,20,13,13]));render()");
+    ok(w.eval("picks.length")===13,"画面を13枚選択状態にできる");
+    ok(d.getElementById("winRibbon").classList.contains("waiting"),"13枚時にTENPAI HUDが表示される");
+    ok(/TENPAI 2種/.test(d.getElementById("winRibbon").textContent),"HUDに待ち種類数を表示");
+    ok(d.querySelectorAll(".tile.waitCandidate").length>=2,"場・私牌のあがり牌候補が発光する");
+
+    const winSource=[].slice.call(d.querySelectorAll("#myrow .tile,#commons .tile")).find(function(t){return t.classList.contains("waitCandidate");});
+    winSource.click();
+    ok(w.eval("picks.length")===14,"光る牌をタップすると14枚目のツモになる");
+    ok(d.getElementById("winRibbon").classList.contains("value"),"完成後はHUDが役・点数表示へ切り替わる");
+    ok(/平和/.test(d.getElementById("winRibbon").textContent),"完成HUDに役名が表示される: "+d.getElementById("winRibbon").textContent);
+    ok(/点/.test(d.getElementById("winRibbon").textContent),"完成HUDに評価点が表示される");
+  }catch(e){log.push("THREW "+e.stack);}
+  const failed=log.filter(function(x){return x.indexOf("FAIL")===0||x.indexOf("THREW")===0;}).length;
+  document.getElementById("out").textContent=log.join("\n")+"\n\n"+failed+" FAIL / "+log.length+" total";
+  document.title="DONE";
+},900);};
+</script>

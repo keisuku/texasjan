@@ -338,6 +338,11 @@ body::before,body::after{display:none}
 /* 選択済みの元牌はGolden Visualと同じく灰色に退色させ、金の✓を付ける。 */
 .tile.used{opacity:.68;filter:saturate(.15) brightness(.84)}
 .tile.used::after{width:1.9cqw;height:1.9cqw;top:.25cqw;right:.25cqw;font-size:1.3cqw}
+.tile.waitCandidate:not(.used){z-index:4;animation:waitGlow 1.15s ease-in-out infinite;
+  box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 .28cqw #64f3e3,
+    0 0 2.2cqw rgba(86,243,224,.92),inset 0 1px 0 rgba(255,255,255,.95)}
+@keyframes waitGlow{50%{filter:brightness(1.16);transform:translateY(-.35cqw)}}
+html.still .tile.waitCandidate{animation:none}
 
 /* --- gold banner labels --- */
 .goldLabel{position:absolute;left:50%;transform:translateX(-50%);z-index:11;
@@ -447,9 +452,27 @@ body::before,body::after{display:none}
   background:rgba(5,24,20,.95);border:1px solid rgba(240,214,132,.85);box-shadow:0 .3cqw 1.2cqw rgba(0,0,0,.6);
   opacity:0;pointer-events:none;transition:opacity .18s ease}
 .toast.on{opacity:1}
-.winRibbon{position:absolute;left:19%;right:19%;top:63.2%;z-index:20;margin:0;padding:.6cqw;
+.winRibbon{position:absolute;left:10%;right:10%;top:63.15%;z-index:20;margin:0;padding:.45cqw .8cqw;
   border-radius:1cqw;background:rgba(20,50,42,.96)}
 .winRibbon strong{font-size:3cqw}.winRibbon span{font-size:1.9cqw}
+.winRibbon.waiting,.winRibbon.value{min-height:3.1%;border-color:rgba(112,245,226,.92);
+  background:linear-gradient(180deg,rgba(7,53,43,.98),rgba(2,25,20,.98));
+  box-shadow:0 0 1.8cqw rgba(74,231,211,.28),0 .35cqw 1cqw rgba(0,0,0,.55)}
+.winRibbon.waiting{justify-content:flex-start;padding-left:1.2cqw;gap:1cqw}
+.winRibbon .waitLead{display:flex;flex-direction:column;align-items:flex-start;line-height:1.05;white-space:nowrap}
+.winRibbon .waitLead b{font-size:2.15cqw;letter-spacing:.12em;color:#8ef4e7}
+.winRibbon .waitLead small{font-size:1.45cqw;color:#b7d7cd;margin-top:.35cqw}
+.winRibbon .waitTiles{display:flex;align-items:center;gap:.65cqw;overflow:hidden}
+.winRibbon .waitChip{display:flex;align-items:center;gap:.22cqw;white-space:nowrap}
+.winRibbon .waitChip.high{position:relative;padding-top:.5cqw}
+.winRibbon .waitChip.high::before{content:"高め";position:absolute;left:0;top:-1.25cqw;font-size:1.15cqw;
+  color:#ffd76c;font-weight:900;letter-spacing:.08em}
+.winRibbon .waitChip .tile{--w:3.15cqw;--ar:1.36;cursor:default;pointer-events:none}
+.winRibbon .waitChip em{font-style:normal;font-size:1.55cqw;color:#f5dfa1;font-weight:900}
+.winRibbon.value{display:flex;left:7%;right:7%;justify-content:center;gap:1.15cqw;color:#f4e6b8;white-space:nowrap}
+.winRibbon.value .valueMain{font-size:2.25cqw;color:#fff0af;font-weight:900}
+.winRibbon.value .yakuList{font-size:1.62cqw;color:#bde1d4;overflow:hidden;text-overflow:ellipsis}
+.winRibbon.value .scorePoint{font-size:2.05cqw;color:#83eedc;font-weight:900}
 /* 決着表示と進行ボタンは同じ帯（私牌の下 58.2% 〜 見出し 67.1%）に入るので、
    決着時は結果を上、進行ボタンを下に積む。重ならないよう両方をこの帯に収める。 */
 .winRibbon.result{display:block;top:58.7%;left:9%;right:9%;text-align:center;
@@ -462,9 +485,9 @@ body::before,body::after{display:none}
 /* --- おすすめ / クリア --- */
 /* 局の進行ボタン。私牌8枚(〜58.2%)と MY FINAL HAND の見出し(67.1%)の間が空いているので、
    ここに置く。牌を選び終えて視線が落ちてくる位置でもある。 */
-.streetNext{position:absolute;left:50%;top:59.7%;transform:translateX(-50%);z-index:16;
-  width:52cqw;height:5.5%;margin:0;padding:0;border:0;border-radius:99cqw;
-  font-size:3.1cqw;font-weight:900;letter-spacing:.14em;color:#1B1508;
+.streetNext{position:absolute;left:50%;top:59.45%;transform:translateX(-50%);z-index:16;
+  width:52cqw;height:3.25%;margin:0;padding:0;border:0;border-radius:99cqw;
+  font-size:2.55cqw;font-weight:900;letter-spacing:.14em;color:#1B1508;
   background:linear-gradient(180deg,#FFF3CE 0%,#F0D273 26%,#C9942A 62%,#8A5E12 100%);
   box-shadow:0 .45cqw 1.1cqw rgba(0,0,0,.55),0 0 2.2cqw rgba(232,200,100,.28),
     inset 0 .18cqw 0 rgba(255,255,255,.72),inset 0 -.22cqw 0 rgba(90,58,10,.45);
@@ -1281,6 +1304,7 @@ html.calib #calib{display:block}
   <div id="calib" aria-hidden="true"></div>
 </div>
 
+<script src="./mahjong-score.js"></script>
 <script>
 /* 素材の差し替えは head のスキンランタイムが済ませている（skins/manifest.js）。 */
 
@@ -1300,6 +1324,7 @@ const TILE_FILE=[
 function faceHTML(id){
   return `<img class="tf" src="./assets/tiles/${TILE_FILE[id]}.svg" alt="" draggable="false">`;
 }
+function tileMarkup(id){return '<div class="tile"><div class="face">'+faceHTML(id)+'</div></div>';}
 function tile(id,cls){const d=document.createElement("div");d.className="tile "+(cls||"");
   d.innerHTML=`<div class="face">${faceHTML(id)}</div>`;return d;}
 function backTile(cls){const d=document.createElement("div");d.className="tile back "+(cls||"");
@@ -1418,12 +1443,22 @@ function quickMelds(c){
   return m;
 }
 function doraCount(ids){const d=doraOf(doraInd);let n=0;ids.forEach(function(t){if(t===d)n++;});return n;}
-/* 手の強さ。完成形が最優先、次に面子数、雀頭、ドラ。役と点数は Stage B で入れ替える。 */
-function handScore(ids){
+function bestEvaluation(ids,winTile){
+  if(winTile!==undefined&&winTile!==null)return MahjongScore.evaluate(ids,winTile,{dora:doraOf(doraInd)});
+  let best=null;
+  Array.from(new Set(ids)).forEach(function(t){
+    const r=MahjongScore.evaluate(ids,t,{dora:doraOf(doraInd)});
+    if(!best||r.score>best.score)best=r;
+  });
+  return best||MahjongScore.evaluate(ids,ids[ids.length-1],{dora:doraOf(doraInd)});
+}
+/* 本物の役・翻・符・評価点を比較値へ変換する。未完成形だけ軽量評価へフォールバックする。 */
+function handScore(ids,winTile){
+  const result=bestEvaluation(ids,winTile);
+  if(result.complete)return 100000000+result.score;
   const c=cnt(ids);
   let hasPair=false;for(let t=0;t<34;t++)if(c[t]>=2){hasPair=true;break;}
-  const complete=ids.length===MAX_HAND&&isComplete14(ids);
-  return (complete?10000:0)+quickMelds(c)*100+(hasPair?50:0)+doraCount(ids)*10;
+  return quickMelds(c)*100+(hasPair?50:0)+doraCount(ids)*10;
 }
 /* 私牌がどれだけ手を伸ばしたかで降りるか決める。乱数だけの判断はやめる。 */
 function seatWillFold(s){
@@ -1459,12 +1494,14 @@ function showdown(){
   }
   const entries=[],finalHand=picks.map(function(x){return x.id;});
   if(!userFolded){
-    entries.push({who:"あなた",seat:null,ids:finalHand,score:handScore(finalHand)});
+    const userEval=bestEvaluation(finalHand,finalHand[finalHand.length-1]);
+    entries.push({who:"あなた",seat:null,ids:finalHand,score:handScore(finalHand,finalHand[finalHand.length-1]),evaluation:userEval});
   }
   seats.forEach(function(s){
     if(s.folded){s.best=null;return;}
     s.best=seatBestHand(s);
-    entries.push({who:s.n,seat:s,ids:s.best,score:handScore(s.best)});
+    const seatEval=bestEvaluation(s.best);
+    entries.push({who:s.n,seat:s,ids:s.best,score:handScore(s.best),evaluation:seatEval});
   });
 
   phase="result";
@@ -1485,8 +1522,9 @@ function showdown(){
   });
   const won=pot;pot=0;
   const w=winners[0];
-  const detail=(w.score>=10000?"完成形":"面子"+quickMelds(cnt(w.ids))+"組")
-    +(doraCount(w.ids)?" ドラ"+doraCount(w.ids):"");
+  const detail=w.evaluation&&w.evaluation.complete
+    ?w.evaluation.yakuNames.join("・")+" / "+w.evaluation.summary
+    :"面子"+quickMelds(cnt(w.ids))+"組"+(doraCount(w.ids)?" ドラ"+doraCount(w.ids):"");
   resultText=winners.map(function(e){return e.who;}).join("・")+" の勝ち（"+detail+"） "+won.toLocaleString();
   const userWon=winners.some(function(e){return e.seat===null;});
   const delta=matchMode!=="rank"?0:(userWon?(winners.length>1?12:24):(userFolded?-14:-8));
@@ -1682,31 +1720,7 @@ function recommend(mode){
 function clearRack(){picks=[];notice="";recOpen=false;recMode="total";render();}
 
 function isComplete14(ids){
-  if(ids.length!==14)return false;
-  const base=cnt(ids);
-  let pairTypes=0;
-  for(let t=0;t<34;t++)if(base[t]===2)pairTypes++;
-  if(pairTypes===7)return true;
-
-  function meldable(c){
-    let t=0;while(t<34&&c[t]===0)t++;
-    if(t===34)return true;
-    if(c[t]>=3){
-      c[t]-=3;if(meldable(c))return true;c[t]+=3;
-    }
-    if(t<27&&t%9<=6&&c[t+1]>0&&c[t+2]>0){
-      c[t]--;c[t+1]--;c[t+2]--;
-      if(meldable(c))return true;
-      c[t]++;c[t+1]++;c[t+2]++;
-    }
-    return false;
-  }
-  for(let p=0;p<34;p++){
-    if(base[p]<2)continue;
-    const c=base.slice();c[p]-=2;
-    if(meldable(c))return true;
-  }
-  return false;
+  return MahjongScore.evaluate(ids,ids[ids.length-1],{dora:doraOf(doraInd)}).complete;
 }
 
 /* ===== render ===== */
@@ -1869,6 +1883,9 @@ function render(fresh){
 }
 function renderCore(fresh){
   const dora=doraOf(doraInd);
+  const selectedIds=picks.map(function(x){return x.id;});
+  const waits=picks.length===13?MahjongScore.findWaits(selectedIds,{dora:dora}):[];
+  const waitSet=new Set(waits.map(function(x){return x.tile;}));
   document.getElementById("street").textContent=STAGE[stage];
   document.getElementById("pot").textContent=pot.toLocaleString();
   const ds=document.getElementById("doraSlot");ds.innerHTML="";ds.appendChild(tile(doraInd,"sm"));
@@ -1901,7 +1918,7 @@ function renderCore(fresh){
   else{
     common.slice(0,15).forEach(function(id,i){
       const isUsed=isPicked("c",i);
-      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"");
+      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":"");
       const t=tile(id,cls);t.dataset.k="c:"+i;
       t.onclick=function(){togglePick("c",i,id);};
       c.appendChild(t);});
@@ -1921,7 +1938,7 @@ function renderCore(fresh){
     for(let k=0;k<4;k++){
       const index=15+g*4+k,id=common[index];
       if(id!==undefined){
-        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":""));
+        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":"")+(!used&&waitSet.has(id)?"waitCandidate ":""));
         t.dataset.k="c:"+index;t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
@@ -1931,7 +1948,7 @@ function renderCore(fresh){
   const mr=document.getElementById("myrow");mr.innerHTML="";
   my.forEach(function(id,i){
     const isUsed=isPicked("p",i);
-    const t=tile(id,(isUsed?"used":"")+(id===dora?" doraMark":""));
+    const t=tile(id,(isUsed?"used":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":""));
     t.dataset.k="p:"+i;t.onclick=function(){togglePick("p",i,id);};
     mr.appendChild(t);});
   const privateCount=picks.filter(function(x){return x.src==="p";}).length;
@@ -1965,16 +1982,29 @@ function renderCore(fresh){
     }
   }
 
-  const complete=picks.length===MAX_HAND&&isComplete14(picks.map(function(x){return x.id;}));
+  const tsumoPick=ordered.length===MAX_HAND?ordered[13]:null;
+  const evaluation=tsumoPick?MahjongScore.evaluate(selectedIds,tsumoPick.id,{dora:dora}):null;
+  const complete=!!(evaluation&&evaluation.complete);
   document.getElementById("finalZone").classList.toggle("win",complete);
   const ribbon=document.getElementById("winRibbon");
   if(phase==="result"){
     ribbon.className="winRibbon on result";
     ribbon.textContent=resultText;
   }else{
-    ribbon.className="winRibbon"+(complete?" on":"");
-    if(complete)ribbon.innerHTML='<strong>完成</strong><span>面子'+quickMelds(cnt(picks.map(function(x){return x.id;})))
-      +'組</span><span>ドラ'+doraCount(picks.map(function(x){return x.id;}))+'</span>';
+    ribbon.className="winRibbon";
+    if(waits.length){
+      const known=cnt(my.concat(common));
+      ribbon.className="winRibbon on waiting";
+      ribbon.innerHTML='<span class="waitLead"><b>TENPAI '+waits.length+'種</b><small>光る牌でツモ</small></span><span class="waitTiles">'
+        +waits.slice(0,7).map(function(w,i){const high=i===0&&waits.some(function(x){return x.result.score<w.result.score;});
+          return '<span class="waitChip'+(high?' high':'')+'">'+tileMarkup(w.tile)+'<em>×'+Math.max(0,4-known[w.tile])+'</em></span>';}).join("")
+        +(waits.length>7?'<em>＋'+(waits.length-7)+'</em>':"")+'</span>';
+    }else if(complete){
+      ribbon.className="winRibbon on value";
+      ribbon.innerHTML='<span class="valueMain">'+(evaluation.limit||evaluation.han+'翻 '+evaluation.fu+'符')+'</span>'
+        +'<span class="yakuList">'+evaluation.yakuNames.join('・')+'</span>'
+        +'<span class="scorePoint">'+evaluation.points.toLocaleString()+'点</span>';
+    }
   }
   if(complete&&!wasComplete&&phase==="play"){
     document.body.classList.remove("win-anim");

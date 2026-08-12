@@ -23,6 +23,7 @@
 | [`art/ui-geometry.md`](art/ui-geometry.md) | **round 3**: UIフレームの共有幾何。角丸比・縁の5層・光源 |
 | [`art/specs/ui-frames.md`](art/specs/ui-frames.md) | **round 3**: SVGフレーム7点の仕様 |
 | [`art/verify-ui.html`](art/verify-ui.html) | **round 3**: SVGの幾何を自動判定 |
+| [`mahjong-score.js`](mahjong-score.js) | 役・翻・符・評価点・13枚待ちを判定する独立エンジン |
 
 素材は `assets/ui/` に置きます。**無ければCSSのフォールバックで動き、置かれた瞬間に差し替わる**ので、
 1点ずつ納品して構いません。
