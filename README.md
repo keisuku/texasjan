@@ -2,6 +2,17 @@
 
 麻雀 × ポーカーのブラウザゲーム。`index.html` を開けば動きます。
 
+## 2026-08-14 Codex / ChatGPT Work 引き継ぎ
+
+**新しい作業セッションは、最初に [`CODEX_START_HERE.md`](CODEX_START_HERE.md) を読んでください。**
+
+最新の高評価ビジュアル、50方向探索計画、ゲーム仕様の現行仮説、Codex移行方針、過去の重要フィードバックを `docs/handoff/` に保存しています。エージェント向けの必須読書順と禁止事項は [`AGENTS.md`](AGENTS.md) が正典です。
+
+- 最新Clean Master：`art/clean-masters/`
+- 旧V2・18画面：`art/visual-archive/v2/`
+- スマホ選別HTML：`visual-exploration/index.html`
+- 完全引き継ぎ：`docs/handoff/MASTER_HANDOFF_2026-08-14.md`
+
 - 941 × 1672 のデザイン解像度。完成見本は `claude-handoff/visual/golden-target.webp`
 - `index.html?calib=1` で完成見本を半透明で重ねた位置合わせモードになります
 - タイトル → ロビー → 6人マッチング → 対局 → ショーダウン → 結果 → 再戦まで一周できます
