@@ -1,0 +1,51 @@
+{
+  "version": "2026-08-14",
+  "designResolution": { "width": 941, "height": 1672 },
+  "canonicalBaseline": [
+    {
+      "id": "clean-lobby",
+      "path": "art/clean-masters/clean-master-lobby.webp",
+      "status": "STRONG_KEEP_BASELINE_NOT_FINAL",
+      "purpose": "Lobby composition, calm background density, ivory-jade-brass language"
+    },
+    {
+      "id": "clean-gacha",
+      "path": "art/clean-masters/clean-master-gacha.webp",
+      "status": "STRONG_KEEP_BASELINE_NOT_FINAL",
+      "purpose": "Character/reward hierarchy and monetization-screen cleanliness"
+    },
+    {
+      "id": "clean-match",
+      "path": "art/clean-masters/clean-master-match.webp",
+      "status": "STRONG_KEEP_BASELINE_NOT_FINAL",
+      "purpose": "Match hierarchy, 5x3 communal board, private tiles, final 14, betting controls"
+    }
+  ],
+  "v2Archive": [
+    { "id": "v2-01", "file": "01-title-opening.webp", "screen": "Title / Opening", "verdict": "KEEP" },
+    { "id": "v2-02", "file": "02-character-lobby.webp", "screen": "Character Lobby", "verdict": "DROP" },
+    { "id": "v2-03", "file": "03-mode-select.webp", "screen": "Mode Select", "verdict": "DROP" },
+    { "id": "v2-04", "file": "04-character-roster.webp", "screen": "Character Roster", "verdict": "DROP" },
+    { "id": "v2-05", "file": "05-character-detail.webp", "screen": "Character Detail", "verdict": "KEEP" },
+    { "id": "v2-06", "file": "06-gacha-banner.webp", "screen": "Gacha Banner", "verdict": "DROP" },
+    { "id": "v2-07", "file": "07-gacha-result.webp", "screen": "Gacha Result", "verdict": "KEEP" },
+    { "id": "v2-08", "file": "08-customization.webp", "screen": "Customization", "verdict": "KEEP" },
+    { "id": "v2-09", "file": "09-shop-season-pass.webp", "screen": "Shop / Season Pass", "verdict": "DROP" },
+    { "id": "v2-10", "file": "10-rank-progression.webp", "screen": "Rank Progression", "verdict": "KEEP" },
+    { "id": "v2-11", "file": "11-missions-event.webp", "screen": "Missions / Event", "verdict": "KEEP" },
+    { "id": "v2-12", "file": "12-tournament-bracket.webp", "screen": "Tournament", "verdict": "DROP" },
+    { "id": "v2-13", "file": "13-betting-decision.webp", "screen": "Betting Decision", "verdict": "KEEP" },
+    { "id": "v2-14", "file": "14-four-tile-reveal.webp", "screen": "+4 Reveal", "verdict": "KEEP" },
+    { "id": "v2-15", "file": "15-tenpai-focus.webp", "screen": "Tenpai Focus", "verdict": "KEEP" },
+    { "id": "v2-16", "file": "16-all-in-pressure.webp", "screen": "All-in Pressure", "verdict": "KEEP" },
+    { "id": "v2-17", "file": "17-river-tsumo.webp", "screen": "River / Tsumo", "verdict": "KEEP" },
+    { "id": "v2-18", "file": "18-match-result.webp", "screen": "Match Result", "verdict": "KEEP" }
+  ],
+  "archiveDirectory": "art/visual-archive/v2",
+  "notes": [
+    "V2 is feature/composition reference, not the final density target.",
+    "Clean Masters are the strongest human-rated baseline but still require macro-direction comparison.",
+    "Generated fine text is never a production asset.",
+    "Future concepts must document layer decomposition."
+  ]
+}
