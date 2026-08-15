@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "updated_at": "2026-08-15T00:00:00+09:00",
+  "canonical_repository": "https://github.com/keisuku/texasjan",
+  "shared_entrypoints": ["PROJECT_STATE.md", "CURRENT_TASK.md", "DECISIONS.md"],
+  "workstreams": [
+    {
+      "id": "00-control-tower",
+      "name": "Control Tower",
+      "tool": "ChatGPT Work",
+      "status": "active",
+      "mission": "Own product direction, compare evidence, approve gates, and update decisions.",
+      "prompt": null,
+      "branch_prefix": "agent/"
+    },
+    {
+      "id": "01-match-visual",
+      "name": "Match Visual Lab",
+      "tool": "ChatGPT Work",
+      "status": "ready",
+      "mission": "Generate and compare five genuinely different match-screen directions.",
+      "prompt": "prompts/01-match-visual.md",
+      "branch_prefix": "visual/"
+    },
+    {
+      "id": "02-meta-gacha",
+      "name": "Meta / Gacha Lab",
+      "tool": "ChatGPT Work",
+      "status": "ready",
+      "mission": "Prove the visual/product language across lobby, characters, and gacha.",
+      "prompt": "prompts/02-meta-gacha.md",
+      "branch_prefix": "meta/"
+    },
+    {
+      "id": "03-probability",
+      "name": "Probability Lab",
+      "tool": "Codex",
+      "status": "ready",
+      "mission": "Benchmark and tune rules toward Hold'em-like probability tension.",
+      "prompt": "prompts/03-probability.md",
+      "branch_prefix": "probability/"
+    },
+    {
+      "id": "04-playable-build",
+      "name": "Playable Build Lab",
+      "tool": "Codex / Claude Code",
+      "status": "ready",
+      "mission": "Protect and improve the verified playable vertical slice.",
+      "prompt": "prompts/04-playable-build.md",
+      "branch_prefix": "build/"
+    }
+  ]
+}
+

@@ -22,7 +22,7 @@
     dialog{width:min(94vw,760px);max-height:94vh;padding:0;border:1px solid #8b763b;border-radius:15px;background:#061913;color:#fff;box-shadow:0 30px 80px #000}.modalbar{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#102f25;position:sticky;top:0}.modalbar button{border:1px solid var(--line);background:#173f33;color:#fff;border-radius:8px;padding:8px 12px}.modalimg{width:100%;display:block}dialog::backdrop{background:rgba(0,0,0,.86)}
     .plan{margin:32px 0 0;border:1px solid var(--line);border-radius:16px;padding:17px;background:rgba(8,33,25,.72)}.plan h2{margin:0 0 10px;font-size:19px}.directions{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.direction{padding:12px;border-radius:11px;background:#11372b;border:1px solid var(--line)}.direction b{display:block;color:#f2d27c;margin-bottom:5px}.direction span{font-size:12px;line-height:1.55;color:#adc0b8}
     .toast{position:fixed;left:50%;bottom:22px;translate:-50% 20px;background:#f2d27c;color:#1c1607;padding:10px 16px;border-radius:999px;font-weight:900;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.on{opacity:1;translate:-50% 0}
-    @media(min-width:720px){.controls{grid-template-columns:180px 180px 1fr auto}.summary{grid-column:auto;align-items:center}.shell{padding-top:30px}}
+    @media(min-width:720px){.controls{grid-template-columns:180px 180px 1fr auto auto}.summary{grid-column:auto;align-items:center}.shell{padding-top:30px}}
   </style>
 </head>
 <body>
@@ -37,7 +37,8 @@
     <select id="setFilter"><option value="all">全セット</option><option value="clean">Clean Masters</option><option value="v2">旧V2・18画面</option></select>
     <select id="verdictFilter"><option value="all">全評価</option><option value="KEEP">KEEPのみ</option><option value="MIX">MIXのみ</option><option value="DROP">DROPのみ</option><option value="unset">未評価のみ</option></select>
     <div class="summary" id="summary"></div>
-    <button class="export" id="exportBtn">結果をコピー</button>
+    <button class="export" id="exportBtn">テキストをコピー</button>
+    <button id="jsonBtn">JSON保存</button>
   </div>
   <div class="section-title"><h2>既存ビジュアル 21案</h2><span>画像タップで拡大</span></div>
   <main class="grid" id="grid"></main>
@@ -53,7 +54,7 @@
   </section>
 </div>
 <dialog id="viewer"><div class="modalbar"><b id="viewerTitle"></b><button id="closeViewer">閉じる</button></div><img class="modalimg" id="viewerImg" alt=""></dialog>
-<div class="toast" id="toast">コピーしました</div>
+<div class="toast" id="toast">完了しました</div>
 <script>
 const clean=[
  {id:'clean-match',set:'clean',title:'Clean Master — Match',file:'../art/clean-masters/clean-master-match.webp',old:'STRONG KEEP / 現在の最強基準'},
@@ -74,7 +75,9 @@ function render(){const sf=document.querySelector('#setFilter').value,vf=documen
  el.querySelector('textarea').onchange=e=>{state[x.id]={...state[x.id],note:e.target.value};save()};grid.appendChild(el)});summary()}
 function summary(){const c={KEEP:0,MIX:0,DROP:0,unset:0};items.forEach(x=>{const v=state[x.id]?.verdict;c[v||'unset']++});document.querySelector('#summary').innerHTML=`<span>KEEP <b>${c.KEEP}</b></span><span>MIX <b>${c.MIX}</b></span><span>DROP <b>${c.DROP}</b></span><span>未評価 <b>${c.unset}</b></span>`}
 function exportText(){const lines=['MAHJONG HOLD\'EM Visual Review',''];['KEEP','MIX','DROP'].forEach(v=>{lines.push(v+':');items.filter(x=>state[x.id]?.verdict===v).forEach(x=>lines.push(`- ${x.title} / ${state[x.id].score||3}点 / ${state[x.id].note||'メモなし'}`));lines.push('')});lines.push('未評価: '+items.filter(x=>!state[x.id]?.verdict).map(x=>x.id).join(', '));return lines.join('\n')}
-document.querySelector('#exportBtn').onclick=async()=>{await navigator.clipboard.writeText(exportText());const t=document.querySelector('#toast');t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500)};
+function exportJson(){const payload={schemaVersion:1,exportedAt:new Date().toISOString(),reviewKey:key,items:items.map(x=>({...x,verdict:state[x.id]?.verdict||null,score:state[x.id]?.score||3,note:state[x.id]?.note||''}))};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='mahjong-holdem-visual-review.json';a.click();URL.revokeObjectURL(url)}
+document.querySelector('#exportBtn').onclick=async()=>{await navigator.clipboard.writeText(exportText());const t=document.querySelector('#toast');t.textContent='テキストをコピーしました';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500)};
+document.querySelector('#jsonBtn').onclick=()=>{exportJson();const t=document.querySelector('#toast');t.textContent='JSONを保存しました';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500)};
 document.querySelector('#setFilter').onchange=render;document.querySelector('#verdictFilter').onchange=render;document.querySelector('#closeViewer').onclick=()=>viewer.close();viewer.onclick=e=>{if(e.target===viewer)viewer.close()};render();
 </script>
 </body>

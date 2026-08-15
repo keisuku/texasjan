@@ -2,6 +2,12 @@
 
 麻雀 × ポーカーのブラウザゲーム。`index.html` を開けば動きます。
 
+## Control Room
+
+**新しいセッションは [`PROJECT_STATE.md`](PROJECT_STATE.md) → [`CURRENT_TASK.md`](CURRENT_TASK.md) → [`DECISIONS.md`](DECISIONS.md) の順に読みます。**
+
+[`orchestration/index.html`](orchestration/index.html) は、親のChatGPT Workと4つの専門レーンを起動する管制盤です。各カードから起動プロンプトをコピーし、ChatGPT Work / Codexへ貼り付けて開始できます。長い会話ログではなく、GitHubの短い状態ファイル・成果物・PRを正典にします。
+
 ## 2026-08-14 Codex / ChatGPT Work 引き継ぎ
 
 **新しい作業セッションは、最初に [`CODEX_START_HERE.md`](CODEX_START_HERE.md) を読んでください。**
@@ -42,3 +48,4 @@
 ## 開発
 
 `claude-handoff/START_HERE.md` に元の引き継ぎ仕様、`CLAUDE.md` に作業上の制約があります。
+

@@ -13,9 +13,9 @@ Date: 2026-08-14 JST
 
 The three files in `art/clean-masters/` are the current visual control group:
 
-1. `clean-master-lobby.png`
-2. `clean-master-gacha.png`
-3. `clean-master-match.png`
+1. `clean-master-lobby.webp`
+2. `clean-master-gacha.webp`
+3. `clean-master-match.webp`
 
 Why they moved the project forward:
 
@@ -165,4 +165,5 @@ Later instruction added screen 19 in a prior numbering context; the definitive r
 10. User then identified V2’s “ChatGPT-like gabigabi” detail: hidden wave patterns plus over-rendering.
 11. Clean Masters removed most global noise and triggered the strongest positive reaction to date.
 12. The next request is broader macro exploration before expensive implementation.
+
 
