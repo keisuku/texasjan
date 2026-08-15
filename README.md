@@ -2,11 +2,15 @@
 
 麻雀 × ポーカーのブラウザゲーム。`index.html` を開けば動きます。
 
-## 2026-08-14 Codex / ChatGPT Work 引き継ぎ
+## Control Room
 
-**新しい作業セッションは、最初に [`CODEX_START_HERE.md`](CODEX_START_HERE.md) を読んでください。**
+**新しいセッションは [`PROJECT_STATE.md`](PROJECT_STATE.md) → [`CURRENT_TASK.md`](CURRENT_TASK.md) → [`DECISIONS.md`](DECISIONS.md) の順に読みます。**
 
-最新の高評価ビジュアル、50方向探索計画、ゲーム仕様の現行仮説、Codex移行方針、過去の重要フィードバックを `docs/handoff/` に保存しています。エージェント向けの必須読書順と禁止事項は [`AGENTS.md`](AGENTS.md) が正典です。
+[`orchestration/index.html`](orchestration/index.html) は、親のChatGPT Workと4つの専門レーンを起動する管制盤です。各カードから起動プロンプトをコピーし、ChatGPT Work / Codexへ貼り付けて開始できます。長い会話ログではなく、GitHubの短い状態ファイル・成果物・PRを正典にします。
+
+## 2026-08-14 Codex / ChatGPT Work 完全引き継ぎ（アーカイブ）
+
+過去の詳細経緯が必要な場合だけ [`CODEX_START_HERE.md`](CODEX_START_HERE.md) と `docs/handoff/` を参照してください。通常の新規セッションでは上記3ファイルと担当レーンのプロンプトだけで開始します。エージェント向けの必須読書順と禁止事項は [`AGENTS.md`](AGENTS.md) が正典です。
 
 - 最新Clean Master：`art/clean-masters/`
 - 旧V2・18画面：`art/visual-archive/v2/`

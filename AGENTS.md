@@ -4,15 +4,14 @@ This repository is the canonical implementation and handoff for **MAHJONG HOLD'E
 
 ## Required reading order
 
-Before changing code or visuals, read these files in order:
+Start with the smallest useful context:
 
-1. `CODEX_START_HERE.md`
-2. `docs/handoff/MASTER_HANDOFF_2026-08-14.md`
-3. `docs/handoff/VISUAL_NORTH_STAR_AND_DECISIONS.md`
-4. `docs/handoff/GAMEPLAY_WORKING_SPEC.md`
-5. `docs/handoff/ROADMAP_50_DIRECTIONS.md`
-6. `docs/handoff/DEVELOPMENT_STRATEGY_CODEX.md`
-7. Existing implementation instructions in `CLAUDE.md` and `claude-handoff/START_HERE.md`
+1. `PROJECT_STATE.md`
+2. `CURRENT_TASK.md`
+3. `DECISIONS.md`
+4. the relevant lane prompt under `orchestration/prompts/`
+
+Read older handoffs and archives only when the active task links them or a specific ambiguity requires them. Do not preload the full project history.
 
 ## Decision states are binding
 
@@ -72,5 +71,5 @@ For visual work, compare at 941 × 1672 and at approximately 25% scale. The main
 
 ## Immediate next task
 
-Do **not** start a framework migration. First extend the visual-direction gallery from the existing 21 references to the approved exploration structure described in `docs/handoff/ROADMAP_50_DIRECTIONS.md`.
+Follow `CURRENT_TASK.md`. The current gate is coordinated through `orchestration/index.html`; do not start a framework migration or a 50-screen bulk generation pass.
 

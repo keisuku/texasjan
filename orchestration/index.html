@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>MAHJONG HOLD'EM — Control Room</title>
+  <style>
+    :root{--bg:#071c15;--panel:#0e3025;--ink:#f4efe3;--muted:#a9bbb3;--gold:#d6b45a;--line:rgba(244,239,227,.15)}
+    *{box-sizing:border-box}html{background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -10%,#245d49 0,#0a2a20 36%,#061711 100%)}
+    .shell{max-width:1120px;margin:auto;padding:28px 14px 80px}header{padding:16px 4px 24px}.kicker{font-size:11px;letter-spacing:.22em;color:var(--gold);font-weight:900}.title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(34px,8vw,72px);line-height:.95;margin:12px 0;color:#fff3ce}.lead{max-width:760px;color:var(--muted);line-height:1.75}.now{border:1px solid rgba(214,180,90,.5);background:linear-gradient(135deg,rgba(214,180,90,.16),rgba(14,48,37,.75));border-radius:16px;padding:16px;margin:0 0 20px}.now b{color:#ffe39a}
+    .links{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.link,.button{display:inline-flex;align-items:center;justify-content:center;min-height:42px;border:1px solid var(--line);border-radius:10px;padding:0 13px;color:var(--ink);background:#12382c;text-decoration:none;font-weight:800;font-size:13px}.link:hover,.button:hover{border-color:var(--gold)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}.card{display:flex;flex-direction:column;min-height:280px;border:1px solid var(--line);border-radius:18px;padding:17px;background:linear-gradient(180deg,rgba(20,62,49,.96),rgba(8,33,25,.98));box-shadow:0 16px 36px rgba(0,0,0,.22)}.card.active{border-color:rgba(214,180,90,.7)}.head{display:flex;justify-content:space-between;gap:12px}.lane{font-size:11px;letter-spacing:.12em;color:var(--gold);font-weight:900}.status{font-size:10px;padding:5px 8px;border:1px solid var(--line);border-radius:999px;text-transform:uppercase}.status.active{color:#ffe39a;border-color:rgba(214,180,90,.6)}.status.ready{color:#aef4f0;border-color:rgba(102,215,223,.5)}h2{font-size:20px;margin:13px 0 6px}.tool{font-size:12px;color:#8fb3a5}.mission{color:var(--muted);line-height:1.65;font-size:14px;flex:1}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:15px}.button{cursor:pointer}.button.primary{background:linear-gradient(#ead17e,#b98b2f);color:#241a05;border-color:#f5dea0}.button:disabled{opacity:.45;cursor:not-allowed}.foot{margin-top:28px;color:#90a79d;font-size:12px;line-height:1.7}.toast{position:fixed;left:50%;bottom:24px;translate:-50% 16px;opacity:0;transition:.2s;background:#ffe39a;color:#211805;padding:10px 16px;border-radius:999px;font-weight:900}.toast.on{opacity:1;translate:-50% 0}
+  </style>
+</head>
+<body>
+<div class="shell">
+  <header><div class="kicker">MAHJONG HOLD'EM / FIVE-LANE CONTROL ROOM</div><h1 class="title">One source.<br>Five focused lanes.</h1><p class="lead">GitHubを長期記憶にし、会話は短い専門ワーカーとして使います。「コピー」→「ChatGPTを開く」→貼り付けて送信、で各レーンを開始できます。</p></header>
+  <section class="now"><b>現在のゲート：</b>4専門レーンを起動し、比較可能な画像・測定・実装証拠を集める。50画面の一括生成や大規模リライトはまだ行わない。<div class="links"><a class="link" href="../PROJECT_STATE.md">PROJECT STATE</a><a class="link" href="../CURRENT_TASK.md">CURRENT TASK</a><a class="link" href="../DECISIONS.md">DECISIONS</a><a class="link" href="../visual-exploration/">Visual Review</a></div></section>
+  <main class="grid" id="grid"></main>
+  <p class="foot">プロンプトと状態はGitHub側が正典です。セッション終了前は <a href="CHECKPOINT_TEMPLATE.md" style="color:#d6b45a">Checkpoint Template</a> で結果を残してください。将来のWorkspace Agents API化でも、この構成を入力インターフェースとして使えます。</p>
+</div>
+<div class="toast" id="toast">起動プロンプトをコピーしました</div>
+<script>
+const fallback={workstreams:[
+ {id:'00-control-tower',name:'Control Tower',tool:'ChatGPT Work',status:'active',mission:'Own product direction, compare evidence, approve gates, and update decisions.',prompt:null},
+ {id:'01-match-visual',name:'Match Visual Lab',tool:'ChatGPT Work',status:'ready',mission:'Generate and compare five genuinely different match-screen directions.',prompt:'prompts/01-match-visual.md'},
+ {id:'02-meta-gacha',name:'Meta / Gacha Lab',tool:'ChatGPT Work',status:'ready',mission:'Prove the visual/product language across lobby, characters, and gacha.',prompt:'prompts/02-meta-gacha.md'},
+ {id:'03-probability',name:'Probability Lab',tool:'Codex',status:'ready',mission:'Benchmark and tune rules toward Hold\'em-like probability tension.',prompt:'prompts/03-probability.md'},
+ {id:'04-playable-build',name:'Playable Build Lab',tool:'Codex / Claude Code',status:'ready',mission:'Protect and improve the verified playable vertical slice.',prompt:'prompts/04-playable-build.md'}
+]};
+const grid=document.querySelector('#grid'),toast=document.querySelector('#toast');
+async function getData(){try{const r=await fetch('WORKSTREAMS.json',{cache:'no-store'});if(!r.ok)throw Error();return await r.json()}catch{return fallback}}
+async function copyPrompt(path){const r=await fetch(path,{cache:'no-store'});if(!r.ok)throw Error('prompt fetch failed');await navigator.clipboard.writeText(await r.text());toast.classList.add('on');setTimeout(()=>toast.classList.remove('on'),1700)}
+function render(data){grid.innerHTML=data.workstreams.map((x,i)=>`<article class="card ${x.status}"><div class="head"><span class="lane">LANE ${String(i).padStart(2,'0')}</span><span class="status ${x.status}">${x.status}</span></div><h2>${x.name}</h2><div class="tool">${x.tool}</div><p class="mission">${x.mission}</p><div class="actions">${x.prompt?`<button class="button primary" data-copy="${x.prompt}">プロンプトをコピー</button>`:'<button class="button" disabled>この画面です</button>'}<a class="button" href="${x.prompt||'CONTROL_TOWER.md'}">内容を見る</a></div>${x.prompt?'<div class="actions"><a class="button" href="https://chatgpt.com/" target="_blank" rel="noopener">ChatGPTを開く</a><a class="button" href="https://github.com/keisuku/texasjan" target="_blank" rel="noopener">GitHub</a></div>':''}</article>`).join('');grid.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copyPrompt(b.dataset.copy).catch(()=>alert('プロンプトファイルを開き、全文をコピーしてください。')))}
+getData().then(render);
+</script>
+</body>
+</html>
