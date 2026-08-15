@@ -2,7 +2,7 @@
 
 - Lane: 02 Meta / Gacha Lab
 - Date/time (JST): 2026-08-16 06:41 JST
-- Branch / PR: `agent/meta-gacha-visual-proof` / pending at checkpoint creation
+- Branch / PR: `agent/meta-gacha-visual-proof` / [PR #13](https://github.com/keisuku/texasjan/pull/13)
 - Status: `READY_FOR_REVIEW`
 
 ## Outcome
@@ -42,4 +42,3 @@ The lane established one shared product-language system for lobby, character, ga
 ## Exact next action
 
 At 25% scale, compare `clean-master-gacha.webp` with `meta-gacha-clean-evolution-v1.png` and choose exactly one: **KEEP Clean Master / MIX the new character-plus-signature-set hierarchy into Clean Master / DROP the new proof**.
-
