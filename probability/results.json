@@ -1,0 +1,1036 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-15T21:54:15.190Z",
+  "seed": 2026081603,
+  "evaluator": {
+    "productionScorer": "../mahjong-score.js MahjongScore.evaluate",
+    "selectionPolicy": "Production solveFlexible search/ranking replicated; player 0 uses total and opponents use sequence/flush/triplet/pairs/total.",
+    "incompleteBias": "Production quickMelds + pair + dora fallback; not shanten or exact equity.",
+    "bettingModel": "No folds or wagers; six live hands always reach showdown.",
+    "nodeCap": 450000
+  },
+  "runtimeSeconds": 263.058,
+  "results": [
+    {
+      "id": "baseline_136_c15_4_4_4_p8_free",
+      "label": "Current baseline",
+      "deals": 2000,
+      "tileCount": 136,
+      "privateTiles": 8,
+      "communalGroups": [
+        15,
+        4,
+        4,
+        4
+      ],
+      "privateRule": {
+        "kind": "free"
+      },
+      "streets": [
+        {
+          "commonTiles": 15,
+          "completionPct": 15.8417,
+          "averageRouteClasses": 0.1637,
+          "multiRoutePct": 0.4833,
+          "averagePrivateRequired": 5.0135,
+          "averagePrivateAttributed": 5.2103,
+          "selectedHandCommunalSourcePossiblePct": 0,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 19,
+          "completionPct": 65.375,
+          "averageRouteClasses": 0.781,
+          "multiRoutePct": 11.7417,
+          "averagePrivateRequired": 4.2195,
+          "averagePrivateAttributed": 4.6926,
+          "selectedHandCommunalSourcePossiblePct": 0.05,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 23,
+          "completionPct": 97.4,
+          "averageRouteClasses": 1.645,
+          "multiRoutePct": 56.3083,
+          "averagePrivateRequired": 3.7235,
+          "averagePrivateAttributed": 4.4399,
+          "selectedHandCommunalSourcePossiblePct": 0.2917,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 27,
+          "completionPct": 100,
+          "averageRouteClasses": 2.3277,
+          "multiRoutePct": 91.9333,
+          "averagePrivateRequired": 3.3364,
+          "averagePrivateAttributed": 4.1861,
+          "selectedHandCommunalSourcePossiblePct": 0.9583,
+          "solverCapHitPct": 0
+        }
+      ],
+      "river": {
+        "splitPotPct": 16.75,
+        "averageWinnerCount": 1.242,
+        "commonBoardCompletePct": 63.55,
+        "playerCompletionCreatedByPrivatePct": 36.45,
+        "totalRecommendationBeatsCommonOnlyPct": 77.1583,
+        "winnerRouteShare": {
+          "sequence": 14.8208,
+          "seven_pairs": 44.95,
+          "triplet": 14.6792,
+          "flush": 25.55
+        }
+      },
+      "leaderChangeProxyPct": [
+        62.8302,
+        48.6328,
+        46.6243
+      ],
+      "effectiveEarlyDecisionProxyPct": 87.7417,
+      "equity": {
+        "sampleDeals": 12,
+        "rolloutsPerStreet": 24,
+        "streets": [
+          {
+            "commonTiles": 15,
+            "meanEquityStdDev": 0.1425,
+            "meanTopEquityPct": 41.5741,
+            "nextStreetCompletionDraw": {
+              "states": 56,
+              "meanPct": 65.1786,
+              "medianPct": 70.8333,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 7.1429,
+                "around16": 0,
+                "around24": 5.3571,
+                "around33": 7.1429,
+                "around50": 10.7143,
+                "above60": 69.6429
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 19,
+            "meanEquityStdDev": 0.1508,
+            "meanTopEquityPct": 44.4387,
+            "nextStreetCompletionDraw": {
+              "states": 23,
+              "meanPct": 95.6522,
+              "medianPct": 100,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 0,
+                "above60": 100
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 23,
+            "meanEquityStdDev": 0.2056,
+            "meanTopEquityPct": 56.9444,
+            "nextStreetCompletionDraw": null
+          },
+          {
+            "commonTiles": 27,
+            "meanEquityStdDev": 0.3555,
+            "meanTopEquityPct": 94.4444,
+            "nextStreetCompletionDraw": null
+          }
+        ],
+        "equityLeaderChangePct": [
+          33.3333,
+          33.3333,
+          50
+        ],
+        "effectiveEarlyDecisionPct": 48.6111
+      }
+    },
+    {
+      "id": "p6_only",
+      "label": "Private 6 only",
+      "deals": 500,
+      "tileCount": 136,
+      "privateTiles": 6,
+      "communalGroups": [
+        15,
+        4,
+        4,
+        4
+      ],
+      "privateRule": {
+        "kind": "free"
+      },
+      "streets": [
+        {
+          "commonTiles": 15,
+          "completionPct": 4.7333,
+          "averageRouteClasses": 0.0483,
+          "multiRoutePct": 0.1,
+          "averagePrivateRequired": 4.168,
+          "averagePrivateAttributed": 4.2723,
+          "selectedHandCommunalSourcePossiblePct": 0,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 19,
+          "completionPct": 36.3,
+          "averageRouteClasses": 0.391,
+          "multiRoutePct": 2.6333,
+          "averagePrivateRequired": 3.4457,
+          "averagePrivateAttributed": 3.7133,
+          "selectedHandCommunalSourcePossiblePct": 0.5,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 23,
+          "completionPct": 87.1667,
+          "averageRouteClasses": 1.2013,
+          "multiRoutePct": 29.2333,
+          "averagePrivateRequired": 2.947,
+          "averagePrivateAttributed": 3.4447,
+          "selectedHandCommunalSourcePossiblePct": 1.5,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 27,
+          "completionPct": 99.9,
+          "averageRouteClasses": 2.0127,
+          "multiRoutePct": 79.5,
+          "averagePrivateRequired": 2.631,
+          "averagePrivateAttributed": 3.278,
+          "selectedHandCommunalSourcePossiblePct": 2.4333,
+          "solverCapHitPct": 0
+        }
+      ],
+      "river": {
+        "splitPotPct": 25.8,
+        "averageWinnerCount": 1.456,
+        "commonBoardCompletePct": 63,
+        "playerCompletionCreatedByPrivatePct": 36.9,
+        "totalRecommendationBeatsCommonOnlyPct": 70.2333,
+        "winnerRouteShare": {
+          "seven_pairs": 53.8,
+          "flush": 18.7,
+          "sequence": 15.2,
+          "triplet": 12.3
+        }
+      },
+      "leaderChangeProxyPct": [
+        62.3016,
+        50.2222,
+        42.4
+      ],
+      "effectiveEarlyDecisionProxyPct": 89.9333,
+      "equity": {
+        "sampleDeals": 12,
+        "rolloutsPerStreet": 24,
+        "streets": [
+          {
+            "commonTiles": 15,
+            "meanEquityStdDev": 0.1315,
+            "meanTopEquityPct": 39.3229,
+            "nextStreetCompletionDraw": {
+              "states": 69,
+              "meanPct": 38.4662,
+              "medianPct": 37.5,
+              "bandSharePct": {
+                "below4": 2.8986,
+                "around8": 7.2464,
+                "around16": 13.0435,
+                "around24": 8.6957,
+                "around33": 26.087,
+                "around50": 23.1884,
+                "above60": 18.8406
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 19,
+            "meanEquityStdDev": 0.1416,
+            "meanTopEquityPct": 41.088,
+            "nextStreetCompletionDraw": {
+              "states": 44,
+              "meanPct": 84.375,
+              "medianPct": 87.5,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 6.8182,
+                "above60": 93.1818
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 23,
+            "meanEquityStdDev": 0.2038,
+            "meanTopEquityPct": 57.3495,
+            "nextStreetCompletionDraw": {
+              "states": 6,
+              "meanPct": 100,
+              "medianPct": 100,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 0,
+                "above60": 100
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 27,
+            "meanEquityStdDev": 0.3152,
+            "meanTopEquityPct": 82.9167,
+            "nextStreetCompletionDraw": null
+          }
+        ],
+        "equityLeaderChangePct": [
+          33.3333,
+          58.3333,
+          25
+        ],
+        "effectiveEarlyDecisionPct": 59.7222
+      }
+    },
+    {
+      "id": "p4_only",
+      "label": "Private 4 only",
+      "deals": 500,
+      "tileCount": 136,
+      "privateTiles": 4,
+      "communalGroups": [
+        15,
+        4,
+        4,
+        4
+      ],
+      "privateRule": {
+        "kind": "free"
+      },
+      "streets": [
+        {
+          "commonTiles": 15,
+          "completionPct": 0.8667,
+          "averageRouteClasses": 0.0087,
+          "multiRoutePct": 0,
+          "averagePrivateRequired": 3.0977,
+          "averagePrivateAttributed": 3.1373,
+          "selectedHandCommunalSourcePossiblePct": 0.1333,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 19,
+          "completionPct": 16.2667,
+          "averageRouteClasses": 0.1693,
+          "multiRoutePct": 0.6667,
+          "averagePrivateRequired": 2.4987,
+          "averagePrivateAttributed": 2.619,
+          "selectedHandCommunalSourcePossiblePct": 1.3333,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 23,
+          "completionPct": 65.5667,
+          "averageRouteClasses": 0.7793,
+          "multiRoutePct": 11,
+          "averagePrivateRequired": 2.0957,
+          "averagePrivateAttributed": 2.3753,
+          "selectedHandCommunalSourcePossiblePct": 4.4,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 27,
+          "completionPct": 98.3,
+          "averageRouteClasses": 1.659,
+          "multiRoutePct": 56.4667,
+          "averagePrivateRequired": 1.8547,
+          "averagePrivateAttributed": 2.261,
+          "selectedHandCommunalSourcePossiblePct": 7,
+          "solverCapHitPct": 0
+        }
+      ],
+      "river": {
+        "splitPotPct": 41.2,
+        "averageWinnerCount": 1.958,
+        "commonBoardCompletePct": 65.6,
+        "playerCompletionCreatedByPrivatePct": 32.7,
+        "totalRecommendationBeatsCommonOnlyPct": 59.6667,
+        "winnerRouteShare": {
+          "seven_pairs": 59.6,
+          "sequence": 20.6,
+          "triplet": 9,
+          "flush": 10.8
+        }
+      },
+      "leaderChangeProxyPct": [
+        47.6636,
+        58.3333,
+        54.6392
+      ],
+      "effectiveEarlyDecisionProxyPct": 83.6667,
+      "equity": {
+        "sampleDeals": 12,
+        "rolloutsPerStreet": 24,
+        "streets": [
+          {
+            "commonTiles": 15,
+            "meanEquityStdDev": 0.0879,
+            "meanTopEquityPct": 32.147,
+            "nextStreetCompletionDraw": {
+              "states": 72,
+              "meanPct": 15.8565,
+              "medianPct": 8.3333,
+              "bandSharePct": {
+                "below4": 29.1667,
+                "around8": 29.1667,
+                "around16": 13.8889,
+                "around24": 2.7778,
+                "around33": 11.1111,
+                "around50": 9.7222,
+                "above60": 4.1667
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 19,
+            "meanEquityStdDev": 0.0922,
+            "meanTopEquityPct": 31.9039,
+            "nextStreetCompletionDraw": {
+              "states": 60,
+              "meanPct": 50.4167,
+              "medianPct": 50,
+              "bandSharePct": {
+                "below4": 1.6667,
+                "around8": 6.6667,
+                "around16": 5,
+                "around24": 5,
+                "around33": 16.6667,
+                "around50": 28.3333,
+                "above60": 36.6667
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 23,
+            "meanEquityStdDev": 0.1195,
+            "meanTopEquityPct": 37.1354,
+            "nextStreetCompletionDraw": {
+              "states": 35,
+              "meanPct": 93.4524,
+              "medianPct": 95.8333,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 2.8571,
+                "above60": 97.1429
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 27,
+            "meanEquityStdDev": 0.2809,
+            "meanTopEquityPct": 70.4167,
+            "nextStreetCompletionDraw": null
+          }
+        ],
+        "equityLeaderChangePct": [
+          75,
+          75,
+          75
+        ],
+        "effectiveEarlyDecisionPct": 66.6667
+      }
+    },
+    {
+      "id": "cadence_15_3_1_1",
+      "label": "15 + 3 + 1 + 1 cadence only",
+      "deals": 500,
+      "tileCount": 136,
+      "privateTiles": 8,
+      "communalGroups": [
+        15,
+        3,
+        1,
+        1
+      ],
+      "privateRule": {
+        "kind": "free"
+      },
+      "streets": [
+        {
+          "commonTiles": 15,
+          "completionPct": 15.8,
+          "averageRouteClasses": 0.1617,
+          "multiRoutePct": 0.3333,
+          "averagePrivateRequired": 5.052,
+          "averagePrivateAttributed": 5.2443,
+          "selectedHandCommunalSourcePossiblePct": 0,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 18,
+          "completionPct": 49.5333,
+          "averageRouteClasses": 0.552,
+          "multiRoutePct": 5.2333,
+          "averagePrivateRequired": 4.385,
+          "averagePrivateAttributed": 4.7783,
+          "selectedHandCommunalSourcePossiblePct": 0,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 19,
+          "completionPct": 64.4333,
+          "averageRouteClasses": 0.7533,
+          "multiRoutePct": 9.8667,
+          "averagePrivateRequired": 4.2333,
+          "averagePrivateAttributed": 4.707,
+          "selectedHandCommunalSourcePossiblePct": 0.0667,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 20,
+          "completionPct": 76.3667,
+          "averageRouteClasses": 0.9757,
+          "multiRoutePct": 19.0667,
+          "averagePrivateRequired": 4.1077,
+          "averagePrivateAttributed": 4.6507,
+          "selectedHandCommunalSourcePossiblePct": 0.0667,
+          "solverCapHitPct": 0
+        }
+      ],
+      "river": {
+        "splitPotPct": 34.6,
+        "averageWinnerCount": 1.676,
+        "commonBoardCompletePct": 1.8,
+        "playerCompletionCreatedByPrivatePct": 74.5667,
+        "totalRecommendationBeatsCommonOnlyPct": 90.1667,
+        "winnerRouteShare": {
+          "sequence": 25.1,
+          "seven_pairs": 63.2,
+          "flush": 5.2,
+          "triplet": 5.9,
+          "incomplete": 0.6
+        }
+      },
+      "leaderChangeProxyPct": [
+        50,
+        20.8633,
+        16.0142
+      ],
+      "effectiveEarlyDecisionProxyPct": 87.1,
+      "equity": {
+        "sampleDeals": 12,
+        "rolloutsPerStreet": 24,
+        "streets": [
+          {
+            "commonTiles": 15,
+            "meanEquityStdDev": 0.1329,
+            "meanTopEquityPct": 40.787,
+            "nextStreetCompletionDraw": {
+              "states": 60,
+              "meanPct": 46.6667,
+              "medianPct": 50,
+              "bandSharePct": {
+                "below4": 3.3333,
+                "around8": 8.3333,
+                "around16": 10,
+                "around24": 5,
+                "around33": 18.3333,
+                "around50": 21.6667,
+                "above60": 33.3333
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 18,
+            "meanEquityStdDev": 0.1794,
+            "meanTopEquityPct": 47.8183,
+            "nextStreetCompletionDraw": {
+              "states": 28,
+              "meanPct": 23.6607,
+              "medianPct": 20.8333,
+              "bandSharePct": {
+                "below4": 35.7143,
+                "around8": 0,
+                "around16": 14.2857,
+                "around24": 10.7143,
+                "around33": 14.2857,
+                "around50": 14.2857,
+                "above60": 10.7143
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 19,
+            "meanEquityStdDev": 0.2037,
+            "meanTopEquityPct": 54.103,
+            "nextStreetCompletionDraw": {
+              "states": 23,
+              "meanPct": 34.9638,
+              "medianPct": 29.1667,
+              "bandSharePct": {
+                "below4": 26.087,
+                "around8": 0,
+                "around16": 8.6957,
+                "around24": 13.0435,
+                "around33": 4.3478,
+                "around50": 17.3913,
+                "above60": 30.4348
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 20,
+            "meanEquityStdDev": 0.2735,
+            "meanTopEquityPct": 68.3333,
+            "nextStreetCompletionDraw": null
+          }
+        ],
+        "equityLeaderChangePct": [
+          58.3333,
+          41.6667,
+          25
+        ],
+        "effectiveEarlyDecisionPct": 55.5556
+      }
+    },
+    {
+      "id": "at_least_1_private",
+      "label": "Require at least 1 private",
+      "deals": 500,
+      "tileCount": 136,
+      "privateTiles": 8,
+      "communalGroups": [
+        15,
+        4,
+        4,
+        4
+      ],
+      "privateRule": {
+        "kind": "atLeast",
+        "count": 1
+      },
+      "streets": [
+        {
+          "commonTiles": 15,
+          "completionPct": 15.4667,
+          "averageRouteClasses": 0.1583,
+          "multiRoutePct": 0.3333,
+          "averagePrivateRequired": 4.9933,
+          "averagePrivateAttributed": 5.187,
+          "selectedHandCommunalSourcePossiblePct": 0,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 19,
+          "completionPct": 63.6333,
+          "averageRouteClasses": 0.747,
+          "multiRoutePct": 10.5667,
+          "averagePrivateRequired": 4.1963,
+          "averagePrivateAttributed": 4.6623,
+          "selectedHandCommunalSourcePossiblePct": 0.0333,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 23,
+          "completionPct": 97.7333,
+          "averageRouteClasses": 1.6287,
+          "multiRoutePct": 55.8667,
+          "averagePrivateRequired": 3.7053,
+          "averagePrivateAttributed": 4.4233,
+          "selectedHandCommunalSourcePossiblePct": 0.3,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 27,
+          "completionPct": 99.9667,
+          "averageRouteClasses": 2.2987,
+          "multiRoutePct": 91.2,
+          "averagePrivateRequired": 3.358,
+          "averagePrivateAttributed": 4.1873,
+          "selectedHandCommunalSourcePossiblePct": 0.6333,
+          "solverCapHitPct": 0
+        }
+      ],
+      "river": {
+        "splitPotPct": 18.4,
+        "averageWinnerCount": 1.242,
+        "commonBoardCompletePct": 63.2,
+        "playerCompletionCreatedByPrivatePct": 36.8,
+        "totalRecommendationBeatsCommonOnlyPct": 77.6,
+        "winnerRouteShare": {
+          "seven_pairs": 45.6,
+          "triplet": 15.3333,
+          "flush": 24.5667,
+          "sequence": 14.5
+        }
+      },
+      "leaderChangeProxyPct": [
+        58.6331,
+        48.2143,
+        42.9448
+      ],
+      "effectiveEarlyDecisionProxyPct": 88.5667,
+      "equity": {
+        "sampleDeals": 12,
+        "rolloutsPerStreet": 24,
+        "streets": [
+          {
+            "commonTiles": 15,
+            "meanEquityStdDev": 0.1606,
+            "meanTopEquityPct": 47.309,
+            "nextStreetCompletionDraw": {
+              "states": 57,
+              "meanPct": 62.5731,
+              "medianPct": 66.6667,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 1.7544,
+                "around16": 0,
+                "around24": 3.5088,
+                "around33": 15.7895,
+                "around50": 21.0526,
+                "above60": 57.8947
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 19,
+            "meanEquityStdDev": 0.1968,
+            "meanTopEquityPct": 55.9606,
+            "nextStreetCompletionDraw": {
+              "states": 19,
+              "meanPct": 96.9298,
+              "medianPct": 100,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 0,
+                "above60": 100
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 23,
+            "meanEquityStdDev": 0.2302,
+            "meanTopEquityPct": 64.6991,
+            "nextStreetCompletionDraw": {
+              "states": 1,
+              "meanPct": 100,
+              "medianPct": 100,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 0,
+                "above60": 100
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 27,
+            "meanEquityStdDev": 0.3498,
+            "meanTopEquityPct": 91.6667,
+            "nextStreetCompletionDraw": null
+          }
+        ],
+        "equityLeaderChangePct": [
+          41.6667,
+          25,
+          41.6667
+        ],
+        "effectiveEarlyDecisionPct": 51.3889
+      }
+    },
+    {
+      "id": "at_least_2_private",
+      "label": "Require at least 2 private",
+      "deals": 500,
+      "tileCount": 136,
+      "privateTiles": 8,
+      "communalGroups": [
+        15,
+        4,
+        4,
+        4
+      ],
+      "privateRule": {
+        "kind": "atLeast",
+        "count": 2
+      },
+      "streets": [
+        {
+          "commonTiles": 15,
+          "completionPct": 14.3,
+          "averageRouteClasses": 0.1473,
+          "multiRoutePct": 0.4333,
+          "averagePrivateRequired": 5.0157,
+          "averagePrivateAttributed": 5.2023,
+          "selectedHandCommunalSourcePossiblePct": 0.0333,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 19,
+          "completionPct": 63.0333,
+          "averageRouteClasses": 0.7373,
+          "multiRoutePct": 9.6667,
+          "averagePrivateRequired": 4.278,
+          "averagePrivateAttributed": 4.7587,
+          "selectedHandCommunalSourcePossiblePct": 0.2,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 23,
+          "completionPct": 97.2333,
+          "averageRouteClasses": 1.624,
+          "multiRoutePct": 55.0667,
+          "averagePrivateRequired": 3.7727,
+          "averagePrivateAttributed": 4.5007,
+          "selectedHandCommunalSourcePossiblePct": 0.1667,
+          "solverCapHitPct": 0
+        },
+        {
+          "commonTiles": 27,
+          "completionPct": 99.9667,
+          "averageRouteClasses": 2.2963,
+          "multiRoutePct": 90.6333,
+          "averagePrivateRequired": 3.379,
+          "averagePrivateAttributed": 4.2377,
+          "selectedHandCommunalSourcePossiblePct": 0.4333,
+          "solverCapHitPct": 0
+        }
+      ],
+      "river": {
+        "splitPotPct": 19.2,
+        "averageWinnerCount": 1.282,
+        "commonBoardCompletePct": 62.8,
+        "playerCompletionCreatedByPrivatePct": 37.2,
+        "totalRecommendationBeatsCommonOnlyPct": 79.1,
+        "winnerRouteShare": {
+          "seven_pairs": 44.8,
+          "sequence": 14.9667,
+          "flush": 26.8,
+          "triplet": 13.4333
+        }
+      },
+      "leaderChangeProxyPct": [
+        60.5634,
+        51.6484,
+        48.7421
+      ],
+      "effectiveEarlyDecisionProxyPct": 88.0333,
+      "equity": {
+        "sampleDeals": 12,
+        "rolloutsPerStreet": 24,
+        "streets": [
+          {
+            "commonTiles": 15,
+            "meanEquityStdDev": 0.1591,
+            "meanTopEquityPct": 44.919,
+            "nextStreetCompletionDraw": {
+              "states": 60,
+              "meanPct": 58.125,
+              "medianPct": 66.6667,
+              "bandSharePct": {
+                "below4": 1.6667,
+                "around8": 1.6667,
+                "around16": 11.6667,
+                "around24": 8.3333,
+                "around33": 5,
+                "around50": 18.3333,
+                "above60": 53.3333
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 19,
+            "meanEquityStdDev": 0.2028,
+            "meanTopEquityPct": 56.4641,
+            "nextStreetCompletionDraw": {
+              "states": 28,
+              "meanPct": 93.1548,
+              "medianPct": 95.8333,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 3.5714,
+                "above60": 96.4286
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 23,
+            "meanEquityStdDev": 0.2248,
+            "meanTopEquityPct": 59.3866,
+            "nextStreetCompletionDraw": {
+              "states": 3,
+              "meanPct": 100,
+              "medianPct": 100,
+              "bandSharePct": {
+                "below4": 0,
+                "around8": 0,
+                "around16": 0,
+                "around24": 0,
+                "around33": 0,
+                "around50": 0,
+                "above60": 100
+              },
+              "targetBandsPct": [
+                8,
+                16,
+                24,
+                33,
+                50
+              ]
+            }
+          },
+          {
+            "commonTiles": 27,
+            "meanEquityStdDev": 0.3613,
+            "meanTopEquityPct": 95.8333,
+            "nextStreetCompletionDraw": null
+          }
+        ],
+        "equityLeaderChangePct": [
+          50,
+          58.3333,
+          50
+        ],
+        "effectiveEarlyDecisionPct": 47.2222
+      }
+    }
+  ]
+}
