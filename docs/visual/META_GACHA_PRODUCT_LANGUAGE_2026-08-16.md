@@ -1,104 +1,134 @@
-# Meta / Gacha Product Language
+# Meta / Gacha Product Language — Japanese Reset
 
 Date: 2026-08-16 JST  
 Lane: Meta / Gacha Lab  
-Status: **PROPOSED — visual evidence ready for Control Tower review**
+Status: **FIVE PROPOSALS READY FOR CONTROL TOWER REVIEW**
 
-## Outcome
+## User correction now binding
 
-The Clean Master family already proves the correct density hierarchy. The next improvement is not more luxury detail; it is a clearer collectible promise. The generated proof makes one character the emotional protagonist and presents CHARACTER / OUTFIT / TABLE / CHIP as one coherent signature set. It intentionally avoids prices, currency values, probability claims, and complete economy design.
+The first proof, `meta-gacha-clean-evolution-v1.png`, is **REJECTED** as a candidate.
 
-Visual proof: [`../../art/meta-gacha-lab/meta-gacha-clean-evolution-v1.png`](../../art/meta-gacha-lab/meta-gacha-clean-evolution-v1.png)
+Its jade, circular architectural frame, clothing details, ornament, and character dominance pushed the product too far toward a Chinese-coded fantasy. It also failed to explain whether the player was previewing a cosmetic, changing clothes, or entering a gacha. The screen created hesitation instead of desire.
 
-## Shared product-language rules
+MAHJONG HOLD'EM should prioritize a **contemporary Japanese atmosphere** that remains internationally legible and reusable. Japanese identity must come from restraint, material choices, typography, utility, contemporary fashion, and product behavior—not a pile of historical symbols.
 
-### 1. One screen, one protagonist
+## Binding visual exclusions
 
-- Lobby: the selected character plus the next play decision.
-- Character: the person, their silhouette, and one human detail that implies personality.
-- Gacha: the featured character plus the coherent collectible set.
-- Reward reveal: the newly owned object or character, not the particle effect.
-- Match: communal tiles and the final 14-tile hand; character presence stays secondary.
+- No qipao / cheongsam collars, tang jackets, hanfu, robe silhouettes, tassels, dragons, phoenixes, Chinese calligraphy, moon gates, palace arches, circular windows, carved lattice, or imperial red-and-gold grammar.
+- Jade is no longer a default brand material. It may appear only as a specific item color after approval.
+- Do not substitute generic “Asian luxury” for Japanese identity.
+- Also avoid Japanese cliché stacking: torii, tatami, shoji, sakura, brush lettering, and kimono are not a shortcut to product identity.
+- Backgrounds stay simple, modular, low-detail, and independent from any single character.
 
-### 2. Preserve one density ladder
+## Benchmark lessons
 
-| Density | What belongs there |
+| Proven pattern | Product lesson for MAHJONG HOLD'EM |
 |---|---|
-| High | face, key tiles, reward object, POT, primary action |
-| Medium | tabs, resource shells, progress, supporting cards |
-| Low | architecture, scenery, ambient texture |
+| Pokémon TCG Pocket links opening to binders and display boards | Acquisition becomes desirable when the player immediately understands how the reward will be displayed and used. |
+| Project SEKAI separates member selection, live outfit, and final confirmation | Customization needs an explicit sequence: choose target → choose item → preview → confirm. |
+| Long-running Japanese character games expose selected state, category tabs, single/multi draw, and a route back | Familiar usability should be solved conventionally; novelty belongs in the reward fantasy, not navigation. |
+| Existing MAHJONG HOLD'EM precedent separates character, table, chip, all-in/showdown, nameplate, and stamp surfaces | Every collectible needs a visible destination inside lobby or match. |
 
-If everything is sharp or decorated, nothing feels valuable.
+Sources:
 
-### 3. Use color as meaning
+- [Pokémon TCG Pocket official launch release](https://press.pokemon.com/en/Pokemon-Trading-Card-Game-Pocket-Launches-Today-Offering-a-Fresh-Take-)
+- [Project SEKAI official FAQ — live outfits](https://pjsekai.sega.jp/faq/index.html)
+- [Uma Musume official character portal](https://umamusume.jp/character/)
 
-- Ivory: breathing room, neutral surfaces, legibility.
-- Jade: brand ownership, selected state, primary navigation.
-- Brass: rank, stakes, and reward moments only.
-- Cyan: active-turn or live informational state only.
-- Red: exceptional warning or competitive pressure, never routine trim.
+## Shared UI grammar
 
-### 4. Make character appeal human before glamorous
+Every meta / gacha concept must provide this visible order:
 
-- Use a readable silhouette and face before costume detail.
-- Give each character one controlled imperfection or lived-in cue: an undone strand, worn cuff, nervous habit, practical tool, or private charm.
-- Connect the cue to play style or motivation; do not rely on idol beauty, royal costume, or lore-heavy ornament.
-- Women can lead the roster, but the presentation must support self-projection and personality rather than sexualized posing.
-- The character may dominate lobby and gacha, never the communal board or final hand during play.
+1. **Return:** obvious back arrow; home when useful.
+2. **Purpose:** short screen title such as STYLE SET, LEAGUE KIT, WARDROBE DROP, CRAFT COLLECTION, or STYLE PLAY.
+3. **Preview:** show exactly what changes in the character or match.
+4. **Category:** character / outfit / table / chip / stamp / FX.
+5. **Choice:** several alternatives at once, never a single isolated item.
+6. **Selected state:** one unmistakable check or highlight.
+7. **Consistency:** the main preview, selected thumbnail, garment card, table, and chip must depict the same set.
+8. **Try:** preview without committing.
+9. **Acquire:** one clearly dominant DRAW action.
+10. **Use:** after acquisition, the route to wardrobe/equip must be obvious.
 
-### 5. Sell a signature set, not isolated loot
+Final values, prices, odds, legal copy, localization, and accessibility remain code-rendered.
 
-The minimum collectible grammar is:
+## Five visual proofs
 
-1. CHARACTER — identity and emotional attachment;
-2. OUTFIT — alternate expression of the same person;
-3. TABLE — the place where their world enters the match;
-4. CHIP — the small tactile object repeated during betting.
+### A — Japanese Premium Club
 
-Nameplates, entry motion, showdown effects, and voice can extend this grammar later, but they should not obscure the four-item core in the first proof.
+![A — Japanese Premium Club](../../art/meta-gacha-lab/meta-a-japanese-premium-club-941x1672.png)
 
-### 6. Reward reveal is a three-beat sequence
+- Product fantasy: bright contemporary Tokyo/Ginza club.
+- Strongest at: general-purpose lobby compatibility and premium calm.
+- Character dependence: medium.
+- Pull desire: medium-high through a tangible gold DRAW surface.
+- Risk: can become a generic luxury game if Tokyo/Japanese utility cues weaken.
 
-1. **Anticipation:** quiet field, silhouette or material cue.
-2. **Recognition:** face or object resolves cleanly.
-3. **Ownership:** the item joins its signature set and the action becomes available.
+### B — Future League Japan
 
-Rarity should come from framing, material contrast, timing, and one local glint—not full-screen fireworks.
+![B — Future League Japan](../../art/meta-gacha-lab/meta-b-future-league-941x1672.png)
 
-### 7. Code owns the interface
+- Product fantasy: Japanese world-championship broadcast sport.
+- Strongest at: immediate UI purpose, category scanning, competition identity.
+- Character dependence: medium.
+- Pull desire: high through signed-kit / team-uniform ownership.
+- Risk: coldness; preserve human character moments outside the match.
 
-- Generated art proves composition and product fantasy.
-- Background, character, collectible objects, UI, and local FX remain separable production layers.
-- Text, values, buttons, probabilities, prices, localization, focus states, and accessibility are code-rendered.
-- Blank resource capsules and action surfaces in the proof are intentional implementation slots, not missing design.
+### C — Character Showdown Japan
 
-## Cross-screen continuity
+![C — Character Showdown Japan](../../art/meta-gacha-lab/meta-c-character-showdown-941x1672.png)
 
-| Screen | Carry forward | Hold back |
-|---|---|---|
-| Lobby | selected character, one signature object, jade selected state | gacha spectacle, dense event copy |
-| Character | full or three-quarter silhouette, explicit selected state, human cue | match-critical information |
-| Gacha | featured character, coherent four-part set, progress, two action zones | prices, legal copy, unapproved economy |
-| Reward reveal | one hero reward, local brass highlight, ownership confirmation | confetti, halos, multiple competing rewards |
-| Match | portrait ownership, table/chip cosmetics, restrained identity cues | face dominance, costume blocking tiles, persistent FX |
+- Product fantasy: modern Tokyo backstage before a decisive match.
+- Strongest at: “I want to become/play as this version” and before/after clarity.
+- Character dependence: high.
+- Pull desire: high through emotional transformation.
+- Risk: character and story can overpower reusable product surfaces.
 
-## Five macro directions
+### D — Modern Japanese Craft
 
-| Direction | Character appeal | Collectible value | Live-ops surfaces | Guardrail |
-|---|---|---|---|---|
-| Grand Casino | poised professionals, status, composure under pressure | tailored outfits, invitation tables, precision chips | invitation seasons, tournament rooms, prestige ladders | brass must stay scarce; avoid generic aristocratic luxury |
-| Future League | athletes, rivals, teams, performance identity | jerseys, entrance packages, broadcast tables, ranked nameplates | league seasons, brackets, team events, spectator moments | add candid humanity so the world does not become cold telemetry |
-| Character Showdown | strongest emotion, rivalry, humor, contradiction | story outfits, expressions, duo scenes, signature showdown moments | character chapters, rival events, collaborations | faces never cover communal tiles or the final hand |
-| Modern Japanese | craft, restraint, everyday character detail, strong origin | textiles, tile cases, atelier tables, regional craft chips | venue seasons, regional festivals, maker stories | modernize aggressively; avoid ordinary mahjong-app nostalgia |
-| Graphic Pop | iconic silhouettes, instant expression, emotes, broad accessibility | bold skins, tactile frames, chips, sticker-like identity assets | short themed chapters, challenge boards, social drops | typography and material finish must prevent an indie/cheap feel |
+![D — Modern Japanese Craft](../../art/meta-gacha-lab/meta-d-modern-japanese-craft-941x1672.png)
 
-## What this proof tests
+- Product fantasy: Japanese industrial craft applied to outfit, table, chip, and match FX.
+- Strongest at: Japanese identity, object value, background reuse, low character dependence.
+- Character dependence: low.
+- Pull desire: medium-high through owning a coordinated material set.
+- Risk: calmness can reduce urgency; interaction and reveal motion must supply anticipation.
 
-- **Keeps:** Clean Master's calm background, ivory/jade/brass family, practical vertical hierarchy, character-first meta screen.
-- **Improves:** collectible relationship, scan order, code-ready empty UI zones, scarcity of gold.
-- **Does not decide:** final art direction, rarity tiers, currencies, prices, odds, pity rules, legal presentation, or complete economy.
+### E — Japanese Graphic Pop
+
+![E — Japanese Graphic Pop](../../art/meta-gacha-lab/meta-e-graphic-pop-941x1672.png)
+
+- Product fantasy: Tokyo editorial graphics and tactile arcade packaging.
+- Strongest at: mobile readability, choice clarity, and the most tappable DRAW.
+- Character dependence: medium.
+- Pull desire: highest immediate click impulse.
+- Risk: weak typography or materials could reduce premium perception.
+
+## Comparison matrix
+
+| Direction | Japanese identity | UI clarity | Character appeal | Draw desire | Reusability |
+|---|---:|---:|---:|---:|---:|
+| A Premium Club | 4 | 4 | 4 | 4 | 5 |
+| B Future League | 3 | 5 | 4 | 4 | 5 |
+| C Character Showdown | 4 | 5 | 5 | 4 | 3 |
+| D Japanese Craft | 5 | 4 | 3 | 4 | 5 |
+| E Graphic Pop | 4 | 5 | 4 | 5 | 4 |
+
+Scores are Meta / Gacha Lab hypotheses, not user decisions.
+
+## Proposed synthesis
+
+The strongest combined product language is likely:
+
+- **A** for reusable lobby/background structure;
+- **B** for navigation and competition utility;
+- **C** for character emotion and before/after presentation;
+- **D** for Japanese material identity and object value;
+- **E** for selected states and DRAW tactility.
+
+Do not synthesize before the Control Tower assigns KEEP / MIX / DROP.
 
 ## Exact Control Tower comparison request
 
-At 25% scale, compare `clean-master-gacha.webp` with `meta-gacha-clean-evolution-v1.png` and choose exactly one: **KEEP Clean Master / MIX the new character-plus-signature-set hierarchy into Clean Master / DROP the new proof**.
+Review A–E at 25% scale and return exactly three choices: **BASE UI = one letter / CHARACTER APPEAL = one letter / DRAW DESIRE = one letter**, then mark every image **KEEP / MIX / DROP**.
 
