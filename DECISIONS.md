@@ -12,6 +12,7 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-15 | ACCEPTED | GitHub is the sole canonical project memory; chat transcripts are not source of truth. | Short state files plus PR/checkpoint discipline replace giant context dumps. |
 | 2026-08-15 | ACCEPTED | Use one parent Control Tower plus four specialist lanes. | See `orchestration/CONTROL_TOWER.md`. |
 | 2026-08-15 | PROPOSED | Five macro directions: Grand Casino, Future League, Character Showdown, Modern Japanese, Graphic Pop. | Gate A must compare representative visuals first. |
+| 2026-08-17 | ACCEPTED | Human review screens use direct Japanese questions; internal workflow codes such as KEEP / MIX / DROP are not shown to the user. | One large image, visible progress, three plain-language choices, and swipe/previous/next navigation are the default review pattern. |
 
 ## States
 
@@ -20,4 +21,3 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 - **WORKING BASELINE:** implemented or testable, not mathematically final.
 - **PROPOSED:** awaiting human approval.
 - **REJECTED:** do not revive without new evidence and explicit interest.
-
