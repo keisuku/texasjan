@@ -1,0 +1,64 @@
+{
+  "seed": 2026081603,
+  "baselineDeals": 2000,
+  "experimentDeals": 500,
+  "equitySampleDeals": 12,
+  "equityRollouts": 24,
+  "solverNodeCap": 450000,
+  "configs": [
+    {
+      "id": "baseline_136_c15_4_4_4_p8_free",
+      "label": "Current baseline",
+      "deals": "baselineDeals",
+      "deckCopies": 4,
+      "privateTiles": 8,
+      "communalGroups": [15, 4, 4, 4],
+      "privateRule": { "kind": "free" }
+    },
+    {
+      "id": "p6_only",
+      "label": "Private 6 only",
+      "deals": "experimentDeals",
+      "deckCopies": 4,
+      "privateTiles": 6,
+      "communalGroups": [15, 4, 4, 4],
+      "privateRule": { "kind": "free" }
+    },
+    {
+      "id": "p4_only",
+      "label": "Private 4 only",
+      "deals": "experimentDeals",
+      "deckCopies": 4,
+      "privateTiles": 4,
+      "communalGroups": [15, 4, 4, 4],
+      "privateRule": { "kind": "free" }
+    },
+    {
+      "id": "cadence_15_3_1_1",
+      "label": "15 + 3 + 1 + 1 cadence only",
+      "deals": "experimentDeals",
+      "deckCopies": 4,
+      "privateTiles": 8,
+      "communalGroups": [15, 3, 1, 1],
+      "privateRule": { "kind": "free" }
+    },
+    {
+      "id": "at_least_1_private",
+      "label": "Require at least 1 private",
+      "deals": "experimentDeals",
+      "deckCopies": 4,
+      "privateTiles": 8,
+      "communalGroups": [15, 4, 4, 4],
+      "privateRule": { "kind": "atLeast", "count": 1 }
+    },
+    {
+      "id": "at_least_2_private",
+      "label": "Require at least 2 private",
+      "deals": "experimentDeals",
+      "deckCopies": 4,
+      "privateTiles": 8,
+      "communalGroups": [15, 4, 4, 4],
+      "privateRule": { "kind": "atLeast", "count": 2 }
+    }
+  ]
+}

@@ -49,5 +49,5 @@ What to inspect: Japanese-versus-Chinese coding; background reusability; purpose
 
 ## Exact next action
 
-Review A–E at 25% scale and return exactly three choices: **BASE UI = one letter / CHARACTER APPEAL = one letter / DRAW DESIRE = one letter**, then mark every image **KEEP / MIX / DROP**.
+Open the official visual review page and answer A–E with one direct Japanese choice per image: **この方向で進めたい / 良い部分だけ使いたい / 今回は使わない**.
 

@@ -126,9 +126,9 @@ The strongest combined product language is likely:
 - **D** for Japanese material identity and object value;
 - **E** for selected states and DRAW tactility.
 
-Do not synthesize before the Control Tower assigns KEEP / MIX / DROP.
+Do not synthesize before the Control Tower records the three direct Japanese choices: 「この方向で進めたい」「良い部分だけ使いたい」「今回は使わない」.
 
 ## Exact Control Tower comparison request
 
-Review A–E at 25% scale and return exactly three choices: **BASE UI = one letter / CHARACTER APPEAL = one letter / DRAW DESIRE = one letter**, then mark every image **KEEP / MIX / DROP**.
+Review A–E at 25% scale. For each image choose exactly one: **この方向で進めたい / 良い部分だけ使いたい / 今回は使わない**. If choosing partial use, note the useful part in plain Japanese.
 

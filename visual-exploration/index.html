@@ -3,82 +3,119 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <title>MAHJONG HOLD'EM — Visual Direction Review</title>
+  <meta name="theme-color" content="#071a14">
+  <title>麻雀ホールデム — ビジュアルを選ぶ</title>
   <style>
-    :root{--ink:#13231d;--jade:#0d4b3a;--jade2:#153d32;--ivory:#f4efe3;--gold:#c99d3c;--red:#b8463f;--blue:#2d7187;--line:rgba(244,239,227,.19)}
-    *{box-sizing:border-box}html{background:#081d16;color:var(--ivory);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}
-    body{margin:0;background:radial-gradient(circle at 50% -20%,#27604c 0,#0a281f 36%,#061913 100%);min-height:100vh}
-    button,select,input,textarea{font:inherit}button{cursor:pointer}.shell{max-width:1180px;margin:auto;padding:18px 12px 100px}
-    header{padding:18px 8px 12px}.kicker{font-size:11px;letter-spacing:.23em;color:#dbc480;font-weight:800}.title{font-family:Georgia,"Times New Roman",serif;font-size:clamp(30px,7vw,64px);line-height:.95;margin:10px 0 12px;color:#f7edce}.lead{max-width:780px;color:#b9c8c1;line-height:1.75;font-size:14px}.lead strong{color:#f4db91}
-    .baseline{border:1px solid rgba(219,196,128,.45);background:linear-gradient(135deg,rgba(201,157,60,.18),rgba(13,75,58,.2));padding:13px 15px;border-radius:14px;margin:12px 0 18px;line-height:1.6;font-size:13px}
-    .controls{position:sticky;top:0;z-index:20;background:rgba(6,25,19,.93);backdrop-filter:blur(14px);border:1px solid var(--line);padding:10px;border-radius:14px;display:grid;grid-template-columns:1fr 1fr;gap:8px;box-shadow:0 12px 30px rgba(0,0,0,.25)}
-    .controls select,.controls button{min-height:42px;border-radius:10px;border:1px solid var(--line);background:#12362b;color:#f5f0e5;padding:0 10px}.controls button{font-weight:800}.controls .export{background:linear-gradient(#e6ca78,#b98625);color:#221806;border-color:#f4dea0}
-    .summary{grid-column:1/-1;display:flex;gap:12px;flex-wrap:wrap;padding:3px 4px 0;font-size:12px;color:#acc0b7}.summary b{color:#ffe4a0}
-    .section-title{margin:30px 4px 12px;display:flex;align-items:end;justify-content:space-between;gap:12px}.section-title h2{font-size:18px;margin:0}.section-title span{font-size:11px;color:#9bb0a7}
-    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px}.card{background:linear-gradient(180deg,rgba(23,61,49,.95),rgba(7,31,24,.98));border:1px solid var(--line);border-radius:18px;overflow:hidden;box-shadow:0 14px 35px rgba(0,0,0,.24)}
-    .card.clean{border-color:rgba(219,196,128,.72);box-shadow:0 0 0 1px rgba(201,157,60,.14),0 14px 40px rgba(0,0,0,.34)}.image-wrap{position:relative;background:#020c09}.image-wrap img{display:block;width:100%;aspect-ratio:941/1672;object-fit:cover}.image-wrap button{position:absolute;inset:0;border:0;background:transparent;color:transparent}.tag{position:absolute;left:10px;top:10px;padding:6px 9px;border-radius:999px;background:rgba(4,19,14,.78);border:1px solid rgba(255,255,255,.25);font-size:10px;font-weight:900;letter-spacing:.08em;color:#fff}.tag.strong{background:rgba(166,119,20,.9)}
-    .body{padding:13px}.meta{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}.meta h3{font-size:15px;line-height:1.35;margin:0}.meta small{color:#91aaa0;white-space:nowrap}.old-verdict{font-size:10px;color:#d8c27c;margin:6px 0 0}.votes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0}.vote{min-height:40px;border-radius:9px;border:1px solid var(--line);background:#0c2a21;color:#d7e2dd;font-size:12px;font-weight:900}.vote.on[data-v="KEEP"]{background:#d3b34f;color:#1f1704}.vote.on[data-v="MIX"]{background:#287185;color:white}.vote.on[data-v="DROP"]{background:#963b35;color:white}
-    .rating{display:flex;align-items:center;gap:9px;font-size:11px;color:#9bb0a7}.rating input{width:100%;accent-color:#d0aa43}.score{min-width:28px;color:#f5d77f;font-weight:900}.note{width:100%;min-height:66px;margin-top:10px;resize:vertical;border-radius:9px;border:1px solid var(--line);background:#082119;color:#eef3f0;padding:9px;line-height:1.5;font-size:12px}.note::placeholder{color:#728c81}
-    dialog{width:min(94vw,760px);max-height:94vh;padding:0;border:1px solid #8b763b;border-radius:15px;background:#061913;color:#fff;box-shadow:0 30px 80px #000}.modalbar{display:flex;justify-content:space-between;align-items:center;padding:9px 12px;background:#102f25;position:sticky;top:0}.modalbar button{border:1px solid var(--line);background:#173f33;color:#fff;border-radius:8px;padding:8px 12px}.modalimg{width:100%;display:block}dialog::backdrop{background:rgba(0,0,0,.86)}
-    .plan{margin:32px 0 0;border:1px solid var(--line);border-radius:16px;padding:17px;background:rgba(8,33,25,.72)}.plan h2{margin:0 0 10px;font-size:19px}.directions{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:8px}.direction{padding:12px;border-radius:11px;background:#11372b;border:1px solid var(--line)}.direction b{display:block;color:#f2d27c;margin-bottom:5px}.direction span{font-size:12px;line-height:1.55;color:#adc0b8}
-    .toast{position:fixed;left:50%;bottom:22px;translate:-50% 20px;background:#f2d27c;color:#1c1607;padding:10px 16px;border-radius:999px;font-weight:900;font-size:12px;opacity:0;pointer-events:none;transition:.2s;z-index:50}.toast.on{opacity:1;translate:-50% 0}
-    @media(min-width:720px){.controls{grid-template-columns:180px 180px 1fr auto auto}.summary{grid-column:auto;align-items:center}.shell{padding-top:30px}}
+    :root{--bg:#071a14;--ivory:#f8f1df;--gold:#dfbd62;--line:rgba(248,241,223,.16)}
+    *{box-sizing:border-box}html{background:var(--bg);color:var(--ivory);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif}body{margin:0;min-height:100vh;background:radial-gradient(circle at 50% -15%,#275a47 0,#0a271e 38%,#061611 100%)}
+    button,select,textarea{font:inherit}button{cursor:pointer}.shell{width:min(100%,760px);margin:auto;padding:env(safe-area-inset-top) 12px calc(34px + env(safe-area-inset-bottom))}
+    header{padding:22px 4px 14px}.eyebrow{color:#dcc77f;font-size:11px;font-weight:800;letter-spacing:.12em}.title{font-size:clamp(28px,8vw,46px);line-height:1.15;margin:8px 0}.lead{margin:0;color:#c4d0cb;font-size:14px;line-height:1.7}.lead b{color:#ffe49b}
+    .status{position:sticky;top:0;z-index:20;padding:10px 0;background:linear-gradient(var(--bg) 72%,transparent)}.statusbox{border:1px solid var(--line);background:rgba(9,31,24,.94);backdrop-filter:blur(14px);border-radius:14px;padding:11px;box-shadow:0 12px 28px rgba(0,0,0,.28)}
+    .progressline{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13px}.progressline b{color:#ffe49b;font-size:15px}.track{height:6px;border-radius:999px;background:#193c31;margin:9px 0 10px;overflow:hidden}.track span{display:block;height:100%;width:0;background:linear-gradient(90deg,#c59a34,#f2d984);transition:width .2s}
+    .filters{display:grid;grid-template-columns:1fr 1fr;gap:8px}.filters select{min-height:42px;width:100%;border:1px solid var(--line);border-radius:10px;background:#12382c;color:#fff;padding:0 10px}
+    .review{border:1px solid var(--line);border-radius:19px;overflow:hidden;background:linear-gradient(180deg,#14392d,#09231a);box-shadow:0 20px 44px rgba(0,0,0,.3)}.imagearea{position:relative;background:#020a08;touch-action:pan-y}.imagearea img{display:block;width:100%;max-height:min(66vh,820px);aspect-ratio:941/1672;object-fit:contain}.badge{position:absolute;left:11px;top:11px;padding:7px 10px;border:1px solid rgba(255,255,255,.3);border-radius:999px;background:rgba(4,18,13,.82);font-size:11px;font-weight:800}.position{position:absolute;right:11px;top:11px;padding:7px 10px;border-radius:999px;background:rgba(4,18,13,.82);font-weight:800;font-size:12px}.zoom{position:absolute;right:11px;bottom:11px;border:1px solid rgba(255,255,255,.34);border-radius:10px;background:rgba(4,18,13,.84);color:#fff;padding:9px 12px;font-weight:800;font-size:12px}
+    .details{padding:15px}.details h2{font-size:19px;line-height:1.4;margin:0}.history{font-size:12px;color:#d8c57f;margin:5px 0 0}.question{font-size:17px;font-weight:900;margin:18px 0 10px}.choices{display:grid;gap:8px}.choice{display:grid;grid-template-columns:28px 1fr;align-items:center;text-align:left;gap:10px;min-height:58px;padding:10px 13px;border-radius:12px;border:1px solid var(--line);background:#0a281f;color:#fff}.choice .mark{display:grid;place-items:center;width:26px;height:26px;border:1px solid rgba(255,255,255,.24);border-radius:50%;font-weight:900}.choice b{display:block;font-size:14px}.choice small{display:block;color:#9fb5ab;margin-top:2px}.choice.on[data-v="KEEP"]{background:#d8b652;color:#1e1706;border-color:#ffe69b}.choice.on[data-v="KEEP"] small,.choice.on[data-v="KEEP"] .mark{color:#392b08}.choice.on[data-v="MIX"]{background:#267a8e;border-color:#78c5d6}.choice.on[data-v="DROP"]{background:#903f39;border-color:#e28c83}
+    .note-label{display:block;margin-top:14px;color:#c8d4cf;font-size:12px;font-weight:800}.note{width:100%;min-height:72px;margin-top:7px;resize:vertical;border-radius:10px;border:1px solid var(--line);background:#071e17;color:#fff;padding:10px;line-height:1.55}.note::placeholder{color:#759086}
+    .nav{display:grid;grid-template-columns:1fr 1.35fr 1fr;gap:8px;padding:13px 15px 16px}.nav button{min-height:48px;border:1px solid var(--line);border-radius:11px;background:#12382c;color:#fff;font-weight:900}.nav .next{background:linear-gradient(#ead17f,#c39731);color:#241b06;border-color:#f5dfa1}.nav button:disabled{opacity:.34;cursor:default}.hint{text-align:center;color:#8fa79d;font-size:11px;margin:10px 0 18px}
+    .empty{padding:50px 20px;text-align:center;color:#c6d2cd}.actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:16px}.actions button{min-height:46px;border-radius:11px;border:1px solid var(--line);background:#10362a;color:#fff;font-weight:800}.actions .primary{background:#d3b253;color:#211805}
+    dialog{width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:#030a08;color:#fff}dialog::backdrop{background:#000}.viewerbar{position:fixed;inset:0 0 auto;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 12px 10px;background:linear-gradient(rgba(0,0,0,.88),transparent)}.viewerbar b{font-size:13px;text-shadow:0 2px 5px #000}.viewerbar button{border:1px solid rgba(255,255,255,.35);border-radius:10px;background:rgba(0,0,0,.6);color:#fff;padding:9px 13px;font-weight:800}.viewerbody{height:100%;display:grid;place-items:center;touch-action:pan-y}.viewerbody img{display:block;width:100%;height:100%;object-fit:contain}.viewernav{position:fixed;inset:auto 0 0;display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:linear-gradient(transparent,rgba(0,0,0,.88))}.viewernav button{min-height:48px;border:1px solid rgba(255,255,255,.3);border-radius:11px;background:rgba(15,47,37,.88);color:#fff;font-weight:900}
+    .toast{position:fixed;left:50%;bottom:calc(18px + env(safe-area-inset-bottom));translate:-50% 18px;z-index:50;opacity:0;pointer-events:none;white-space:nowrap;border-radius:999px;background:#f1d47f;color:#1e1706;padding:11px 16px;font-size:12px;font-weight:900;transition:.2s}.toast.on{opacity:1;translate:-50% 0}
+    @media(min-width:680px){.shell{padding-left:18px;padding-right:18px}.choices{grid-template-columns:repeat(3,1fr)}.choice{grid-template-columns:1fr;text-align:center;place-items:center}.choice .mark{margin:auto}.details{padding:18px 20px}.nav{padding:15px 20px 20px}}
   </style>
 </head>
 <body>
 <div class="shell">
   <header>
-    <div class="kicker">MAHJONG HOLD'EM / VISUAL DIRECTION REVIEW</div>
-    <h1 class="title">Clean first.<br>Then choose the world.</h1>
-    <p class="lead">既存21案をスマホで選別する引き継ぎ用ギャラリーです。<strong>最新Clean 3案は現在の最強基準</strong>ですが、最終決定ではありません。次は上位概念5方向×10画面を同じ仕組みで比較します。</p>
+    <div class="eyebrow">麻雀ホールデム｜ビジュアル選定</div>
+    <h1 class="title">1枚ずつ見て、<br>直感で選ぶ。</h1>
+    <p class="lead">難しい評価は不要です。画像を大きく見て、<b>いちばん近い答えを1つ</b>選んでください。</p>
   </header>
-  <div class="baseline"><b>最重要：</b>「5千倍前進」評価を受けたClean Mastersを壊さず比較基準にする。細部の磨き込みへ直行せず、Grand Casino / Future League / Character Showdown / Modern Japanese / Graphic Pop の5方向を先に承認する。</div>
-  <div class="controls">
-    <select id="setFilter"><option value="all">全セット</option><option value="clean">Clean Masters</option><option value="v2">旧V2・18画面</option></select>
-    <select id="verdictFilter"><option value="all">全評価</option><option value="KEEP">KEEPのみ</option><option value="MIX">MIXのみ</option><option value="DROP">DROPのみ</option><option value="unset">未評価のみ</option></select>
-    <div class="summary" id="summary"></div>
-    <button class="export" id="exportBtn">テキストをコピー</button>
-    <button id="jsonBtn">JSON保存</button>
-  </div>
-  <div class="section-title"><h2>既存ビジュアル 21案</h2><span>画像タップで拡大</span></div>
-  <main class="grid" id="grid"></main>
-  <section class="plan">
-    <h2>次の50案 — 承認待ちの5方向</h2>
-    <div class="directions">
-      <div class="direction"><b>A｜Grand Casino</b><span>現在のClean基準。明るい未来の高級麻雀カジノ。</span></div>
-      <div class="direction"><b>B｜Future League</b><span>世界大会・中継競技。手番と賭けの緊張を最優先。</span></div>
-      <div class="direction"><b>C｜Character Showdown</b><span>Poker Chaseを洗練。キャラと感情・課金商品力。</span></div>
-      <div class="direction"><b>D｜Modern Japanese</b><span>漆・陶器・和紙を現代化した日本発の高級競技。</span></div>
-      <div class="direction"><b>E｜Graphic Pop</b><span>触感と瞬間視認性を主役にした大胆なモバイル戦略。</span></div>
+  <div class="status"><div class="statusbox">
+    <div class="progressline"><span>回答済み <b id="answered">0 / 26</b></span><span id="currentPosition">1 / 26</span></div>
+    <div class="track"><span id="progress"></span></div>
+    <div class="filters">
+      <select id="setFilter" aria-label="表示する画像群"><option value="all">すべての案</option><option value="clean">現在の基準 3案</option><option value="meta">新しいガチャ案 5案</option><option value="v2">以前の案 18案</option></select>
+      <select id="verdictFilter" aria-label="回答で絞り込む"><option value="all">すべての回答</option><option value="unset">まだ答えていない</option><option value="KEEP">進めたい</option><option value="MIX">部分だけ使いたい</option><option value="DROP">今回は使わない</option></select>
     </div>
-  </section>
+  </div></div>
+  <main id="review"></main>
+  <p class="hint">画像部分を左右にスワイプしても移動できます</p>
+  <div class="actions"><button class="primary" id="copyBtn">回答をコピー</button><button id="jsonBtn">回答をファイル保存</button></div>
 </div>
-<dialog id="viewer"><div class="modalbar"><b id="viewerTitle"></b><button id="closeViewer">閉じる</button></div><img class="modalimg" id="viewerImg" alt=""></dialog>
-<div class="toast" id="toast">完了しました</div>
+<dialog id="viewer">
+  <div class="viewerbar"><b id="viewerTitle"></b><button id="closeViewer">閉じる</button></div>
+  <div class="viewerbody" id="viewerBody"><img id="viewerImg" alt=""></div>
+  <div class="viewernav"><button id="viewerPrev">← 前の案</button><button id="viewerNext">次の案 →</button></div>
+</dialog>
+<div class="toast" id="toast">保存しました</div>
 <script>
 const clean=[
- {id:'clean-match',set:'clean',title:'Clean Master — Match',file:'../art/clean-masters/clean-master-match.webp',old:'STRONG KEEP / 現在の最強基準'},
- {id:'clean-lobby',set:'clean',title:'Clean Master — Lobby',file:'../art/clean-masters/clean-master-lobby.webp',old:'STRONG KEEP / 現在の最強基準'},
- {id:'clean-gacha',set:'clean',title:'Clean Master — Gacha',file:'../art/clean-masters/clean-master-gacha.webp',old:'STRONG KEEP / 現在の最強基準'}
+  {id:'clean-match',set:'clean',title:'対局画面',file:'../art/clean-masters/clean-master-match.webp',old:'現在の比較基準'},
+  {id:'clean-lobby',set:'clean',title:'ロビー画面',file:'../art/clean-masters/clean-master-lobby.webp',old:'現在の比較基準'},
+  {id:'clean-gacha',set:'clean',title:'ガチャ画面',file:'../art/clean-masters/clean-master-gacha.webp',old:'現在の比較基準'}
 ];
-const v2names=['Title / Opening','Character Lobby','Mode Select','Character Roster','Character Detail','Gacha Banner','Gacha Result','Customization','Shop / Season Pass','Rank Progression','Missions / Event','Tournament Bracket','Betting Decision','+4 Reveal','Tenpai Focus','All-in Pressure','River / Tsumo','Match Result'];
+const meta=[
+  {id:'meta-a',set:'meta',title:'A｜現代日本プレミアムクラブ',file:'../art/meta-gacha-lab/meta-a-japanese-premium-club-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-b',set:'meta',title:'B｜日本発フューチャーリーグ',file:'../art/meta-gacha-lab/meta-b-future-league-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-c',set:'meta',title:'C｜キャラクター対決',file:'../art/meta-gacha-lab/meta-c-character-showdown-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-d',set:'meta',title:'D｜現代日本工芸',file:'../art/meta-gacha-lab/meta-d-modern-japanese-craft-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-e',set:'meta',title:'E｜日本グラフィックポップ',file:'../art/meta-gacha-lab/meta-e-graphic-pop-941x1672.png',old:'新しい比較候補（未決定）'}
+];
+const names=['タイトル・開始画面','キャラクターロビー','モード選択','キャラクター一覧','キャラクター詳細','ガチャ告知','ガチャ結果','着せ替え','ショップ・シーズンパス','ランク進行','ミッション・イベント','大会表','賭ける場面','4枚公開','テンパイ注目','オールインの緊張','決着・ツモ','対局結果'];
 const files=['01-title-opening','02-character-lobby','03-mode-select','04-character-roster','05-character-detail','06-gacha-banner','07-gacha-result','08-customization','09-shop-season-pass','10-rank-progression','11-missions-event','12-tournament-bracket','13-betting-decision','14-four-tile-reveal','15-tenpai-focus','16-all-in-pressure','17-river-tsumo','18-match-result'];
-const kept=new Set([1,5,7,8,10,11,13,14,15,16,17,18]);
-const items=[...clean,...files.map((f,i)=>({id:`v2-${String(i+1).padStart(2,'0')}`,set:'v2',title:`V2 ${String(i+1).padStart(2,'0')} — ${v2names[i]}`,file:`../art/visual-archive/v2/${f}.webp`,old:kept.has(i+1)?'過去評価 KEEP':'過去評価 DROP'}))];
-const key='mahjong-holdem-visual-review-v3';let state=JSON.parse(localStorage.getItem(key)||'{}');
-const grid=document.querySelector('#grid'),viewer=document.querySelector('#viewer'),viewerImg=document.querySelector('#viewerImg'),viewerTitle=document.querySelector('#viewerTitle');
-function save(){localStorage.setItem(key,JSON.stringify(state));summary()}
-function render(){const sf=document.querySelector('#setFilter').value,vf=document.querySelector('#verdictFilter').value;grid.innerHTML='';items.filter(x=>(sf==='all'||x.set===sf)&&((vf==='all')||(vf==='unset'&&!state[x.id]?.verdict)||(state[x.id]?.verdict===vf))).forEach(x=>{const s=state[x.id]||{};const el=document.createElement('article');el.className='card '+(x.set==='clean'?'clean':'');el.innerHTML=`<div class="image-wrap"><img loading="lazy" src="${x.file}" alt="${x.title}"><span class="tag ${x.set==='clean'?'strong':''}">${x.set==='clean'?'CLEAN MASTER':'V2 ARCHIVE'}</span><button aria-label="拡大"></button></div><div class="body"><div class="meta"><h3>${x.title}</h3><small>${x.set==='clean'?'941×1672':'V2'}</small></div><div class="old-verdict">${x.old}</div><div class="votes">${['KEEP','MIX','DROP'].map(v=>`<button class="vote ${s.verdict===v?'on':''}" data-v="${v}">${v}</button>`).join('')}</div><label class="rating">評価 <input type="range" min="1" max="5" step="1" value="${s.score||3}"><span class="score">${s.score||3}/5</span></label><textarea class="note" placeholder="残す部分・直す部分・MIX先">${s.note||''}</textarea></div>`;
- el.querySelector('.image-wrap button').onclick=()=>{viewerImg.src=x.file;viewerTitle.textContent=x.title;viewer.showModal()};
- el.querySelectorAll('.vote').forEach(b=>b.onclick=()=>{state[x.id]={...state[x.id],verdict:b.dataset.v};save();render()});
- const range=el.querySelector('input'),score=el.querySelector('.score');range.oninput=()=>{score.textContent=range.value+'/5';state[x.id]={...state[x.id],score:+range.value};save()};
- el.querySelector('textarea').onchange=e=>{state[x.id]={...state[x.id],note:e.target.value};save()};grid.appendChild(el)});summary()}
-function summary(){const c={KEEP:0,MIX:0,DROP:0,unset:0};items.forEach(x=>{const v=state[x.id]?.verdict;c[v||'unset']++});document.querySelector('#summary').innerHTML=`<span>KEEP <b>${c.KEEP}</b></span><span>MIX <b>${c.MIX}</b></span><span>DROP <b>${c.DROP}</b></span><span>未評価 <b>${c.unset}</b></span>`}
-function exportText(){const lines=['MAHJONG HOLD\'EM Visual Review',''];['KEEP','MIX','DROP'].forEach(v=>{lines.push(v+':');items.filter(x=>state[x.id]?.verdict===v).forEach(x=>lines.push(`- ${x.title} / ${state[x.id].score||3}点 / ${state[x.id].note||'メモなし'}`));lines.push('')});lines.push('未評価: '+items.filter(x=>!state[x.id]?.verdict).map(x=>x.id).join(', '));return lines.join('\n')}
-function exportJson(){const payload={schemaVersion:1,exportedAt:new Date().toISOString(),reviewKey:key,items:items.map(x=>({...x,verdict:state[x.id]?.verdict||null,score:state[x.id]?.score||3,note:state[x.id]?.note||''}))};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='mahjong-holdem-visual-review.json';a.click();URL.revokeObjectURL(url)}
-document.querySelector('#exportBtn').onclick=async()=>{await navigator.clipboard.writeText(exportText());const t=document.querySelector('#toast');t.textContent='テキストをコピーしました';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500)};
-document.querySelector('#jsonBtn').onclick=()=>{exportJson();const t=document.querySelector('#toast');t.textContent='JSONを保存しました';t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1500)};
-document.querySelector('#setFilter').onchange=render;document.querySelector('#verdictFilter').onchange=render;document.querySelector('#closeViewer').onclick=()=>viewer.close();viewer.onclick=e=>{if(e.target===viewer)viewer.close()};render();
+const previousKeeps=new Set([1,5,7,8,10,11,13,14,15,16,17,18]);
+const items=[...clean,...meta,...files.map((file,index)=>({id:`v2-${String(index+1).padStart(2,'0')}`,set:'v2',title:names[index],file:`../art/visual-archive/v2/${file}.webp`,old:previousKeeps.has(index+1)?'以前の選定では候補に残った案':'以前の選定では見送った案'}))];
+const setLabels={clean:'現在の基準',meta:'新しいガチャ案',v2:'以前の案'};
+const labels={KEEP:'この方向で進めたい',MIX:'良い部分だけ使いたい',DROP:'今回は使わない'};
+const storageKey='mahjong-holdem-visual-review-v3';
+let state=JSON.parse(localStorage.getItem(storageKey)||'{}');
+let currentIndex=0;
+let touchStartX=0;
+const review=document.querySelector('#review');
+const viewer=document.querySelector('#viewer');
+function filteredItems(){
+  const setValue=document.querySelector('#setFilter').value;
+  const verdictValue=document.querySelector('#verdictFilter').value;
+  return items.filter(item=>(setValue==='all'||item.set===setValue)&&(verdictValue==='all'||(verdictValue==='unset'&&!state[item.id]?.verdict)||state[item.id]?.verdict===verdictValue));
+}
+function save(){localStorage.setItem(storageKey,JSON.stringify(state));updateProgress()}
+function updateProgress(){const answered=items.filter(item=>state[item.id]?.verdict).length;document.querySelector('#answered').textContent=`${answered} / ${items.length}`;document.querySelector('#progress').style.width=`${answered/items.length*100}%`}
+function move(delta){const visible=filteredItems();if(!visible.length)return;currentIndex=Math.max(0,Math.min(visible.length-1,currentIndex+delta));render()}
+function choose(id,verdict){state[id]={...state[id],verdict};save();render()}
+function render(){
+  const visible=filteredItems();
+  if(currentIndex>=visible.length)currentIndex=Math.max(0,visible.length-1);
+  if(!visible.length){review.innerHTML='<section class="review empty"><b>この条件に合う画像はありません。</b><p>上の絞り込みを変更してください。</p></section>';document.querySelector('#currentPosition').textContent='0 / 0';updateProgress();return}
+  const item=visible[currentIndex];const selected=state[item.id]?.verdict;
+  document.querySelector('#currentPosition').textContent=`${currentIndex+1} / ${visible.length}`;
+  review.innerHTML=`<article class="review">
+    <div class="imagearea" id="swipeArea"><img src="${item.file}" alt="${item.title}"><span class="badge">${setLabels[item.set]}</span><span class="position">${currentIndex+1} / ${visible.length}</span><button class="zoom" id="zoomBtn">全画面で見る</button></div>
+    <div class="details"><h2>${item.title}</h2><p class="history">${item.old}</p><p class="question">この案をどうしたいですか？</p>
+      <div class="choices">
+        <button class="choice ${selected==='KEEP'?'on':''}" data-v="KEEP"><span class="mark">○</span><span><b>この方向で進めたい</b><small>ほぼこの方向を基準にする</small></span></button>
+        <button class="choice ${selected==='MIX'?'on':''}" data-v="MIX"><span class="mark">＋</span><span><b>良い部分だけ使いたい</b><small>構図・色・キャラなどを採用</small></span></button>
+        <button class="choice ${selected==='DROP'?'on':''}" data-v="DROP"><span class="mark">×</span><span><b>今回は使わない</b><small>次の比較から外す</small></span></button>
+      </div>
+      <label class="note-label">伝えたいことがあれば（任意）<textarea class="note" id="note" placeholder="例：キャラの大きさは好き。背景はもっと静かに。">${state[item.id]?.note||''}</textarea></label>
+    </div>
+    <nav class="nav"><button id="prevBtn" ${currentIndex===0?'disabled':''}>← 前へ</button><button id="nextUnanswered">未回答へ</button><button class="next" id="nextBtn" ${currentIndex===visible.length-1?'disabled':''}>次へ →</button></nav>
+  </article>`;
+  document.querySelectorAll('.choice').forEach(button=>button.onclick=()=>choose(item.id,button.dataset.v));
+  document.querySelector('#note').onchange=event=>{state[item.id]={...state[item.id],note:event.target.value};save();toast('メモを保存しました')};
+  document.querySelector('#prevBtn').onclick=()=>move(-1);document.querySelector('#nextBtn').onclick=()=>move(1);
+  document.querySelector('#nextUnanswered').onclick=()=>{const next=visible.findIndex((candidate,index)=>index>currentIndex&&!state[candidate.id]?.verdict);const first=visible.findIndex(candidate=>!state[candidate.id]?.verdict);currentIndex=next>=0?next:first>=0?first:currentIndex;render()};
+  document.querySelector('#zoomBtn').onclick=()=>openViewer(item);bindSwipe(document.querySelector('#swipeArea'));updateProgress();
+}
+function bindSwipe(element){element.ontouchstart=event=>{touchStartX=event.changedTouches[0].screenX};element.ontouchend=event=>{const distance=event.changedTouches[0].screenX-touchStartX;if(Math.abs(distance)<55)return;move(distance<0?1:-1);if(viewer.open)syncViewer()}}
+function openViewer(item){document.querySelector('#viewerImg').src=item.file;document.querySelector('#viewerImg').alt=item.title;document.querySelector('#viewerTitle').textContent=`${currentIndex+1} / ${filteredItems().length}　${item.title}`;viewer.showModal()}
+function syncViewer(){const visible=filteredItems();if(!visible.length)return;const item=visible[currentIndex];document.querySelector('#viewerImg').src=item.file;document.querySelector('#viewerImg').alt=item.title;document.querySelector('#viewerTitle').textContent=`${currentIndex+1} / ${visible.length}　${item.title}`}
+function exportText(){const lines=['麻雀ホールデム　ビジュアル選定結果',''];['KEEP','MIX','DROP'].forEach(verdict=>{lines.push(labels[verdict]);items.filter(item=>state[item.id]?.verdict===verdict).forEach(item=>lines.push(`・${item.title}${state[item.id]?.note?`：${state[item.id].note}`:''}`));lines.push('')});lines.push(`未回答：${items.filter(item=>!state[item.id]?.verdict).length}件`);return lines.join('\n')}
+function exportJson(){const payload={schemaVersion:2,exportedAt:new Date().toISOString(),reviewKey:storageKey,items:items.map(item=>({...item,verdict:state[item.id]?.verdict||null,verdictLabel:labels[state[item.id]?.verdict]||null,note:state[item.id]?.note||''}))};const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const anchor=document.createElement('a');anchor.href=url;anchor.download='mahjong-holdem-visual-review.json';anchor.click();URL.revokeObjectURL(url)}
+function toast(message){const element=document.querySelector('#toast');element.textContent=message;element.classList.add('on');setTimeout(()=>element.classList.remove('on'),1500)}
+document.querySelector('#setFilter').onchange=()=>{currentIndex=0;render()};document.querySelector('#verdictFilter').onchange=()=>{currentIndex=0;render()};
+document.querySelector('#copyBtn').onclick=async()=>{await navigator.clipboard.writeText(exportText());toast('回答をコピーしました')};document.querySelector('#jsonBtn').onclick=()=>{exportJson();toast('回答を保存しました')};
+document.querySelector('#closeViewer').onclick=()=>viewer.close();document.querySelector('#viewerPrev').onclick=()=>{move(-1);syncViewer()};document.querySelector('#viewerNext').onclick=()=>{move(1);syncViewer()};bindSwipe(document.querySelector('#viewerBody'));
+document.addEventListener('keydown',event=>{if(event.key==='ArrowLeft'){move(-1);if(viewer.open)syncViewer()}if(event.key==='ArrowRight'){move(1);if(viewer.open)syncViewer()}});render();
 </script>
 </body>
 </html>
