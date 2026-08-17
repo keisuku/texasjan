@@ -25,6 +25,11 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-17 | REJECTED | B｜日本発フューチャーリーグ、E｜日本グラフィックポップを今回の主方向として使う。 | Gate Aの明示的な人間判断。 |
 | 2026-08-17 | REJECTED | 現行のガチャ告知、分散したガチャ結果、ごちゃついたショップ・ランク・ミッション、テンパイ注目をそのまま使う。 | 直感性と管理可能性を優先して再設計または今回見送り。 |
 
+| 2026-08-17 | ACCEPTED | ベットの手番は画面上の席配置に沿って時計回りに進める。 | 明示的な手番配列 [0,1,3,5,4,2] を状態機械へ渡し、FOLD / ALL-IN席を飛ばしても順序を保持する。 |
+| 2026-08-17 | ACCEPTED | RAISEとALL-INは、実行前に最小額から全持ち点まで調整できる金額バーを開く。 | スライダー、±100、最小、1/2 POT、POT、ALL-INプリセットを用意し、確定前はPOTを動かさない。 |
+| 2026-08-17 | ACCEPTED | 通常の共通牌公開は15＋4＋4＝23枚で終了する。 | 3回目の＋4は通常進行から外し、3ストリートの固定seed基準値へ更新する。 |
+| 2026-08-17 | PROPOSED | 各局POTは1位総取りを維持し、複数局の試合全体のみ最終賞金85% / 15%を比較検証する。 | 各局で2位へ配ると弱いCALLとALL-INを過度に救済し、FOLDとブラフを壊すため。docs/rules/PAYOUT_STRUCTURE_2026-08-17.md |
+
 ## States
 
 - ACCEPTED: explicitly approved direction.
