@@ -30,6 +30,11 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-17 | ACCEPTED | 通常の共通牌公開は15＋4＋4＝23枚で終了する。 | 3回目の＋4は通常進行から外し、3ストリートの固定seed基準値へ更新する。 |
 | 2026-08-17 | PROPOSED | 各局POTは1位総取りを維持し、複数局の試合全体のみ最終賞金85% / 15%を比較検証する。 | 各局で2位へ配ると弱いCALLとALL-INを過度に救済し、FOLDとブラフを壊すため。docs/rules/PAYOUT_STRUCTURE_2026-08-17.md |
 
+| 2026-08-18 | REJECTED | art/gate-b/gate-b-08-plus4-raise-slider-v1.png を候補・参考・修正元として使う。 | 承認済み世界観を継承せず、人物・卓・牌・情報構造が破綻した低品質初稿。画像はGitHubから削除する。 |
+| 2026-08-18 | ACCEPTED | 内部品質確認を通らない生成初稿を人間レビューやGitHubへ出さない。 | Gate Bは941×1672、約25%縮小、承認済み基準との比較、席・牌・文字・人物の破綻確認を通った候補だけ進捗として数える。 |
+| 2026-08-18 | PROPOSED | ショーダウンでは非フォールド全員の私牌8枚と実際の最終14枚を保存し、一人ずつ切り替えるインスペクターで公開する。 | 8枚だけでは23枚の共通牌から最終14枚を人間が再構成できない。docs/rules/SHOWDOWN_VISIBILITY_2026-08-18.md |
+| 2026-08-18 | PROPOSED | ALL-IN後、全ライブプレイヤーの追加ベット可能性がなくなった時点で私牌8枚を公開し、残りの＋4をランアウトする。 | Poker TDA Rule 16と同じ「判断終了後に完全公開」の原則。追加判断が残る間は公開しない。 |
+
 ## States
 
 - ACCEPTED: explicitly approved direction.
