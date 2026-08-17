@@ -17,6 +17,13 @@ f.onload=function(){setTimeout(function(){
     ok(t.left>=a.left-1&&t.right<=a.right+1&&t.top>=a.top-1&&t.bottom<=a.bottom+1,
       name+": 主要操作が画面内に収まる");
   });
+  w.go("game");
+  const raise=d.getElementById("bRaise");
+  if(!raise.disabled)raise.click();
+  const sheet=d.getElementById("raiseSheet"),a=d.getElementById("app").getBoundingClientRect(),s=sheet.getBoundingClientRect();
+  ok(sheet.classList.contains("open"),"RAISEで金額調整バーが開く");
+  ok(s.left>=a.left-1&&s.right<=a.right+1&&s.top>=a.top-1&&s.bottom<=a.bottom+1,
+    "金額調整バーが390px画面内に収まる");
   document.getElementById("out").textContent=log.join("\n")+"\n\n"+
     log.filter(function(x){return x.indexOf("FAIL")===0;}).length+" FAIL / "+log.length+" total";
   document.title="DONE";
