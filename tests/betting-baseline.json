@@ -2,28 +2,39 @@
   "generatedBy": "node tests/simulate-betting.js 100000",
   "seed": "0x5eed1234",
   "hands": 100000,
+  "actionOrder": [
+    0,
+    1,
+    3,
+    5,
+    4,
+    2
+  ],
+  "streets": [
+    "common15",
+    "plus4I",
+    "plus4II"
+  ],
   "potMedian": {
     "common15": 1634,
     "plus4I": 2534,
-    "plus4II": 3134,
-    "plus4III": 4934
+    "plus4II": 3134
   },
   "potP90": {
     "common15": 2234,
     "plus4I": 3134,
-    "plus4II": 4634,
-    "plus4III": 7034
+    "plus4II": 4634
   },
-  "potMaxObserved": 22334,
+  "potMaxObserved": 10034,
   "orbitActionsMedian": 6,
   "orbitActionsP90": 10,
   "actions": {
-    "checks": 1480475,
-    "calls": 1101963,
-    "raises": 234077,
-    "folds": 26884,
+    "checks": 1165275,
+    "calls": 780536,
+    "raises": 164430,
+    "folds": 17576,
     "allins": 0
   },
   "conservationFailures": 0,
-  "interpretation": "CALL/CHECK固定のユーザーに対するBOT基準値。勝率・役分布の完成基準ではなく、賭けテンポの回帰検査用。"
+  "interpretation": "時計回り・15＋4＋4のCALL/CHECK固定ユーザーに対するBOT基準値。勝率・役分布や2位賞金の完成基準ではなく、賭けテンポの回帰検査用。"
 }

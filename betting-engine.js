@@ -22,13 +22,23 @@
     for(let i=0;i<n;i++)out[i]=Math.max(0,Number(a&&a[i])||0);
     return out;
   }
+  function normalizeActionOrder(input,n){
+    const fallback=Array.from({length:n},function(_,i){return i;});
+    if(!Array.isArray(input)||input.length!==n)return fallback;
+    const seen=new Set(input);
+    if(seen.size!==n||input.some(function(i){return !Number.isInteger(i)||i<0||i>=n;}))return fallback;
+    return input.slice();
+  }
   function canAct(s,i){return !s.folded[i]&&!s.allIn[i]&&s.stacks[i]>0;}
   function livePlayers(s){
     const out=[];for(let i=0;i<s.playerCount;i++)if(!s.folded[i])out.push(i);return out;
   }
   function nextActor(s,after){
-    for(let step=1;step<=s.playerCount;step++){
-      const i=(after+step+s.playerCount)%s.playerCount;
+    const order=s.actionOrder;
+    let at=order.indexOf(after);
+    if(at<0)at=order.length-1;
+    for(let step=1;step<=order.length;step++){
+      const i=order[(at+step)%order.length];
       if(canAct(s,i))return i;
     }
     return -1;
@@ -52,6 +62,7 @@
     const n=Math.max(2,Number(config.playerCount)||6);
     const s={
       playerCount:n,userIndex:Number(config.userIndex),dealerIndex:Number(config.dealerIndex)||0,
+      actionOrder:normalizeActionOrder(config.actionOrder,n),
       street:Number(config.street)||1,phase:"acting",currentActor:-1,
       stacks:cloneNum(config.stacks,n),folded:cloneBool(config.folded,n,false),
       allIn:new Array(n).fill(false),acted:new Array(n).fill(false),

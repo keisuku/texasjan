@@ -32,6 +32,19 @@ try{
   ok(s.actions[0].type==="ALL-IN"&&s.stacks[0]===0,"最低レイズ未満でも全持ち点ならALL-IN可能");
   MahjongBetting.act(s,1,"raise",150);MahjongBetting.act(s,2,"call");
   ok(s.phase==="complete"&&s.roundBets.join(",")==="50,150,150","ショートALL-INを含む一巡が閉じる");
+
+  const clockwise=[0,1,3,5,4,2];
+  s=MahjongBetting.startRound({playerCount:6,userIndex:5,dealerIndex:5,actionOrder:clockwise,
+    stacks:[1000,1000,1000,1000,1000,1000],folded:[],minRaise:100});
+  const seen=[];
+  while(s.phase==="acting"){seen.push(s.currentActor);MahjongBetting.act(s,s.currentActor,"check");}
+  ok(seen.join(",")==="4,2,0,1,3,5","画面配置どおり時計回りに一巡する ("+seen.join(",")+")");
+
+  s=MahjongBetting.startRound({playerCount:6,userIndex:5,dealerIndex:5,actionOrder:clockwise,
+    stacks:[1000,1000,0,1000,1000,1000],folded:[false,false,true,false,false,false],minRaise:100});
+  ok(s.currentActor===4,"FOLD/ALL-IN席を飛ばして時計回りを保つ");
+  MahjongBetting.act(s,4,"raise",100);
+  ok(s.currentActor===0,"次の行動可能席も時計回りで選ぶ");
 }catch(e){log.push("THREW "+e.message);}
 document.getElementById("out").textContent=log.join("\n")+"\n\n"+
   log.filter(function(x){return x.indexOf("FAIL")===0||x.indexOf("THREW")===0;}).length+" FAIL / "+log.length+" total";

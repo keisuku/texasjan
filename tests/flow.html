@@ -24,7 +24,7 @@ f.onload=function(){setTimeout(function(){
     ok(w.eval("stage")===1&&d.querySelectorAll("#commons .tile").length===15,
        "対局は共通15枚公開済みで始まる");
 
-    for(let k=0;k<3;k++){w.fastForwardBetting();d.getElementById("bNext").click();}
+    for(let k=0;k<2;k++){w.fastForwardBetting();d.getElementById("bNext").click();}
     w.fastForwardBetting();
     d.getElementById("bRec").click();
     if(w.eval("picks.length")<14){
@@ -32,7 +32,7 @@ f.onload=function(){setTimeout(function(){
         t.click();return w.eval("picks.length")===14;
       });
     }
-    ok(w.eval("stage")===4&&w.eval("picks.length")===14,"ショーダウン可能な状態まで進む");
+    ok(w.eval("stage")===3&&w.eval("common.length")===23&&w.eval("picks.length")===14,"共通23枚でショーダウン可能な状態まで進む");
     d.getElementById("bNext").click();
     ok(w.eval('phase')==="result","ショーダウンで勝敗が確定する");
     d.getElementById("bNext").click();

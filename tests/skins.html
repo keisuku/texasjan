@@ -104,8 +104,8 @@ f.onload=function(){setTimeout(function(){
   const st0=w.eval("stage");
   bn.click();
   ok(w.eval("stage")===st0+1,"進行ボタンで局が進む ("+st0+" -> "+w.eval("stage")+")");
-  w.fastForwardBetting();bn.click();w.fastForwardBetting();bn.click();w.fastForwardBetting();
-  ok(w.eval("stage")===4,"+4 を3つ開くと stage=4 (got "+w.eval("stage")+")");
+  w.fastForwardBetting();bn.click();w.fastForwardBetting();
+  ok(w.eval("stage")===3&&w.eval("common.length")===23,"+4 を2つ開くと共通23枚 (stage="+w.eval("stage")+")");
   ok(/あと \d+ 枚えらぶ/.test(bn.textContent)&&bn.disabled,
      "14枚そろう前は残り枚数を示して押せない ("+bn.textContent+")");
   ok(d.getElementById("bCall").disabled,"ベッティング完了後は CALL が無効");
