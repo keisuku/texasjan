@@ -1,0 +1,20 @@
+{
+  "seed": 2026081801,
+  "baselineDeals": 5000,
+  "experimentDeals": 5000,
+  "equitySampleDeals": 0,
+  "equityRollouts": 0,
+  "solverNodeCap": 450000,
+  "configs": [
+    {
+      "id": "current_136_c15_4_4_p8_equal_total",
+      "label": "Current 23-common, equal total-mode policy",
+      "deals": "baselineDeals",
+      "deckCopies": 4,
+      "privateTiles": 8,
+      "communalGroups": [15, 4, 4],
+      "privateRule": { "kind": "free" },
+      "playerModes": ["total", "total", "total", "total", "total", "total"]
+    }
+  ]
+}
