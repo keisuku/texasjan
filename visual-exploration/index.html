@@ -31,10 +31,10 @@
     <p class="lead">難しい評価は不要です。画像を大きく見て、<b>いちばん近い答えを1つ</b>選んでください。</p>
   </header>
   <div class="status"><div class="statusbox">
-    <div class="progressline"><span>回答済み <b id="answered">0 / 21</b></span><span id="currentPosition">1 / 21</span></div>
+    <div class="progressline"><span>回答済み <b id="answered">0 / 26</b></span><span id="currentPosition">1 / 26</span></div>
     <div class="track"><span id="progress"></span></div>
     <div class="filters">
-      <select id="setFilter" aria-label="表示する画像群"><option value="all">すべての案</option><option value="clean">現在の基準 3案</option><option value="v2">以前の案 18案</option></select>
+      <select id="setFilter" aria-label="表示する画像群"><option value="all">すべての案</option><option value="clean">現在の基準 3案</option><option value="meta">新しいガチャ案 5案</option><option value="v2">以前の案 18案</option></select>
       <select id="verdictFilter" aria-label="回答で絞り込む"><option value="all">すべての回答</option><option value="unset">まだ答えていない</option><option value="KEEP">進めたい</option><option value="MIX">部分だけ使いたい</option><option value="DROP">今回は使わない</option></select>
     </div>
   </div></div>
@@ -54,10 +54,18 @@ const clean=[
   {id:'clean-lobby',set:'clean',title:'ロビー画面',file:'../art/clean-masters/clean-master-lobby.webp',old:'現在の比較基準'},
   {id:'clean-gacha',set:'clean',title:'ガチャ画面',file:'../art/clean-masters/clean-master-gacha.webp',old:'現在の比較基準'}
 ];
+const meta=[
+  {id:'meta-a',set:'meta',title:'A｜現代日本プレミアムクラブ',file:'../art/meta-gacha-lab/meta-a-japanese-premium-club-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-b',set:'meta',title:'B｜日本発フューチャーリーグ',file:'../art/meta-gacha-lab/meta-b-future-league-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-c',set:'meta',title:'C｜キャラクター対決',file:'../art/meta-gacha-lab/meta-c-character-showdown-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-d',set:'meta',title:'D｜現代日本工芸',file:'../art/meta-gacha-lab/meta-d-modern-japanese-craft-941x1672.png',old:'新しい比較候補（未決定）'},
+  {id:'meta-e',set:'meta',title:'E｜日本グラフィックポップ',file:'../art/meta-gacha-lab/meta-e-graphic-pop-941x1672.png',old:'新しい比較候補（未決定）'}
+];
 const names=['タイトル・開始画面','キャラクターロビー','モード選択','キャラクター一覧','キャラクター詳細','ガチャ告知','ガチャ結果','着せ替え','ショップ・シーズンパス','ランク進行','ミッション・イベント','大会表','賭ける場面','4枚公開','テンパイ注目','オールインの緊張','決着・ツモ','対局結果'];
 const files=['01-title-opening','02-character-lobby','03-mode-select','04-character-roster','05-character-detail','06-gacha-banner','07-gacha-result','08-customization','09-shop-season-pass','10-rank-progression','11-missions-event','12-tournament-bracket','13-betting-decision','14-four-tile-reveal','15-tenpai-focus','16-all-in-pressure','17-river-tsumo','18-match-result'];
 const previousKeeps=new Set([1,5,7,8,10,11,13,14,15,16,17,18]);
-const items=[...clean,...files.map((file,index)=>({id:`v2-${String(index+1).padStart(2,'0')}`,set:'v2',title:names[index],file:`../art/visual-archive/v2/${file}.webp`,old:previousKeeps.has(index+1)?'以前の選定では候補に残った案':'以前の選定では見送った案'}))];
+const items=[...clean,...meta,...files.map((file,index)=>({id:`v2-${String(index+1).padStart(2,'0')}`,set:'v2',title:names[index],file:`../art/visual-archive/v2/${file}.webp`,old:previousKeeps.has(index+1)?'以前の選定では候補に残った案':'以前の選定では見送った案'}))];
+const setLabels={clean:'現在の基準',meta:'新しいガチャ案',v2:'以前の案'};
 const labels={KEEP:'この方向で進めたい',MIX:'良い部分だけ使いたい',DROP:'今回は使わない'};
 const storageKey='mahjong-holdem-visual-review-v3';
 let state=JSON.parse(localStorage.getItem(storageKey)||'{}');
@@ -81,7 +89,7 @@ function render(){
   const item=visible[currentIndex];const selected=state[item.id]?.verdict;
   document.querySelector('#currentPosition').textContent=`${currentIndex+1} / ${visible.length}`;
   review.innerHTML=`<article class="review">
-    <div class="imagearea" id="swipeArea"><img src="${item.file}" alt="${item.title}"><span class="badge">${item.set==='clean'?'現在の基準':'以前の案'}</span><span class="position">${currentIndex+1} / ${visible.length}</span><button class="zoom" id="zoomBtn">全画面で見る</button></div>
+    <div class="imagearea" id="swipeArea"><img src="${item.file}" alt="${item.title}"><span class="badge">${setLabels[item.set]}</span><span class="position">${currentIndex+1} / ${visible.length}</span><button class="zoom" id="zoomBtn">全画面で見る</button></div>
     <div class="details"><h2>${item.title}</h2><p class="history">${item.old}</p><p class="question">この案をどうしたいですか？</p>
       <div class="choices">
         <button class="choice ${selected==='KEEP'?'on':''}" data-v="KEEP"><span class="mark">○</span><span><b>この方向で進めたい</b><small>ほぼこの方向を基準にする</small></span></button>

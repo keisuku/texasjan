@@ -13,6 +13,11 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-15 | ACCEPTED | Use one parent Control Tower plus four specialist lanes. | See `orchestration/CONTROL_TOWER.md`. |
 | 2026-08-15 | PROPOSED | Five macro directions: Grand Casino, Future League, Character Showdown, Modern Japanese, Graphic Pop. | Gate A must compare representative visuals first. |
 | 2026-08-17 | ACCEPTED | Human review screens use direct Japanese questions; internal workflow codes such as KEEP / MIX / DROP are not shown to the user. | One large image, visible progress, three plain-language choices, and swipe/previous/next navigation are the default review pattern. |
+| 2026-08-16 | ACCEPTED | Contemporary Japanese atmosphere is the product default; avoid Chinese-coded clothing, architecture, ornament, and imperial color grammar. | Meta / Gacha Lab first proof rejected and replaced by five Japanese-centered directions. |
+| 2026-08-16 | ACCEPTED | Japanese identity should come from restraint, contemporary fashion, product behavior, typography, craft, and materials rather than cliché stacking. | Backgrounds remain simple, modular, low-detail, and reusable across characters. |
+| 2026-08-16 | ACCEPTED | Meta/customization UI must expose return, purpose, category, multiple choices, selected state, preview/try, and confirm/acquire. | Familiar usability is solved conventionally before adding spectacle. |
+| 2026-08-16 | ACCEPTED | Main preview, selected thumbnail, garment card, and matching table/chip/stamp must represent one consistent character and set. | Prevents the generated-composite mismatch identified in the first proof. |
+| 2026-08-16 | REJECTED | `art/meta-gacha-lab/meta-gacha-clean-evolution-v1.png` as a candidate visual. | Too Chinese-coded, too character-dominant, and unclear as gacha versus customization. |
 
 ## States
 
