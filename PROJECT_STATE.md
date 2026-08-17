@@ -1,57 +1,56 @@
-# MAHJONG HOLD'EM — Project State
+# PROJECT STATE — MAHJONG HOLD'EM
 
-Updated: **2026-08-15 JST**  
-Repository: `keisuku/texasjan`  
-Product promise: **Mahjong Texas Hold'em**
+最終更新: 2026-08-17
 
-## One-minute state
+## 現在地
 
-MAHJONG HOLD'EM is a six-player browser game combining shared mahjong tiles, private information, and Hold'em-style betting. The repository already has a playable title → lobby → matching → match → showdown → result loop, independent scoring logic, conventional tile assets, UI asset specs, and browser tests.
+- GitHub mainには、タイトルから対局・結果までのプレイ可能なHTML検証版がある。
+- 6人のCHECK / CALL / BET / RAISE / FOLD / ALL-INと、レイズ後の再巡回が実装済み。
+- Gate Aのビジュアルレビューは26/26回答済み。
+- 現在のゲートはGate B Golden Visual統合。まだ製品実装へは進まない。
 
-The strongest visual baseline is the three-image **Clean Master** set in `art/clean-masters/`. It received the strongest user reaction so far but remains **STRONG KEEP**, not final. The next visual gate is to compare five genuinely different product directions before an expensive production rewrite.
+## 採用するビジュアル統合
 
-## Current operating model
+旧V2の「押したくなる高揚感」を主軸にする。Cleanは通常対局の簡潔さ、Aは現代日本の高級感、Cはキャラクターの感情、Dは工芸素材として限定的に混ぜる。
 
-GitHub is the only canonical memory. Chat sessions are temporary workers.
+### 強い基準
 
-| Lane | Primary tool | Responsibility | Status |
-|---|---|---|---|
-| 00 Control Tower | ChatGPT Work | Product decisions, synthesis, approvals | ACTIVE |
-| 01 Match Visual Lab | ChatGPT Work | Native image generation, match composition | READY |
-| 02 Meta / Gacha Lab | ChatGPT Work | Lobby, character, gacha, monetization surfaces | READY |
-| 03 Probability Lab | Codex | Simulation, equity, tie rate, rule tuning | READY |
-| 04 Playable Build Lab | Codex / Claude Code | Browser implementation and tests | READY |
+- タイトル・開始画面
+- キャラクターロビー
+- モード選択
+- キャラクター一覧（構造のみ。画質とキャラは改善）
+- 着せ替え（ページの雰囲気。卓は改善）
+- 4枚公開
 
-Use `orchestration/index.html` as the launchpad and `orchestration/WORKSTREAMS.json` as the machine-readable lane registry.
+### 部分採用
 
-## Binding product principles
+- 通常対局のシンプルさ
+- ロビーの方向性
+- ガチャのコンセプト
+- A、C、Dの局所要素
+- ALL-INの緊張、アガリ・勝利の演出
 
-- Preserve the Hold'em loop: **information change → probability change → betting decision**.
-- Visual is product. Show visual work before calling it complete.
-- Do not make discard selection, rivers, calls, furiten, or ordinary tile efficiency the protagonist.
-- The communal field and the player's final 14-tile hand are the two principal visual objects.
-- Use real image/source assets for visual-critical components. Code owns layout, text, numbers, interaction, accessibility, and responsive behavior.
-- Future reveals must be fair after any accepted semi-structured initial-board generation.
+### 今回使わない
 
-## Working gameplay baseline
+- B｜日本発フューチャーリーグ
+- E｜日本グラフィックポップ
+- 現行のガチャ告知、ガチャ結果、ショップ・シーズンパス
+- ランク進行、ミッション・イベント、テンパイ注目
 
-The current prototype uses 136 tiles, six players, 15 initial communal tiles, three later `+4` reveal groups, eight private tiles, and a selectable final 14-tile hand. This is a **WORKING BASELINE**, not final mathematics. It must be measured against Hold'em-like emotional probability bands around 8%, 16%, 24%, 31–35%, and rare ~50% composite draws.
+## レーン状況
 
-## Visual baseline and next gate
+- Control Tower: Gate Bを進行中。
+- Match Visual: 5枚の統合ビジュアル作成待ち。
+- Meta / Gacha: キャラクター一覧・着せ替え・獲得結果の集約案を作成待ち。
+- Probability: 初期ベースラインをマージ済み。次は同一seedの公開刻みA/B比較。
+- Playable: 実ベッティングをマージ済み。ビジュアル承認まで挙動を保持。
 
-Clean Masters use restrained ivory, jade, and brass, with cyan reserved for active-turn information. Five macro directions remain proposed: Grand Casino, Future League, Character Showdown, Modern Japanese, and Graphic Pop.
+## 確率ベースライン
 
-Do not generate a full 50-screen set yet. First prove the five directions on representative match concepts, then test the strongest candidates across match, lobby, and gacha.
+現行公開進行での主要な到達率は 15.8% → 65.4% → 97.4% → 100%。これは完成値ではなく、次の比較実験の基準値。
 
-## Context policy
+## 次の一手
 
-- **Hot context:** this file, `CURRENT_TASK.md`, `DECISIONS.md`, and the relevant lane prompt.
-- **Warm context:** the one or two handoff/spec files linked by the active task.
-- **Cold archive:** older handoffs, rejected art, long chronology. Read only for a specific question.
+941 × 1672のGate B 5画面を同一品質で作り、1本のvisual PRへ保存し、公式GitHub Pagesで人間レビューへ出す。
 
-Never paste the whole archive into a new session. At every handoff, preserve decisions and artifact links, not the entire conversation.
-
-## Next human-visible milestone
-
-Launch the four specialist prompts from the control room. The Control Tower then compares their artifacts and records the next accepted gate in `DECISIONS.md`.
-
+詳細な人間判断: docs/visual/HUMAN_REVIEW_2026-08-17.md
