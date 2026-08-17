@@ -1,30 +1,48 @@
-# Current Task
+# CURRENT TASK — Gate B Golden Visual 統合
 
-Updated: **2026-08-15 JST**
+最終更新: 2026-08-17
 
-## Gate A — launch the four specialist lanes
+## 目的
 
-Create durable, independently resumable work in four lanes while the parent ChatGPT Work session remains product director.
+Gate Aの26/26人間レビューを、実装可能な5枚の統合ビジュアルへ変換する。
 
-### Required outputs
+主軸は旧V2の「押したくなる高揚感」。そこへCleanの簡潔さ、Aの現代日本プレミアム、Cのキャラクター感情、Dの工芸素材を限定的に統合する。
 
-- **Match Visual Lab:** five representative 941 × 1672 match-screen concepts, one per macro direction, generated as actual images rather than prose only.
-- **Meta / Gacha Lab:** a cross-screen product-language test covering lobby, character, and gacha, with at least one high-quality generated visual proof.
-- **Probability Lab:** a reproducible baseline simulation report for the current rule set plus the first tunable experiment matrix.
-- **Playable Build Lab:** a verified current-build audit and a minimal vertical-slice implementation plan that preserves approved scoring and flow.
+## 次に作る5画面（941 × 1672）
 
-### Acceptance gate
+1. タイトル・開始画面
+2. キャラクターロビー＋モード選択
+3. キャラクター一覧＋着せ替え＋獲得結果を集約した画面
+4. 通常対局画面
+5. 4枚公開／ALL-IN／アガリ・勝利の強演出画面
 
-The Control Tower must be able to compare artifacts by links or files, record KEEP / MIX / DROP, and choose the next two directions without reopening the full historical conversation.
+## 制約
 
-### Explicit non-goals
+- 5枚を同じアート言語、同じキャラクター品質、同じ情報階層で揃える。
+- キャラクター一覧の構造は残すが、ガビガビ感とキャラクター品質は作り直す。
+- 通常対局はCleanのシンプルな美しさを継承し、演出を盛りすぎない。
+- 強い光・動き・文字演出は4枚公開、ALL-IN、勝利へ集中する。
+- Aの高級感とDの工芸素材は局所的に使い、全画面をリアル素材で埋めない。
+- BとEの方向、常時発光、全画面の細密装飾、中国的記号の混入は禁止。
+- キャラクター詳細、着せ替え、ガチャ結果は可能な限り集約し、画面数を抑える。
 
-- No framework migration.
-- No 50-screen bulk generation before Gate A review.
-- No promotion of a proposed visual direction to final without human approval.
-- No large gameplay rewrite before probability baseline measurements.
+## 並行タスク
 
-### Completion protocol
+- Probability lane: 同一seedで 15 + 4 + 1 + 1 と 15 + 3 + 1 + 1 を比較し、テキサスホールデムに近い情報変化を定量化する。
+- Playable lane: マージ済みの6人ベッティング、役判定、牌選択を保持する。承認前の大規模な見た目変更はしない。
+- Control Tower: 5枚を公式レビューへ掲載し、人間が最初に実装する最大2画面を選べる状態にする。
 
-Every lane ends with a checkpoint using `orchestration/CHECKPOINT_TEMPLATE.md`. Durable code, docs, or assets go to a lane branch and PR. If a tool cannot write GitHub, it returns the checkpoint and downloadable artifacts for the Control Tower to persist.
+## 完了条件
 
+- 5枚が941 × 1672で揃い、約25%表示でも主役が読める。
+- visual-exploration/index.html から日本語で比較できる。
+- 人間が最初に実装する最大2画面を選ぶ。
+- 選ばれた画面だけをアセット分解し、実装PRへ進める。
+
+## 今回しないこと
+
+- 50画面の一括生成
+- フレームワークやUnityへの移行
+- 未承認画面の本実装
+- 大会、ランク、ミッション、イベント、シーズンパスの拡張
+- 確率検証前のルール全面改変
