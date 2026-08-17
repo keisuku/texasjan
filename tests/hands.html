@@ -17,7 +17,7 @@ f.onload=function(){
      ||E("stage")>0,"初期持ち点がGolden Visualの数字");
   let winners=0,hands=0,conserved=true,bad="",neg="";
   for(let h=0;h<30;h++){
-    for(let k=0;k<3;k++){w.fastForwardBetting();const p=d.querySelector(".revealGroup.pending");if(p)p.click();}
+    for(let k=0;k<2;k++){w.fastForwardBetting();const p=d.querySelector(".revealGroup.pending");if(p)p.click();}
     w.fastForwardBetting();
     d.getElementById("bRec").click();
     if(d.querySelectorAll("#rack .tile").length<14){
