@@ -1,0 +1,39 @@
+<!doctype html><meta charset="utf-8"><title>ベッティング状態機械の検査</title>
+<pre id="out">running</pre><script src="../betting-engine.js"></script><script>
+const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
+function table(){return MahjongBetting.startRound({playerCount:6,userIndex:5,dealerIndex:5,
+  stacks:[1000,1000,1000,1000,1000,1000],folded:[],minRaise:100});}
+try{
+  let s=table();
+  ok(s.currentActor===0,"ディーラー左隣から始まる");
+  MahjongBetting.act(s,0,"raise",200);
+  for(let i=1;i<6;i++)MahjongBetting.act(s,i,"call");
+  ok(s.phase==="complete","BET→5人CALLで一巡が閉じる");
+  ok(s.roundBets.every(function(x){return x===200;}),"全員が最高額200へ揃う");
+  ok(s.stacks.reduce(function(a,b){return a+b;},0)===4800,"支払総額1,200が正確");
+
+  s=table();
+  MahjongBetting.act(s,0,"check");MahjongBetting.act(s,1,"check");
+  MahjongBetting.act(s,2,"raise",100);
+  for(let i=3;i<6;i++)MahjongBetting.act(s,i,"call");
+  ok(s.currentActor===0&&s.phase==="acting","途中のレイズ後、先にCHECKした席へ手番が戻る");
+  MahjongBetting.act(s,0,"call");MahjongBetting.act(s,1,"call");
+  ok(s.phase==="complete","レイズへの全員対応後にだけ一巡が閉じる");
+
+  s=table();
+  MahjongBetting.act(s,0,"raise",200);
+  for(let i=1;i<5;i++)MahjongBetting.act(s,i,"fold");
+  MahjongBetting.act(s,5,"fold");
+  ok(s.phase==="complete"&&s.uncontestedWinner===0,"5人FOLDで残った1席が即勝者になる");
+
+  s=MahjongBetting.startRound({playerCount:3,userIndex:2,dealerIndex:2,
+    stacks:[50,1000,1000],folded:[],minRaise:100});
+  MahjongBetting.act(s,0,"raise",50);
+  ok(s.actions[0].type==="ALL-IN"&&s.stacks[0]===0,"最低レイズ未満でも全持ち点ならALL-IN可能");
+  MahjongBetting.act(s,1,"raise",150);MahjongBetting.act(s,2,"call");
+  ok(s.phase==="complete"&&s.roundBets.join(",")==="50,150,150","ショートALL-INを含む一巡が閉じる");
+}catch(e){log.push("THREW "+e.message);}
+document.getElementById("out").textContent=log.join("\n")+"\n\n"+
+  log.filter(function(x){return x.indexOf("FAIL")===0||x.indexOf("THREW")===0;}).length+" FAIL / "+log.length+" total";
+document.title="DONE";
+</script>
