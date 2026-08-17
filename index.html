@@ -267,7 +267,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .commons{display:grid;grid-template-columns:repeat(5,auto);justify-content:center;align-content:center;gap:3px;min-height:214px;padding-top:27px}
 .commons .tile.md{--w:39px}
 .commons .hint{grid-column:1/-1;padding:56px 12px}
-.revealRail{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin:8px 5px 2px;padding-right:96px}
+.revealRail{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin:8px 5px 2px;padding-right:96px}
 .revealGroup{position:relative;display:grid;grid-template-columns:repeat(2,auto);grid-template-rows:repeat(2,auto);justify-content:center;gap:2px;padding:5px 3px 18px;border-radius:10px;
   background:linear-gradient(180deg,rgba(3,18,15,.44),rgba(2,11,9,.76));border:1px solid rgba(235,212,137,.34)}
 .revealGroup .tile{--w:23px}.revealGroup .revealLabel{position:absolute;left:0;right:0;bottom:1px;text-align:center;color:#e9ce7c;font-size:8px;font-weight:900;letter-spacing:.08em}
@@ -428,9 +428,9 @@ html.still .tile.waitCandidate{animation:none}
 .commons .tile.md{--w:7cqw;--ar:1.08}
 .commons .hint{grid-column:1/-1;padding:0;font-size:1.7cqw;color:#cfe3d8}
 
-/* --- +4 I / II / III --- */
-.revealRail{position:absolute;left:50%;top:39.18%;transform:translateX(-50%);width:43.5cqw;height:9.75%;
-  margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:2.2cqw}
+/* --- +4 I / II --- */
+.revealRail{position:absolute;left:50%;top:39.18%;transform:translateX(-50%);width:36cqw;height:9.75%;
+  margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:2.2cqw}
 .revealGroup{height:100%;align-content:center;padding:.5cqw .3cqw 2.1cqw;gap:.3cqw;border-radius:1.2cqw;
   background:linear-gradient(180deg,rgba(2,30,25,.94),rgba(1,15,12,.98));border:1px solid rgba(239,207,102,.78)}
 .revealGroup .tile{--w:5.2cqw}
@@ -546,8 +546,28 @@ html.still .streetNext.hot{animation:none}
 .betBar .fold{background:linear-gradient(180deg,#cd4a38,#7c1512)}
 .betBar .call{background:linear-gradient(180deg,#2f7ec9,#123d74)}
 .betBar .raise{background:linear-gradient(180deg,#e8b74c,#94590f);color:#1b1508}
-.betBar .dial{height:120%;aspect-ratio:1;justify-self:end;border-radius:50%;font-size:3.2cqw;
-  background:radial-gradient(circle,#16406e 0 52%,#061a2c 54%);color:#fff0b7}
+.betBar .dial{height:120%;aspect-ratio:1;justify-self:end;border-radius:50%;font-size:2.45cqw;
+  background:radial-gradient(circle,#7a241d 0 51%,#2a0b08 54%);color:#fff0b7}
+
+/* RAISE / ALL-IN の金額調整。通常時は隠し、選択時だけ最終手牌の直上へ出す。 */
+.raiseSheet{position:absolute;left:3.2%;right:3.2%;bottom:12.5%;z-index:34;display:none;
+  padding:2.2cqw;border-radius:2.2cqw;background:rgba(3,16,13,.97);
+  border:.24cqw solid rgba(238,208,116,.88);box-shadow:0 1.2cqw 4cqw rgba(0,0,0,.72)}
+.raiseSheet.open{display:block}
+.raiseSheetHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.4cqw}
+.raiseSheetHead b{font-size:2.6cqw;letter-spacing:.12em;color:#f5e3af}
+.raiseSheetHead output{font-size:4cqw;font-weight:900;color:#fff0b7;font-variant-numeric:tabular-nums}
+.raiseSheetClose{width:6cqw;height:6cqw;border-radius:50%;font-size:3cqw;background:#173b31;color:#fff0b7}
+.raiseAdjust{display:grid;grid-template-columns:8cqw 1fr 8cqw;gap:1.2cqw;align-items:center}
+.raiseAdjust button{height:7cqw;border-radius:1.3cqw;font-size:3.5cqw;background:#173b31;color:#fff0b7;
+  border:.16cqw solid rgba(238,208,116,.5)}
+.raiseRange{width:100%;accent-color:#d7b447;height:7cqw;touch-action:pan-x}
+.raisePresets{display:grid;grid-template-columns:repeat(4,1fr);gap:1cqw;margin-top:1.2cqw}
+.raisePresets button{height:6.6cqw;border-radius:1cqw;font-size:2.05cqw;font-weight:900;
+  background:#102d26;color:#ead79f;border:.14cqw solid rgba(238,208,116,.42)}
+.raisePresets button[data-raise-preset="allin"]{background:#6f211b;color:#fff3cf}
+.raiseConfirm{width:100%;height:8cqw;margin-top:1.4cqw;border-radius:1.5cqw;font-size:2.8cqw;font-weight:900;
+  letter-spacing:.08em;background:linear-gradient(180deg,#f0cf71,#a66c18);color:#1b1508}
 body.win-anim #app>*:not(.finalZone):not(.winRibbon){filter:brightness(.48) saturate(.7)}
 
 /* 配牌の飛翔。走らなくても最終位置に見えるよう、起点はCSS変数で与える */
@@ -1312,7 +1332,24 @@ html.calib #calib{display:block}
     <button class="fold" id="bFold"><span class="btn-label">FOLD</span></button>
     <button class="call" id="bCall">CALL<br>400</button>
     <button class="raise" id="bRaise"><span class="btn-label">RAISE</span></button>
-    <button class="dial" id="bDial">400</button>
+    <button class="dial" id="bDial"><span class="gold-text">ALL-IN</span></button>
+  </div>
+
+  <div class="raiseSheet" id="raiseSheet" aria-hidden="true">
+    <div class="raiseSheetHead"><b>レイズ額</b><output id="raiseValue">400</output>
+      <button class="raiseSheetClose" id="bRaiseClose" aria-label="金額調整を閉じる">×</button></div>
+    <div class="raiseAdjust">
+      <button id="bRaiseMinus" aria-label="100減らす">−</button>
+      <input class="raiseRange" id="raiseRange" type="range" min="100" max="1000" step="100" value="400" aria-label="レイズ額">
+      <button id="bRaisePlus" aria-label="100増やす">＋</button>
+    </div>
+    <div class="raisePresets">
+      <button data-raise-preset="min">最小</button>
+      <button data-raise-preset="half">1/2 POT</button>
+      <button data-raise-preset="pot">POT</button>
+      <button data-raise-preset="allin">ALL-IN</button>
+    </div>
+    <button class="raiseConfirm" id="bRaiseConfirm">この金額でレイズ</button>
   </div>
 
   <button class="gameHome" id="bHome" title="ロビーへ" data-go="lobby">◀</button>
@@ -1370,7 +1407,9 @@ let picks=[],pickSeq=0,notice="";
 let activeSeat=0,recOpen=false,recMode="total",wasComplete=false,dealAnim=0;
 let userStack=5870,betAmount=400,currentCall=400;
 let phase="play",userFolded=false,resultText="";
-let betting=null,dealerSeat=5,userAction="",aiTimer=0;
+const CLOCKWISE_SEATS=[0,1,3,5,4,2];
+function nextClockwiseSeat(i){const at=CLOCKWISE_SEATS.indexOf(i);return CLOCKWISE_SEATS[(at<0?0:at+1)%CLOCKWISE_SEATS.length];}
+let betting=null,dealerSeat=2,userAction="",aiTimer=0,raiseSheetOpen=false;
 const IS_STILL=document.documentElement.classList.contains("still");
 let matchMode="rank",lastResult=null;
 let rankPoints=(function(){
@@ -1395,8 +1434,8 @@ function newHand(){
   ensureTable();
   window.clearTimeout(aiTimer);
   shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
-  phase="play";userFolded=false;resultText="";
-  betting=null;userAction="";dealerSeat=(dealerSeat+1)%6;
+  phase="play";userFolded=false;resultText="";raiseSheetOpen=false;
+  betting=null;userAction="";dealerSeat=nextClockwiseSeat(dealerSeat);
   Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
   seats.forEach(function(s){
@@ -1438,7 +1477,7 @@ function nextStreet(){
     flashToast(activeSeat===5?"あなたのアクションを選んでください。":"相手のアクションを待っています。");return;
   }
   if(stage===0){openCommon15();}
-  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;beginBettingRound();}
+  else if(stage<3){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;raiseSheetOpen=false;beginBettingRound();}
   else{showdown();return;}
   notice="";
   render();
@@ -1454,7 +1493,7 @@ function beginBettingRound(){
   seats.forEach(function(s){s.action="";s.thinking=false;s.bet=0;});
   userAction="";
   betting=MahjongBetting.startRound({playerCount:6,userIndex:5,dealerIndex:dealerSeat,street:stage,
-    stacks:tableStacks(),folded:tableFolded(),minRaise:MIN_BET});
+    actionOrder:CLOCKWISE_SEATS,stacks:tableStacks(),folded:tableFolded(),minRaise:MIN_BET});
   syncBettingState();
   const l=MahjongBetting.legal(betting,5);
   const min=l?Math.min(l.maxTarget,l.minRaiseTarget):MIN_BET;
@@ -1634,23 +1673,33 @@ function showdown(){
   render();
 }
 
-function cycleBet(){
-  if(!betting)return;
-  const l=MahjongBetting.legal(betting,5);if(!l)return;
-  const floor=Math.min(l.maxTarget,l.minRaiseTarget),half=Math.ceil((pot*.5)/100)*100;
-  const levels=[floor,Math.max(floor,half),Math.max(floor,Math.ceil(pot/100)*100),l.maxTarget];
-  const unique=levels.filter(function(v,i,a){return v>betting.highestBet&&a.indexOf(v)===i&&v<=l.maxTarget;});
-  if(!unique.length)return;
-  const at=unique.indexOf(betAmount);
-  betAmount=unique[(at+1+unique.length)%unique.length];
-  render();
+function raiseLegal(){return betting?MahjongBetting.legal(betting,5):null;}
+function clampRaise(v,l){
+  if(!l)return MIN_BET;
+  const min=Math.min(l.maxTarget,l.minRaiseTarget);
+  return Math.max(min,Math.min(l.maxTarget,Number(v)||min));
 }
+function raisePreset(kind,l){
+  const min=Math.min(l.maxTarget,l.minRaiseTarget);
+  if(kind==="allin")return l.maxTarget;
+  if(kind==="half")return clampRaise(Math.ceil(Math.max(min,pot*.5)/100)*100,l);
+  if(kind==="pot")return clampRaise(Math.ceil(Math.max(min,pot)/100)*100,l);
+  return min;
+}
+function openRaiseSheet(allIn){
+  const l=raiseLegal();if(!l||!l.canRaise)return;
+  betAmount=allIn?l.maxTarget:clampRaise(betAmount,l);
+  raiseSheetOpen=true;render();
+}
+function closeRaiseSheet(){raiseSheetOpen=false;render();}
+function adjustRaise(delta){const l=raiseLegal();if(!l)return;betAmount=clampRaise(betAmount+delta,l);render();}
 function playerAction(kind){
   if(phase!=="play"||!betting||betting.phase!=="acting"||betting.currentActor!==5){
     flashToast("現在はあなたの手番ではありません。");return;
   }
   const l=MahjongBetting.legal(betting,5);if(!l)return;
   if(kind==="raise"&&!l.canRaise){flashToast("これ以上レイズできません。");return;}
+  raiseSheetOpen=false;
   applyBetAction(5,kind==="call"&&l.toCall===0?"check":kind,kind==="raise"?betAmount:0);
   render();continueBetting();
 }
@@ -1820,7 +1869,7 @@ function isComplete14(ids){
 }
 
 /* ===== render ===== */
-const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23","+4 III · 27"];
+const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23"];
 
 /* ===== 動き =====
    render() は毎回 innerHTML="" でDOMを作り直すので CSS transition が効かない。
@@ -2026,7 +2075,7 @@ function renderCore(fresh){
       c.appendChild(t);});
   }
   const rr=document.getElementById("revealRail");rr.innerHTML="";
-  for(let g=0;g<3;g++){
+  for(let g=0;g<2;g++){
     const revealed=stage>=g+2, wantsNext=!revealed&&g===stage-1;
     const isNext=wantsNext&&(!betting||betting.phase==="complete");
     const group=document.createElement("div");
@@ -2034,7 +2083,7 @@ function renderCore(fresh){
     if(isNext){
       /* 次の+4はこの枠自体をタップして公開する。picksには触らないので選択済みの手牌は保持される。 */
       group.setAttribute("role","button");group.tabIndex=0;
-      group.setAttribute("aria-label","+4 "+["I","II","III"][g]+" を公開");
+      group.setAttribute("aria-label","+4 "+["I","II"][g]+" を公開");
       group.onclick=nextStreet;
       group.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();nextStreet();}};
     }
@@ -2045,7 +2094,7 @@ function renderCore(fresh){
         t.dataset.k="c:"+index;t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
-    const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
+    const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II"][g];group.appendChild(label);rr.appendChild(group);
   }
 
   const mr=document.getElementById("myrow");mr.innerHTML="";
@@ -2132,7 +2181,7 @@ function renderCore(fresh){
   /* 局の進行はこのボタンが持つ。+4 枠のタップも従来どおり効くが、
      そちらは隠れた操作なので、明示的な導線をこちらに置く。 */
   const bn=document.getElementById("bNext");
-  const ROMAN=["Ⅰ","Ⅱ","Ⅲ"];
+  const ROMAN=["Ⅰ","Ⅱ"];
   bn.classList.remove("hot","afterResult");bn.disabled=false;
   if(phase==="result"){bn.innerHTML='<span class="btn-label">結果を見る</span>';
     bn.classList.add("hot","afterResult");}
@@ -2140,7 +2189,7 @@ function renderCore(fresh){
   else if(betting&&betting.phase==="acting"){
     const who=activeSeat===5?"YOUR TURN":(activeSeat>=0?seats[activeSeat].n+" THINKING":"BETTING");
     bn.innerHTML='<span class="btn-label">'+who+'</span>';bn.disabled=true;}
-  else if(stage<4)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
+  else if(stage<3)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
   else if(!userFolded&&picks.length<MAX_HAND){
     /* 14枚そろわないとショーダウンできない。押してから叱るのではなく、先に何が足りないかを見せる。 */
     bn.innerHTML='<span class="btn-label">あと '+(MAX_HAND-picks.length)+' 枚えらぶ</span>';
@@ -2158,12 +2207,20 @@ function renderCore(fresh){
   const yourTurn=phase==="play"&&betting&&betting.phase==="acting"&&betting.currentActor===5&&!userFolded;
   call.innerHTML=wrap(currentCall>0?"CALL<br>"+Math.min(currentCall,userStack).toLocaleString():"CHECK");
   call.disabled=!yourTurn||userStack<=0;
-  document.getElementById("bDial").innerHTML=
-    '<span class="gold-text">'+(betting&&betAmount>=((betting.roundBets[5]||0)+userStack)&&userStack>0?"ALL IN":"TO "+betAmount.toLocaleString())+'</span>';
-  document.getElementById("bFold").disabled=!yourTurn;
   const legal=yourTurn?MahjongBetting.legal(betting,5):null;
+  document.getElementById("bFold").disabled=!yourTurn;
   document.getElementById("bRaise").disabled=!yourTurn||!legal||!legal.canRaise;
   document.getElementById("bDial").disabled=!yourTurn||!legal||!legal.canRaise;
+  if(!yourTurn||!legal||!legal.canRaise)raiseSheetOpen=false;
+  const sheet=document.getElementById("raiseSheet");
+  sheet.classList.toggle("open",raiseSheetOpen);sheet.setAttribute("aria-hidden",raiseSheetOpen?"false":"true");
+  if(raiseSheetOpen&&legal){
+    const min=Math.min(legal.maxTarget,legal.minRaiseTarget),range=document.getElementById("raiseRange");
+    betAmount=clampRaise(betAmount,legal);
+    range.min=String(min);range.max=String(legal.maxTarget);range.step="100";range.value=String(betAmount);
+    document.getElementById("raiseValue").textContent=betAmount.toLocaleString();
+    document.getElementById("bRaiseConfirm").textContent=(betAmount===legal.maxTarget?"ALL-IN ":"レイズ ") + betAmount.toLocaleString();
+  }
   dealAnim=0;
 }
 
@@ -2178,8 +2235,14 @@ document.getElementById("bCall").onclick=function(){
   if(phase==="result"){go("result");return;}
   playerAction("call");
 };
-document.getElementById("bRaise").onclick=function(){playerAction("raise");};
-document.getElementById("bDial").onclick=cycleBet;
+document.getElementById("bRaise").onclick=function(){openRaiseSheet(false);};
+document.getElementById("bDial").onclick=function(){openRaiseSheet(true);};
+document.getElementById("bRaiseClose").onclick=closeRaiseSheet;
+document.getElementById("bRaiseMinus").onclick=function(){adjustRaise(-100);};
+document.getElementById("bRaisePlus").onclick=function(){adjustRaise(100);};
+document.getElementById("raiseRange").oninput=function(){const l=raiseLegal();if(!l)return;betAmount=clampRaise(this.value,l);document.getElementById("raiseValue").textContent=betAmount.toLocaleString();document.getElementById("bRaiseConfirm").textContent=(betAmount===l.maxTarget?"ALL-IN ":"レイズ ")+betAmount.toLocaleString();};
+document.querySelectorAll("[data-raise-preset]").forEach(function(btn){btn.onclick=function(){const l=raiseLegal();if(!l)return;betAmount=raisePreset(btn.dataset.raisePreset,l);render();};});
+document.getElementById("bRaiseConfirm").onclick=function(){playerAction("raise");};
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
 
 /* ======================================================================
