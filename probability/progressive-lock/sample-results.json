@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "seed": 2026081804,
-  "deals": 120,
+  "deals": 500,
   "equitySampleDeals": 6,
   "equityRollouts": 8,
   "rules": {
@@ -20,18 +20,18 @@
   "evaluator": "mahjong-score.js plus the production probability strategy/search replicated with a mandatory-lock multiset constraint.",
   "metrics": {
     "free": {
-      "finalCompletionPct": 98.6111,
+      "finalCompletionPct": 97.8667,
       "lockRegretPct": 0,
-      "splitPotPct": 28.3333,
-      "averageWinnerCount": 1.55,
+      "splitPotPct": 29.8,
+      "averageWinnerCount": 1.586,
       "winnerRouteSharePct": {
-        "flush": 14.1667,
-        "seven_pairs": 57.5,
-        "sequence": 21.25,
-        "triplet": 7.0833
+        "flush": 12.1667,
+        "seven_pairs": 60.2,
+        "sequence": 19.3333,
+        "triplet": 8.3
       },
-      "averagePrivateRequired": 3.6875,
-      "averagePrivateAttributed": 4.3708,
+      "averagePrivateRequired": 3.712,
+      "averagePrivateAttributed": 4.4283,
       "sharedCoreCollisionPairPct": null,
       "averageSharedCommonLockOverlap": null,
       "winnerRoutePivotPct": null,
@@ -46,22 +46,22 @@
       "solverCapHitPct": 0
     },
     "lock8_flop": {
-      "finalCompletionPct": 46.5278,
-      "lockRegretPct": 52.0833,
-      "splitPotPct": 29.1667,
-      "averageWinnerCount": 1.425,
+      "finalCompletionPct": 44.8333,
+      "lockRegretPct": 53.0333,
+      "splitPotPct": 27,
+      "averageWinnerCount": 1.408,
       "winnerRouteSharePct": {
-        "seven_pairs": 58.3333,
-        "sequence": 21.6667,
-        "triplet": 9.1667,
-        "incomplete": 8.3333,
-        "flush": 2.5
+        "seven_pairs": 54,
+        "sequence": 25.8,
+        "triplet": 10.4,
+        "incomplete": 7.2,
+        "flush": 2.6
       },
-      "averagePrivateRequired": 3.7597,
-      "averagePrivateAttributed": 4.1042,
-      "sharedCoreCollisionPairPct": 97.4444,
-      "averageSharedCommonLockOverlap": 3.1861,
-      "winnerRoutePivotPct": 59.6491,
+      "averagePrivateRequired": 3.7787,
+      "averagePrivateAttributed": 4.1187,
+      "sharedCoreCollisionPairPct": 96.7733,
+      "averageSharedCommonLockOverlap": 3.1212,
+      "winnerRoutePivotPct": 56.392,
       "equityLeaderChangePct": [
         16.6667,
         33.3333
@@ -73,24 +73,51 @@
       "solverCapHitPct": 0
     },
     "lock4_4": {
-      "finalCompletionPct": 58.6111,
-      "lockRegretPct": 40,
-      "splitPotPct": 30.8333,
-      "averageWinnerCount": 1.5333,
+      "finalCompletionPct": 55.8,
+      "lockRegretPct": 42.0667,
+      "splitPotPct": 31.4,
+      "averageWinnerCount": 1.532,
       "winnerRouteSharePct": {
-        "seven_pairs": 53.3333,
-        "sequence": 27.0833,
-        "triplet": 13.75,
-        "incomplete": 2.5,
-        "flush": 3.3333
+        "seven_pairs": 54,
+        "sequence": 25.2,
+        "triplet": 12.8,
+        "incomplete": 4.6,
+        "flush": 3.4
       },
-      "averagePrivateRequired": 3.7194,
-      "averagePrivateAttributed": 4.0972,
-      "sharedCoreCollisionPairPct": 95.3333,
-      "averageSharedCommonLockOverlap": 3.145,
-      "winnerRoutePivotPct": 64.1304,
+      "averagePrivateRequired": 3.743,
+      "averagePrivateAttributed": 4.1267,
+      "sharedCoreCollisionPairPct": 95.4667,
+      "averageSharedCommonLockOverlap": 3.1263,
+      "winnerRoutePivotPct": 64.8825,
       "equityLeaderChangePct": [
         16.6667,
+        50
+      ],
+      "equityAnyRankMovePct": [
+        83.3333,
+        83.3333
+      ],
+      "solverCapHitPct": 0
+    },
+    "lock4_2": {
+      "finalCompletionPct": 63.7667,
+      "lockRegretPct": 34.1,
+      "splitPotPct": 32.2,
+      "averageWinnerCount": 1.548,
+      "winnerRouteSharePct": {
+        "flush": 5.4667,
+        "seven_pairs": 54.8,
+        "sequence": 23.8333,
+        "triplet": 12.9,
+        "incomplete": 3
+      },
+      "averagePrivateRequired": 3.7347,
+      "averagePrivateAttributed": 4.1443,
+      "sharedCoreCollisionPairPct": 87.6267,
+      "averageSharedCommonLockOverlap": 2.1425,
+      "winnerRoutePivotPct": 67.1835,
+      "equityLeaderChangePct": [
+        66.6667,
         50
       ],
       "equityAnyRankMovePct": [
