@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "seed": 2026081804,
+  "deals": 120,
+  "equitySampleDeals": 6,
+  "equityRollouts": 8,
+  "rules": {
+    "deck": 136,
+    "players": 6,
+    "private": 8,
+    "communalGroups": [
+      15,
+      4,
+      4
+    ],
+    "final": 14
+  },
+  "pairedDealPolicy": "All variants consume the exact same seeded deal before any strategy is evaluated.",
+  "lookaheadPolicy": "Lock choice receives only private tiles, the currently revealed communal prefix, dora, prior locks, and strategy mode.",
+  "evaluator": "mahjong-score.js plus the production probability strategy/search replicated with a mandatory-lock multiset constraint.",
+  "metrics": {
+    "free": {
+      "finalCompletionPct": 98.6111,
+      "lockRegretPct": 0,
+      "splitPotPct": 28.3333,
+      "averageWinnerCount": 1.55,
+      "winnerRouteSharePct": {
+        "flush": 14.1667,
+        "seven_pairs": 57.5,
+        "sequence": 21.25,
+        "triplet": 7.0833
+      },
+      "averagePrivateRequired": 3.6875,
+      "averagePrivateAttributed": 4.3708,
+      "sharedCoreCollisionPairPct": null,
+      "averageSharedCommonLockOverlap": null,
+      "winnerRoutePivotPct": null,
+      "equityLeaderChangePct": [
+        50,
+        66.6667
+      ],
+      "equityAnyRankMovePct": [
+        83.3333,
+        83.3333
+      ],
+      "solverCapHitPct": 0
+    },
+    "lock8_flop": {
+      "finalCompletionPct": 46.5278,
+      "lockRegretPct": 52.0833,
+      "splitPotPct": 29.1667,
+      "averageWinnerCount": 1.425,
+      "winnerRouteSharePct": {
+        "seven_pairs": 58.3333,
+        "sequence": 21.6667,
+        "triplet": 9.1667,
+        "incomplete": 8.3333,
+        "flush": 2.5
+      },
+      "averagePrivateRequired": 3.7597,
+      "averagePrivateAttributed": 4.1042,
+      "sharedCoreCollisionPairPct": 97.4444,
+      "averageSharedCommonLockOverlap": 3.1861,
+      "winnerRoutePivotPct": 59.6491,
+      "equityLeaderChangePct": [
+        16.6667,
+        33.3333
+      ],
+      "equityAnyRankMovePct": [
+        66.6667,
+        83.3333
+      ],
+      "solverCapHitPct": 0
+    },
+    "lock4_4": {
+      "finalCompletionPct": 58.6111,
+      "lockRegretPct": 40,
+      "splitPotPct": 30.8333,
+      "averageWinnerCount": 1.5333,
+      "winnerRouteSharePct": {
+        "seven_pairs": 53.3333,
+        "sequence": 27.0833,
+        "triplet": 13.75,
+        "incomplete": 2.5,
+        "flush": 3.3333
+      },
+      "averagePrivateRequired": 3.7194,
+      "averagePrivateAttributed": 4.0972,
+      "sharedCoreCollisionPairPct": 95.3333,
+      "averageSharedCommonLockOverlap": 3.145,
+      "winnerRoutePivotPct": 64.1304,
+      "equityLeaderChangePct": [
+        16.6667,
+        50
+      ],
+      "equityAnyRankMovePct": [
+        83.3333,
+        83.3333
+      ],
+      "solverCapHitPct": 0
+    }
+  }
+}
