@@ -265,12 +265,14 @@ function emptyStreet() {
 function runConfig(cfg, root, index) {
   const deals = root[cfg.deals] || cfg.deals;
   const rng = mulberry32((root.seed ^ hashString(cfg.id) ^ index) >>> 0);
+  const playerModes = cfg.playerModes || MODES;
   const streetAgg = cfg.communalGroups.map(emptyStreet);
   let splits = 0, tiedPlayers = 0, finalPlayers = 0, earlyEffectiveProxy = 0, earlyProxyDen = 0;
   let commonOnlyComplete = 0, fullOnlyComplete = 0, totalModeUplift = 0, totalModeUpliftDen = 0;
   const leaderChanges = new Array(cfg.communalGroups.length - 1).fill(0);
   const leaderComparable = new Array(cfg.communalGroups.length - 1).fill(0);
   const winnerRoutes = {};
+  const winnerCountHistogram = {};
   const equitySamples = [];
 
   for (let di = 0; di < deals; di++) {
@@ -278,7 +280,7 @@ function runConfig(cfg, root, index) {
     for (let si = 0; si < deal.streets.length; si++) {
       const common = deal.streets[si], states = [];
       for (let p = 0; p < 6; p++) {
-        const state = seatState(deal.privates[p], common, deal.dora, cfg.privateRule, root.solverNodeCap, MODES[p]);
+        const state = seatState(deal.privates[p], common, deal.dora, cfg.privateRule, root.solverNodeCap, playerModes[p]);
         states.push(state); const a = streetAgg[si]; a.players++;
         if (state.solved.complete) a.complete++;
         a.routes += state.solved.routes.length;
@@ -302,6 +304,7 @@ function runConfig(cfg, root, index) {
       }
     }
     const finalStates = perStreet[perStreet.length - 1], win = winnerShares(finalStates);
+    winnerCountHistogram[win.winners.length] = (winnerCountHistogram[win.winners.length] || 0) + 1;
     finalPlayers += 6;
     if (win.winners.length > 1) splits++;
     tiedPlayers += win.winners.length;
@@ -327,7 +330,7 @@ function runConfig(cfg, root, index) {
   const equity = runEquitySamples(cfg, root, equitySamples);
   return {
     id: cfg.id, label: cfg.label, deals, tileCount: cfg.deckCopies * 34, privateTiles: cfg.privateTiles,
-    communalGroups: cfg.communalGroups, privateRule: cfg.privateRule,
+    communalGroups: cfg.communalGroups, privateRule: cfg.privateRule, playerModes,
     streets: streetAgg.map((a, i) => ({
       commonTiles: cfg.communalGroups.slice(0, i + 1).reduce((x, y) => x + y, 0),
       completionPct: r4(pct(a.complete, a.players)), averageRouteClasses: r4(a.routes / a.players),
@@ -336,7 +339,7 @@ function runConfig(cfg, root, index) {
       solverCapHitPct: r4(pct(a.capHits, a.players))
     })),
     river: {
-      splitPotPct: r4(pct(splits, deals)), averageWinnerCount: r4(tiedPlayers / deals),
+      splitPotPct: r4(pct(splits, deals)), averageWinnerCount: r4(tiedPlayers / deals), winnerCountHistogram,
       commonBoardCompletePct: r4(pct(commonOnlyComplete, deals)),
       playerCompletionCreatedByPrivatePct: r4(pct(fullOnlyComplete, deals * 6)),
       totalRecommendationBeatsCommonOnlyPct: r4(pct(totalModeUplift, totalModeUpliftDen)),
@@ -350,6 +353,7 @@ function runConfig(cfg, root, index) {
 
 function runEquitySamples(cfg, root, samples) {
   const streetCount = cfg.communalGroups.length;
+  const playerModes = cfg.playerModes || MODES;
   const agg = Array.from({ length: streetCount }, () => ({ dispersions: [], top: [], leaders: [], nextDraw: [] }));
   const changes = new Array(streetCount - 1).fill(0), changeDen = new Array(streetCount - 1).fill(0);
   let effective = 0, effectiveDen = 0;
@@ -370,7 +374,7 @@ function runEquitySamples(cfg, root, samples) {
           if (sj === si + 1) nextSnapshot = nextCommon.slice();
         }
         const states = [];
-        for (let p = 0; p < 6; p++) states.push(seatState(deal.privates[p], nextCommon, deal.dora, cfg.privateRule, root.solverNodeCap, MODES[p]));
+        for (let p = 0; p < 6; p++) states.push(seatState(deal.privates[p], nextCommon, deal.dora, cfg.privateRule, root.solverNodeCap, playerModes[p]));
         const win = winnerShares(states); for (let p = 0; p < 6; p++) shares[p] += win.shares[p];
         if (nextSnapshot) for (let p = 0; p < 6; p++) {
           if (incomplete[p] && solvePool(deal.privates[p], nextSnapshot, deal.dora, cfg.privateRule, root.solverNodeCap).complete) nextCompletions[p]++;
@@ -434,7 +438,7 @@ function main() {
     schemaVersion: 1, generatedAt: new Date().toISOString(), seed: root.seed,
     evaluator: {
       productionScorer: "../mahjong-score.js MahjongScore.evaluate",
-      selectionPolicy: "Production solveFlexible search/ranking replicated; player 0 uses total and opponents use sequence/flush/triplet/pairs/total.",
+      selectionPolicy: "Production solveFlexible search/ranking replicated; config.playerModes overrides the production total/sequence/flush/triplet/pairs/total seat policies.",
       incompleteBias: "Production quickMelds + pair + dora fallback; not shanten or exact equity.",
       bettingModel: "No folds or wagers; six live hands always reach showdown.",
       nodeCap: root.solverNodeCap

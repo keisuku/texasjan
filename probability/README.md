@@ -22,3 +22,13 @@ node probability/simulate.js --only baseline_136_c15_4_4_4_p8_free --out /tmp/ba
 
 `results.json` is a committed deterministic snapshot. `REPORT.md` explains metric definitions, evaluator bias, findings, and the recommended next experiment.
 
+## Starting-eight luck benchmark
+
+Current 15 + 4 + 4 / private-8 with equal player policies:
+
+```bash
+node probability/simulate.js --config probability/config-starting-eight-luck.json --out probability/starting-eight-luck-hand-results.json
+node probability/simulate-starting-eight-series.js probability/starting-eight-luck-hand-results.json probability/starting-eight-luck-series.json
+```
+
+See `STARTING_EIGHT_LUCK_2026-08-18.md` for the 5,000-deal hand benchmark and one-million-season 10/100-hand point distributions.

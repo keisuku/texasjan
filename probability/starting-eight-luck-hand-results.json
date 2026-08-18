@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-08-17T23:54:24.865Z",
+  "seed": 2026081801,
+  "evaluator": {
+    "productionScorer": "../mahjong-score.js MahjongScore.evaluate",
+    "selectionPolicy": "Production solveFlexible search/ranking replicated; all six seats use identical total-mode policy to isolate deal luck.",
+    "bettingModel": "No folds or wagers; six live hands always reach showdown.",
+    "nodeCap": 450000
+  },
+  "runtimeSeconds": 169.139,
+  "results": [{
+    "id": "current_136_c15_4_4_p8_equal_total",
+    "label": "Current 23-common, equal total-mode policy",
+    "deals": 5000,
+    "tileCount": 136,
+    "privateTiles": 8,
+    "communalGroups": [15, 4, 4],
+    "privateRule": {"kind": "free"},
+    "playerModes": ["total", "total", "total", "total", "total", "total"],
+    "streets": [
+      {"commonTiles": 15, "completionPct": 15.47, "averagePrivateRequired": 4.9882, "averagePrivateAttributed": 5.2587},
+      {"commonTiles": 19, "completionPct": 64.84, "averagePrivateRequired": 4.1723, "averagePrivateAttributed": 4.6847},
+      {"commonTiles": 23, "completionPct": 97.6633, "averagePrivateRequired": 3.6314, "averagePrivateAttributed": 4.2827}
+    ],
+    "river": {
+      "splitPotPct": 26.34,
+      "averageWinnerCount": 1.4918,
+      "winnerCountHistogram": {"1": 3683, "2": 695, "3": 299, "4": 167, "5": 115, "6": 41},
+      "commonBoardCompletePct": 16.22,
+      "playerCompletionCreatedByPrivatePct": 81.4433,
+      "totalRecommendationBeatsCommonOnlyPct": 92.3067,
+      "winnerRouteShare": {"triplet": 8.412, "flush": 16.97, "seven_pairs": 54.38, "sequence": 20.238}
+    },
+    "leaderChangeProxyPct": [61.1886, 48.1275],
+    "effectiveEarlyDecisionProxyPct": 88.16
+  }]
+}
