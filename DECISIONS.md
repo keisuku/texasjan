@@ -35,6 +35,9 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-18 | PROPOSED | ショーダウンでは非フォールド全員の私牌8枚と実際の最終14枚を保存し、一人ずつ切り替えるインスペクターで公開する。 | 8枚だけでは23枚の共通牌から最終14枚を人間が再構成できない。docs/rules/SHOWDOWN_VISIBILITY_2026-08-18.md |
 | 2026-08-18 | PROPOSED | ALL-IN後、全ライブプレイヤーの追加ベット可能性がなくなった時点で私牌8枚を公開し、残りの＋4をランアウトする。 | Poker TDA Rule 16と同じ「判断終了後に完全公開」の原則。追加判断が残る間は公開しない。 |
 
+| 2026-08-18 | ACCEPTED | ショーダウンの一次表示は勝者の最終14枚だけを大きく出し、私牌由来の牌へ印を付ける。 | 全員分を同時表示して情報過多にしない。他家は順位行タップで同じ領域へ切り替え、元の私牌8枚も確認可能にする。 |
+| 2026-08-18 | REPRODUCIBLE BASELINE | 私牌8枚だけの運差を、共通15＋4＋4、全員同一方針、5,000局と10/100局各100万シーズンで固定seed測定した。 | 最終14枚の私牌由来は平均4.28枚。100点アンティ時の首位―最下位差中央値は10局1,800点、100局5,450点。probability/STARTING_EIGHT_LUCK_2026-08-18.md |
+
 ## States
 
 - ACCEPTED: explicitly approved direction.
