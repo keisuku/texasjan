@@ -94,8 +94,9 @@
   }
   function renderOpponentLocks(){
     const data=opponentLater[rule];
+    document.querySelectorAll(".hiddenFour").forEach(x=>x.hidden=stage<2);
     document.querySelectorAll("[data-opponent-lock]").forEach((b,i)=>{
-      const item=data[i];b.hidden=stage<2;b.innerHTML="";b.setAttribute("aria-label",item.name+"が後から固定した"+item.tiles.length+"枚を拡大する");
+      const item=data[i];b.hidden=stage<3;b.innerHTML="";b.setAttribute("aria-label",item.name+"が後から固定した"+item.tiles.length+"枚を拡大する");
       const pair=document.createElement("span");pair.className="miniPair";item.tiles.forEach(name=>{const tile=document.createElement("span");tile.className="miniTile";tile.innerHTML='<img alt="" src="'+tileSrc(name)+'">';pair.appendChild(tile);});
       const label=document.createElement("small");label.textContent="後の"+item.tiles.length+"枚";b.append(pair,label);
     });
