@@ -40,6 +40,8 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 
 | 2026-08-18 | PROPOSED | プリフロップは固定なし、共通15公開後に4枚、次の＋4公開後に追加4枚を固定し、最後は固定8＋自由6で最終14枚を作る。 | 操作モックと同一seed比較仕様を追加。experiments/progressive-lock/ / probability/PROGRESSIVE_LOCK_EXPERIMENT_2026-08-18.md |
 | 2026-08-18 | WORKING BASELINE | 固定は4→2、共通牌の追加公開は4→4→4へ戻す。プリフロップ固定なし、15枚で4固定、最初の＋4で追加2固定、残り2回の＋4では固定を増やさない。 | 人間playtestで方向性良好。500局で完成76.3%、固定後悔23.7%、split 23.4%。本番は未変更。experiments/progressive-lock/ / probability/progressive-lock/REPORT.md |
+| 2026-08-18 | ACCEPTED | 固定4→2・公開15＋4＋4＋4を本番進行へ反映する。 | 人間が独立モックを操作して明示承認。プリフロップ固定なし、固定6枚＋自由8枚で最終14枚を作る。 |
+| 2026-08-18 | ACCEPTED | 本番結果画面で全参加者の私牌8枚・実際の最終14枚・役要約を一人ずつ切り替えて公開する。 | Hold'emより候補集合が大きいため、私牌8枚だけの公開では勝敗根拠を読めない。私牌由来牌は青枠で示す。 |
 
 ## States
 

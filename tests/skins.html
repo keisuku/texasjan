@@ -13,6 +13,7 @@ f.onload=function(){setTimeout(function(){
   const d=f.contentDocument, w=f.contentWindow, root=d.documentElement;
   const bg=function(sel){return w.getComputedStyle(d.querySelector(sel)).backgroundImage;};
   const commons=function(){return d.querySelectorAll("#commons .tile").length;};
+  w.fastForwardBetting();d.getElementById("bNext").click(); /* PREFLOP → COMMON 15 */
 
   /* ---- カタログが読めているか ---- */
   const S=w.MH_SKINS;
@@ -98,14 +99,14 @@ f.onload=function(){setTimeout(function(){
   ok(!overlap(nb,R(".sourceZone")),"進行ボタンが私牌8枚と重なっていない");
   ok(!overlap(nb,R(".labelFinal")),"進行ボタンが MY FINAL HAND の見出しと重なっていない");
   ok(!overlap(nb,R("#rack")),"進行ボタンが最終手牌と重なっていない");
-  w.fastForwardBetting();
-  ok(/を公開/.test(bn.textContent),"進行ボタンが次に開く枠を示している ("+bn.textContent+")");
-
-  const st0=w.eval("stage");
+  w.fastForwardBetting();d.getElementById("bRec").click();
+  ok(/を公開/.test(bn.textContent),"固定4枚後、進行ボタンが次に開く枠を示している ("+bn.textContent+")");
   bn.click();
-  ok(w.eval("stage")===st0+1,"進行ボタンで局が進む ("+st0+" -> "+w.eval("stage")+")");
+  ok(w.eval("stage")===2&&w.eval("picks.filter(function(p){return p.locked;}).length")===4,"4枚固定して+4 Iへ進む");
+  w.fastForwardBetting();d.getElementById("bRec").click();bn.click();
+  ok(w.eval("stage")===3&&w.eval("picks.filter(function(p){return p.locked;}).length")===6,"追加2枚を固定");
   w.fastForwardBetting();bn.click();w.fastForwardBetting();
-  ok(w.eval("stage")===3&&w.eval("common.length")===23,"+4 を2つ開くと共通23枚 (stage="+w.eval("stage")+")");
+  ok(w.eval("stage")===4&&w.eval("common.length")===27,"+4 を3つ開くと共通27枚 (stage="+w.eval("stage")+")");
   ok(/あと \d+ 枚えらぶ/.test(bn.textContent)&&bn.disabled,
      "14枚そろう前は残り枚数を示して押せない ("+bn.textContent+")");
   ok(d.getElementById("bCall").disabled,"ベッティング完了後は CALL が無効");
@@ -127,9 +128,9 @@ f.onload=function(){setTimeout(function(){
   ok(d.querySelectorAll("#rsRanking .rs-rankrow").length===6,"結果画面に6人の順位が表示される");
   ok(d.getElementById("rsTiles").children.length>0,"結果画面に最終手牌またはFOLD状態が表示される");
   d.getElementById("bResultAgain").click();
-  ok(w.eval('phase')==="play"&&w.eval("stage")===1,"「もう一局」で新しい局が始まる");
+  ok(w.eval('phase')==="play"&&w.eval("stage")===0,"「もう一局」でプリフロップから新しい局が始まる");
   ok(d.getElementById("screen-game").classList.contains("on"),"再戦で対局画面へ戻る");
-  ok(d.querySelectorAll("#commons .tile").length===15,"新しい局でも共通15枚");
+  ok(d.querySelectorAll("#commons .tile").length===0,"新しい局は共通牌未公開");
 
   /* ---- ガチャ: 引く → 所持する → 装備できる ---- */
   w.go("shop");

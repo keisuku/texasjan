@@ -17,13 +17,11 @@ f.onload=function(){
      ||E("stage")>0,"初期持ち点がGolden Visualの数字");
   let winners=0,hands=0,conserved=true,bad="",neg="";
   for(let h=0;h<30;h++){
-    for(let k=0;k<2;k++){w.fastForwardBetting();const p=d.querySelector(".revealGroup.pending");if(p)p.click();}
-    w.fastForwardBetting();
-    d.getElementById("bRec").click();
-    if(d.querySelectorAll("#rack .tile").length<14){
-      const cs=[].slice.call(d.querySelectorAll("#commons .tile:not(.used)"));
-      for(let i=0;i<cs.length&&d.querySelectorAll("#rack .tile").length<14;i++)cs[i].click();
-    }
+    w.fastForwardBetting();d.getElementById("bNext").click();
+    w.fastForwardBetting();d.getElementById("bRec").click();d.getElementById("bNext").click();
+    w.fastForwardBetting();d.getElementById("bRec").click();d.getElementById("bNext").click();
+    w.fastForwardBetting();d.getElementById("bNext").click();
+    w.fastForwardBetting();d.getElementById("bRec").click();
     d.getElementById("bNext").click();   /* ショーダウン */
     hands++;
     if(E("pot")!==0)bad="局"+h+" 決着後のPOTが"+E("pot");
@@ -39,7 +37,7 @@ f.onload=function(){
   ok(conserved,"点棒総和が全局で保存された（期待 "+TOTAL+"）");
   ok(winners===hands,"毎局かならず決着した ("+winners+"/"+hands+")");
   /* 卓の生死は「その瞬間の生存数」では測れない。
-     newHand() は ensureTable() → postAnte() → openCommon15() の順に走るので、
+     newHand() は ensureTable() → postAnte() → preflop の順に走るので、
      ループ直後の状態はもう ante と初手のベットを引いたあとで、
      ぎりぎりの席が一時的に0になる。ここを閾値で見ると稀に落ちる（実測 約1/10）。
 
@@ -48,7 +46,7 @@ f.onload=function(){
   log.push("INFO  30局終了時点の生存 "+E("seats.filter(function(s){return s.stack>0;}).length")
     +"/5（ante 差引後）");
   /* ループの最後の bNext で31局目はもう始まっている。ここでは押さずに状態を見る。 */
-  ok(E("stage")===1&&E("common.length")===15&&E("phase")==="play",
+  ok(E("stage")===0&&E("common.length")===0&&E("phase")==="play",
      "何局続けても次の局が必ず始まる（stage="+E("stage")+" common="+E("common.length")+"）");
   ok(E("userStack")>0,"自分の点棒が尽きたまま次局へ入らない (YOU="+E("userStack")+")");
   ok(E("seats.filter(function(s){return !s.folded;}).length")>=1,
