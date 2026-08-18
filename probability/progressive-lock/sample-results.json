@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "seed": 2026081804,
   "deals": 500,
   "equitySampleDeals": 6,
@@ -11,6 +11,7 @@
     "communalGroups": [
       15,
       4,
+      4,
       4
     ],
     "final": 14
@@ -20,108 +21,116 @@
   "evaluator": "mahjong-score.js plus the production probability strategy/search replicated with a mandatory-lock multiset constraint.",
   "metrics": {
     "free": {
-      "finalCompletionPct": 97.8667,
+      "finalCompletionPct": 100,
       "lockRegretPct": 0,
-      "splitPotPct": 29.8,
-      "averageWinnerCount": 1.586,
+      "splitPotPct": 19.6,
+      "averageWinnerCount": 1.282,
       "winnerRouteSharePct": {
-        "flush": 12.1667,
-        "seven_pairs": 60.2,
-        "sequence": 19.3333,
-        "triplet": 8.3
+        "flush": 26.2,
+        "seven_pairs": 46.4,
+        "triplet": 14.9,
+        "sequence": 12.5
       },
-      "averagePrivateRequired": 3.712,
-      "averagePrivateAttributed": 4.4283,
+      "averagePrivateRequired": 3.327,
+      "averagePrivateAttributed": 4.1813,
       "sharedCoreCollisionPairPct": null,
       "averageSharedCommonLockOverlap": null,
       "winnerRoutePivotPct": null,
       "equityLeaderChangePct": [
         50,
-        66.6667
+        50,
+        16.6667
       ],
       "equityAnyRankMovePct": [
+        100,
         83.3333,
-        83.3333
+        100
       ],
       "solverCapHitPct": 0
     },
     "lock8_flop": {
-      "finalCompletionPct": 44.8333,
-      "lockRegretPct": 53.0333,
-      "splitPotPct": 27,
-      "averageWinnerCount": 1.408,
+      "finalCompletionPct": 55.4667,
+      "lockRegretPct": 44.5333,
+      "splitPotPct": 22,
+      "averageWinnerCount": 1.326,
       "winnerRouteSharePct": {
-        "seven_pairs": 54,
-        "sequence": 25.8,
-        "triplet": 10.4,
-        "incomplete": 7.2,
-        "flush": 2.6
+        "seven_pairs": 49.8,
+        "sequence": 25.2,
+        "triplet": 15.8,
+        "incomplete": 3,
+        "flush": 6.2
       },
-      "averagePrivateRequired": 3.7787,
-      "averagePrivateAttributed": 4.1187,
+      "averagePrivateRequired": 3.5523,
+      "averagePrivateAttributed": 4.0557,
       "sharedCoreCollisionPairPct": 96.7733,
       "averageSharedCommonLockOverlap": 3.1212,
-      "winnerRoutePivotPct": 56.392,
+      "winnerRoutePivotPct": 57.6169,
       "equityLeaderChangePct": [
-        16.6667,
+        50,
+        50,
         33.3333
       ],
       "equityAnyRankMovePct": [
-        66.6667,
+        100,
+        100,
         83.3333
       ],
       "solverCapHitPct": 0
     },
     "lock4_4": {
-      "finalCompletionPct": 55.8,
-      "lockRegretPct": 42.0667,
-      "splitPotPct": 31.4,
-      "averageWinnerCount": 1.532,
+      "finalCompletionPct": 64.9333,
+      "lockRegretPct": 35.0667,
+      "splitPotPct": 25.2,
+      "averageWinnerCount": 1.386,
       "winnerRouteSharePct": {
-        "seven_pairs": 54,
-        "sequence": 25.2,
-        "triplet": 12.8,
-        "incomplete": 4.6,
-        "flush": 3.4
+        "seven_pairs": 47,
+        "sequence": 21.7667,
+        "triplet": 21.3667,
+        "incomplete": 3,
+        "flush": 6.8667
       },
-      "averagePrivateRequired": 3.743,
-      "averagePrivateAttributed": 4.1267,
+      "averagePrivateRequired": 3.4493,
+      "averagePrivateAttributed": 3.9877,
       "sharedCoreCollisionPairPct": 95.4667,
       "averageSharedCommonLockOverlap": 3.1263,
-      "winnerRoutePivotPct": 64.8825,
+      "winnerRoutePivotPct": 63.925,
       "equityLeaderChangePct": [
-        16.6667,
-        50
+        50,
+        66.6667,
+        33.3333
       ],
       "equityAnyRankMovePct": [
-        83.3333,
-        83.3333
+        100,
+        100,
+        100
       ],
       "solverCapHitPct": 0
     },
     "lock4_2": {
-      "finalCompletionPct": 63.7667,
-      "lockRegretPct": 34.1,
-      "splitPotPct": 32.2,
-      "averageWinnerCount": 1.548,
+      "finalCompletionPct": 76.3,
+      "lockRegretPct": 23.7,
+      "splitPotPct": 23.4,
+      "averageWinnerCount": 1.376,
       "winnerRouteSharePct": {
-        "flush": 5.4667,
-        "seven_pairs": 54.8,
-        "sequence": 23.8333,
-        "triplet": 12.9,
-        "incomplete": 3
+        "flush": 11.0667,
+        "seven_pairs": 46.4,
+        "sequence": 18.8333,
+        "triplet": 21.9,
+        "incomplete": 1.8
       },
-      "averagePrivateRequired": 3.7347,
-      "averagePrivateAttributed": 4.1443,
+      "averagePrivateRequired": 3.4387,
+      "averagePrivateAttributed": 4.002,
       "sharedCoreCollisionPairPct": 87.6267,
       "averageSharedCommonLockOverlap": 2.1425,
-      "winnerRoutePivotPct": 67.1835,
+      "winnerRoutePivotPct": 65.9884,
       "equityLeaderChangePct": [
-        66.6667,
-        50
+        33.3333,
+        33.3333,
+        33.3333
       ],
       "equityAnyRankMovePct": [
         83.3333,
+        100,
         83.3333
       ],
       "solverCapHitPct": 0

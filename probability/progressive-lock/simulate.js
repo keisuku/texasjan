@@ -301,10 +301,11 @@ function dealOne(cfg, rng) {
   const common15 = wall.splice(0, 15);
   const turn4 = wall.splice(0, 4);
   const river4 = wall.splice(0, 4);
+  const final4 = wall.splice(0, 4);
   return {
     privates,
     dora: doraOf(doraIndicator),
-    streets: [common15, common15.concat(turn4), common15.concat(turn4, river4)],
+    streets: [common15, common15.concat(turn4), common15.concat(turn4, river4), common15.concat(turn4, river4, final4)],
     remaining: wall.slice()
   };
 }
@@ -361,7 +362,7 @@ function evaluateDealVariant(deal, variant, cfg) {
   }
   const finalStates = [];
   for (let p = 0; p < 6; p++) {
-    finalStates.push(evaluateSeat(deal.privates[p], deal.streets[2], deal.dora, MODES[p], locks[p], cfg.solverNodeCap));
+    finalStates.push(evaluateSeat(deal.privates[p], deal.streets[3], deal.dora, MODES[p], locks[p], cfg.solverNodeCap));
   }
   const win = winnerShares(finalStates);
   const winnerRoutes = win.winners.map(p => finalStates[p].result.complete
@@ -389,8 +390,8 @@ function rankOrder(eq) {
 
 function sampledEquity(deal, variant, cfg, dealIndex) {
   const equities = [];
-  for (let street = 0; street < 3; street++) {
-    if (street === 2) {
+  for (let street = 0; street < 4; street++) {
+    if (street === 3) {
       const actual = evaluateDealVariant(deal, variant, cfg);
       equities.push(actual.win.shares);
       continue;
@@ -398,19 +399,17 @@ function sampledEquity(deal, variant, cfg, dealIndex) {
     const shares = new Array(6).fill(0);
     for (let rollout = 0; rollout < cfg.equityRollouts; rollout++) {
       const rng = mulberry32((cfg.seed ^ (dealIndex * 1009) ^ (street * 9176) ^ (rollout * 31337) ^ VARIANTS.indexOf(variant)) >>> 0);
-      const unseen = deal.streets[2].slice(deal.streets[street].length).concat(deal.remaining);
+      const unseen = deal.streets[3].slice(deal.streets[street].length).concat(deal.remaining);
       shuffle(unseen, rng);
       const simulated = {
         privates: deal.privates,
         dora: deal.dora,
-        streets: [deal.streets[0].slice(), deal.streets[1].slice(), deal.streets[2].slice()],
+        streets: deal.streets.map(x => x.slice()),
         remaining: []
       };
-      if (street === 0) {
-        simulated.streets[1] = simulated.streets[0].concat(unseen.slice(0, 4));
-        simulated.streets[2] = simulated.streets[1].concat(unseen.slice(4, 8));
-      } else {
-        simulated.streets[2] = simulated.streets[1].concat(unseen.slice(0, 4));
+      for (let next = street + 1; next < 4; next++) {
+        const offset = (next - street - 1) * 4;
+        simulated.streets[next] = simulated.streets[next - 1].concat(unseen.slice(offset, offset + 4));
       }
       const result = evaluateDealVariant(simulated, variant, cfg);
       for (let p = 0; p < 6; p++) shares[p] += result.win.shares[p];
@@ -425,7 +424,7 @@ function emptyAgg() {
     playerStates: 0, complete: 0, regret: 0, splits: 0, winnerCount: 0,
     privateMin: 0, privateMax: 0, collisionPairs: 0, overlapTotal: 0,
     pivot: 0, pivotDen: 0, lockCapHits: 0, finalCapHits: 0,
-    routeShare: {}, equityLeaderChanges: [0, 0], equityRankMoves: [0, 0], equitySamples: 0
+    routeShare: {}, equityLeaderChanges: [0, 0, 0], equityRankMoves: [0, 0, 0], equitySamples: 0
   };
 }
 
@@ -462,7 +461,7 @@ function run(cfg) {
       if (di < cfg.equitySampleDeals) {
         const eq = sampledEquity(deal, variant, cfg, di);
         agg.equitySamples++;
-        for (let s = 1; s < 3; s++) {
+        for (let s = 1; s < 4; s++) {
           const before = rankOrder(eq[s - 1]), after = rankOrder(eq[s]);
           agg.equityLeaderChanges[s - 1] += Number(before[0] !== after[0]);
           agg.equityRankMoves[s - 1] += Number(before.some((seat, rank) => after[rank] !== seat));
@@ -490,12 +489,12 @@ function run(cfg) {
     };
   }
   return {
-    schemaVersion: 1,
+    schemaVersion: 2,
     seed: cfg.seed,
     deals: cfg.deals,
     equitySampleDeals: cfg.equitySampleDeals,
     equityRollouts: cfg.equityRollouts,
-    rules: { deck: 136, players: 6, private: 8, communalGroups: [15, 4, 4], final: 14 },
+    rules: { deck: 136, players: 6, private: 8, communalGroups: [15, 4, 4, 4], final: 14 },
     pairedDealPolicy: "All variants consume the exact same seeded deal before any strategy is evaluated.",
     lookaheadPolicy: "Lock choice receives only private tiles, the currently revealed communal prefix, dora, prior locks, and strategy mode.",
     evaluator: "mahjong-score.js plus the production probability strategy/search replicated with a mandatory-lock multiset constraint.",
@@ -508,7 +507,7 @@ function renderReport(report) {
     const m = report.metrics[v];
     return `| ${v} | ${m.finalCompletionPct}% | ${m.lockRegretPct}% | ${m.splitPotPct}% | ${m.averagePrivateAttributed} | ${m.sharedCoreCollisionPairPct == null ? "—" : m.sharedCoreCollisionPairPct + "%"} |`;
   }).join("\n");
-  return `# 段階固定 4→4 / 4→2 — paired-seed pilot\n\n状態: **PROPOSED / 実験結果**\n\n同じ seed **${report.seed}** の ${report.deals} deals を、${VARIANTS.map(v => `\`${v}\``).join(" / ")} の${VARIANTS.length}条件へ同時に通した。production scorer と既存5方針を再利用し、固定処理には未来の +4 を渡していない。\n\n| 条件 | 最終完成 | 固定後悔 | split pot | 私牌由来平均 | 共通core衝突(pair) |\n|---|---:|---:|---:|---:|---:|\n${rows}\n\n## 追加指標\n\n${VARIANTS.map(v => { const m = report.metrics[v]; return `- **${v}**: winner route ${JSON.stringify(m.winnerRouteSharePct)}; route pivot ${m.winnerRoutePivotPct == null ? "—" : m.winnerRoutePivotPct + "%"}; equity leader change 15→19 / 19→23 = ${m.equityLeaderChangePct.join("% / ")}%`; }).join("\n")}\n\n## 読み方\n\n- **固定後悔**は、同一dealで free なら完成するのに、その固定条件では完成不能になったplayer-state率。\n- **共通core衝突**は、2席が固定した「共通由来」の牌型に1枚以上のmultiset overlapがあるplayer-pair率。\n- **route pivot**は、勝者の初回固定方針と最終完成ルートが異なる率。\n- **equity movement** は ${report.equitySampleDeals} deals × ${report.equityRollouts} fair runouts の方向性指標。sampleが小さいため採用判断には使わない。\n\n## 判定\n\nこの結果はルール採用ではない。4→2は4→4より完成率と固定後悔を改善したが初期合格帯には未達。次は固定UI playtestとlock picker調整を先に行い、その後にdeal数とequity sampleを増やす。\n`;
+  return `# 固定4→2・公開4→4→4 — paired-seed pilot\n\n状態: **WORKING BASELINE / 実験結果**\n\n同じ seed **${report.seed}** の ${report.deals} deals を、${VARIANTS.map(v => `\`${v}\``).join(" / ")} の${VARIANTS.length}条件へ同時に通した。共通牌は15＋4＋4＋4＝27枚。production scorer と既存5方針を再利用し、固定処理には未来の +4 を渡していない。\n\n| 条件 | 最終完成 | 固定後悔 | split pot | 私牌由来平均 | 共通core衝突(pair) |\n|---|---:|---:|---:|---:|---:|\n${rows}\n\n## 23枚版との差（lock4_2）\n\n| 公開 | 最終完成 | 固定後悔 | split pot |\n|---|---:|---:|---:|\n| 15＋4＋4＝23枚 | 63.7667% | 34.1% | 32.2% |\n| 15＋4＋4＋4＝27枚 | ${report.metrics.lock4_2.finalCompletionPct}% | ${report.metrics.lock4_2.lockRegretPct}% | ${report.metrics.lock4_2.splitPotPct}% |\n\n27枚化で完成率は **+12.5333pt**、固定後悔は **-10.4pt**、split potは **-8.8pt**。同じ固定6枚でも、最後の4枚が救済と勝敗分離の両方に効いている。\n\n## 追加指標\n\n${VARIANTS.map(v => { const m = report.metrics[v]; return `- **${v}**: winner route ${JSON.stringify(m.winnerRouteSharePct)}; route pivot ${m.winnerRoutePivotPct == null ? "—" : m.winnerRoutePivotPct + "%"}; equity leader change 15→19 / 19→23 / 23→27 = ${m.equityLeaderChangePct.join("% / ")}%`; }).join("\n")}\n\n## 読み方\n\n- **固定後悔**は、同一dealで free なら完成するのに、その固定条件では完成不能になったplayer-state率。\n- **共通core衝突**は、2席が固定した「共通由来」の牌型に1枚以上のmultiset overlapがあるplayer-pair率。\n- **route pivot**は、勝者の初回固定方針と最終完成ルートが異なる率。\n- **equity movement** は ${report.equitySampleDeals} deals × ${report.equityRollouts} fair runouts の方向性指標。sampleが小さいため採用判断には使わない。\n\n## 判定\n\n人間の操作感では固定4→2を維持し、追加公開を4→4→4へ戻す方向を作業基準とする。完成76.3%は初期合格帯75–92%へ入った。固定後悔23.7%は目標20%以下に少し届かないため、本番採用前に追加playtestを続ける。\n`;
 }
 
 function main() {

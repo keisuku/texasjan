@@ -39,6 +39,7 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-18 | REPRODUCIBLE BASELINE | 私牌8枚だけの運差を、共通15＋4＋4、全員同一方針、5,000局と10/100局各100万シーズンで固定seed測定した。 | 最終14枚の私牌由来は平均4.28枚。100点アンティ時の首位―最下位差中央値は10局1,800点、100局5,450点。probability/STARTING_EIGHT_LUCK_2026-08-18.md |
 
 | 2026-08-18 | PROPOSED | プリフロップは固定なし、共通15公開後に4枚、次の＋4公開後に追加4枚を固定し、最後は固定8＋自由6で最終14枚を作る。 | 操作モックと同一seed比較仕様を追加。experiments/progressive-lock/ / probability/PROGRESSIVE_LOCK_EXPERIMENT_2026-08-18.md |
+| 2026-08-18 | WORKING BASELINE | 固定は4→2、共通牌の追加公開は4→4→4へ戻す。プリフロップ固定なし、15枚で4固定、最初の＋4で追加2固定、残り2回の＋4では固定を増やさない。 | 人間playtestで方向性良好。500局で完成76.3%、固定後悔23.7%、split 23.4%。本番は未変更。experiments/progressive-lock/ / probability/progressive-lock/REPORT.md |
 
 ## States
 

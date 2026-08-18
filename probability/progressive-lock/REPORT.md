@@ -1,22 +1,31 @@
-# 段階固定 4→4 / 4→2 — paired-seed pilot
+# 固定4→2・公開4→4→4 — paired-seed pilot
 
-状態: **PROPOSED / 実験結果**
+状態: **WORKING BASELINE / 実験結果**
 
-同じ seed **2026081804** の 500 deals を、`free` / `lock8_flop` / `lock4_4` / `lock4_2` の4条件へ同時に通した。production scorer と既存5方針を再利用し、固定処理には未来の +4 を渡していない。
+同じ seed **2026081804** の 500 deals を、`free` / `lock8_flop` / `lock4_4` / `lock4_2` の4条件へ同時に通した。共通牌は15＋4＋4＋4＝27枚。production scorer と既存5方針を再利用し、固定処理には未来の +4 を渡していない。
 
 | 条件 | 最終完成 | 固定後悔 | split pot | 私牌由来平均 | 共通core衝突(pair) |
 |---|---:|---:|---:|---:|---:|
-| free | 97.8667% | 0% | 29.8% | 4.4283 | — |
-| lock8_flop | 44.8333% | 53.0333% | 27% | 4.1187 | 96.7733% |
-| lock4_4 | 55.8% | 42.0667% | 31.4% | 4.1267 | 95.4667% |
-| lock4_2 | 63.7667% | 34.1% | 32.2% | 4.1443 | 87.6267% |
+| free | 100% | 0% | 19.6% | 4.1813 | — |
+| lock8_flop | 55.4667% | 44.5333% | 22% | 4.0557 | 96.7733% |
+| lock4_4 | 64.9333% | 35.0667% | 25.2% | 3.9877 | 95.4667% |
+| lock4_2 | 76.3% | 23.7% | 23.4% | 4.002 | 87.6267% |
+
+## 23枚版との差（lock4_2）
+
+| 公開 | 最終完成 | 固定後悔 | split pot |
+|---|---:|---:|---:|
+| 15＋4＋4＝23枚 | 63.7667% | 34.1% | 32.2% |
+| 15＋4＋4＋4＝27枚 | 76.3% | 23.7% | 23.4% |
+
+27枚化で完成率は **+12.5333pt**、固定後悔は **-10.4pt**、split potは **-8.8pt**。同じ固定6枚でも、最後の4枚が救済と勝敗分離の両方に効いている。
 
 ## 追加指標
 
-- **free**: winner route {"flush":12.1667,"seven_pairs":60.2,"sequence":19.3333,"triplet":8.3}; route pivot —; equity leader change 15→19 / 19→23 = 50% / 66.6667%
-- **lock8_flop**: winner route {"seven_pairs":54,"sequence":25.8,"triplet":10.4,"incomplete":7.2,"flush":2.6}; route pivot 56.392%; equity leader change 15→19 / 19→23 = 16.6667% / 33.3333%
-- **lock4_4**: winner route {"seven_pairs":54,"sequence":25.2,"triplet":12.8,"incomplete":4.6,"flush":3.4}; route pivot 64.8825%; equity leader change 15→19 / 19→23 = 16.6667% / 50%
-- **lock4_2**: winner route {"flush":5.4667,"seven_pairs":54.8,"sequence":23.8333,"triplet":12.9,"incomplete":3}; route pivot 67.1835%; equity leader change 15→19 / 19→23 = 66.6667% / 50%
+- **free**: winner route {"flush":26.2,"seven_pairs":46.4,"triplet":14.9,"sequence":12.5}; route pivot —; equity leader change 15→19 / 19→23 / 23→27 = 50% / 50% / 16.6667%
+- **lock8_flop**: winner route {"seven_pairs":49.8,"sequence":25.2,"triplet":15.8,"incomplete":3,"flush":6.2}; route pivot 57.6169%; equity leader change 15→19 / 19→23 / 23→27 = 50% / 50% / 33.3333%
+- **lock4_4**: winner route {"seven_pairs":47,"sequence":21.7667,"triplet":21.3667,"incomplete":3,"flush":6.8667}; route pivot 63.925%; equity leader change 15→19 / 19→23 / 23→27 = 50% / 66.6667% / 33.3333%
+- **lock4_2**: winner route {"flush":11.0667,"seven_pairs":46.4,"sequence":18.8333,"triplet":21.9,"incomplete":1.8}; route pivot 65.9884%; equity leader change 15→19 / 19→23 / 23→27 = 33.3333% / 33.3333% / 33.3333%
 
 ## 読み方
 
@@ -27,4 +36,4 @@
 
 ## 判定
 
-この結果はルール採用ではない。4→2は4→4より完成率と固定後悔を改善したが初期合格帯には未達。次は固定UI playtestとlock picker調整を先に行い、その後にdeal数とequity sampleを増やす。
+人間の操作感では固定4→2を維持し、追加公開を4→4→4へ戻す方向を作業基準とする。完成76.3%は初期合格帯75–92%へ入った。固定後悔23.7%は目標20%以下に少し届かないため、本番採用前に追加playtestを続ける。
