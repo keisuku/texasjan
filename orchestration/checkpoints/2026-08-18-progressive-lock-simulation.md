@@ -7,7 +7,7 @@
 
 ## Outcome
 
-The free / lock8-at-15 / lock4-at-15-plus-lock4-at-19 conditions now run on identical seeded deals with the production scorer and existing five strategy ranks. Lock choice receives no future reveal.
+The free / lock8-at-15 / lock4+4 / lock4+2 conditions now run on identical seeded deals with the production scorer and existing five strategy ranks. Lock choice receives no future reveal. The 4→2 variant fixes six tiles and leaves eight final slots free.
 
 ## Human-visible artifacts
 
@@ -16,12 +16,12 @@ The free / lock8-at-15 / lock4-at-15-plus-lock4-at-19 conditions now run on iden
 
 ## Decisions made
 
-- PROPOSED: keep 4→4 as an experiment only until a larger paired run and playtest agree.
+- PROPOSED: compare 4→2 against 4→4 as experiments only until a larger paired run and playtest agree.
 
 ## Verification
 
 - Test/check: `node probability/progressive-lock/test.js`
-- Result: deterministic seed, lock count, visible-copy limit, and no-future-input invariants covered.
+- Result: deterministic seed, 4→8 and 4→6 lock counts, visible-copy limit, and first/second-lock no-future-input invariants covered.
 
 ## Open risks
 
