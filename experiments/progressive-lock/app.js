@@ -26,10 +26,10 @@
     4:{locked:["c6","c7","c8","p3","p4","c3","c4","t1"],draft:["p0","p1","p2","c9","c10","r3"]}
   };
   const opponents=[
-    {name:"九蓮",score:"混一色　2,400点",private:["Man1","Man1","Man6","Pin3","Sou2","Sou7","Nan","Chun"],final:["Man1","Man1","Man2","Man3","Man4","Pin2","Pin2","Pin2","Sou3","Sou4","Sou5","Nan","Nan","Chun"],from:[0,1,7,12]},
-    {name:"カムイ",score:"七対子　1,800点",private:["Man4","Man4","Pin1","Pin7","Sou3","Sou8","Haku","Hatsu"],final:["Man4","Man4","Pin2","Pin2","Pin5","Pin5","Sou3","Sou3","Sou8","Sou8","Haku","Haku","Hatsu","Hatsu"],from:[0,1,6,7,10,11,12,13]},
-    {name:"翡翠",score:"対々和　1,200点",private:["Man7","Man7","Man9","Pin8","Pin8","Sou4","Ton","Ton"],final:["Man7","Man7","Man7","Pin8","Pin8","Pin8","Sou4","Sou4","Sou4","Ton","Ton","Ton","Haku","Haku"],from:[0,1,3,4,6,9,10]},
-    {name:"レン",score:"平和　900点",private:["Man2","Man5","Pin3","Pin4","Sou6","Sou7","Shaa","Haku"],final:["Man2","Man3","Man4","Man5","Man6","Man7","Pin2","Pin3","Pin4","Sou5","Sou6","Sou7","Haku","Haku"],from:[0,3,4,5,10,11,12]},
+    {name:"九蓮",score:"獲得 2,400点",private:["Man1","Man1","Man6","Pin3","Sou2","Sou7","Nan","Chun"],final:["Man1","Man1","Man2","Man3","Man4","Pin2","Pin2","Pin2","Sou3","Sou4","Sou5","Nan","Nan","Chun"],from:[0,1,7,12]},
+    {name:"カムイ",score:"獲得 1,800点",private:["Man4","Man4","Pin1","Pin7","Sou3","Sou8","Haku","Hatsu"],final:["Man4","Man4","Pin2","Pin2","Pin5","Pin5","Sou3","Sou3","Sou8","Sou8","Haku","Haku","Hatsu","Hatsu"],from:[0,1,6,7,10,11,12,13]},
+    {name:"翡翠",score:"獲得 1,200点",private:["Man7","Man7","Man9","Pin8","Pin8","Sou4","Ton","Ton"],final:["Man7","Man7","Man7","Pin8","Pin8","Pin8","Sou4","Sou4","Sou4","Ton","Ton","Ton","Haku","Haku"],from:[0,1,3,4,6,9,10]},
+    {name:"レン",score:"獲得 900点",private:["Man2","Man5","Pin3","Pin4","Sou6","Sou7","Shaa","Haku"],final:["Man2","Man3","Man4","Man5","Man6","Man7","Pin2","Pin3","Pin4","Sou5","Sou6","Sou7","Haku","Haku"],from:[0,3,4,5,10,11,12]},
     {name:"アキ",score:"降り",private:["Man8","Pin1","Pin9","Sou1","Sou9","Pei","Chun","Chun"],final:["Man8","Man8","Pin1","Pin2","Pin3","Pin7","Pin8","Pin9","Sou1","Sou2","Sou3","Chun","Chun","Chun"],from:[0,1,8,12,13]}
   ];
   let stage=0,locked=[],draft=[],toastTimer=0,shownPlayer=0;
@@ -69,7 +69,7 @@
     const b=document.createElement("span");b.className="tile disabled"+(fromPrivate?" from-private":"");b.innerHTML='<img alt="" src="'+tileSrc(name)+'">';return b;
   }
   function showData(){
-    if(shownPlayer===0){const ids=locked.concat(draft);return {name:"あなた",score:"七対子　3,600点",private:privateTiles,final:ids.map(uid=>byId[uid].name),from:ids.map((uid,i)=>byId[uid].source==="private"?i:-1).filter(i=>i>=0)};}
+    if(shownPlayer===0){const ids=locked.concat(draft);return {name:"あなた",score:"獲得 3,600点",private:privateTiles,final:ids.map(uid=>byId[uid].name),from:ids.map((uid,i)=>byId[uid].source==="private"?i:-1).filter(i=>i>=0)};}
     return opponents[shownPlayer-1];
   }
   function renderFinal(){
