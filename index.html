@@ -267,7 +267,7 @@ body::after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
 .commons{display:grid;grid-template-columns:repeat(5,auto);justify-content:center;align-content:center;gap:3px;min-height:214px;padding-top:27px}
 .commons .tile.md{--w:39px}
 .commons .hint{grid-column:1/-1;padding:56px 12px}
-.revealRail{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin:8px 5px 2px;padding-right:96px}
+.revealRail{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin:8px 5px 2px;padding-right:96px}
 .revealGroup{position:relative;display:grid;grid-template-columns:repeat(2,auto);grid-template-rows:repeat(2,auto);justify-content:center;gap:2px;padding:5px 3px 18px;border-radius:10px;
   background:linear-gradient(180deg,rgba(3,18,15,.44),rgba(2,11,9,.76));border:1px solid rgba(235,212,137,.34)}
 .revealGroup .tile{--w:23px}.revealGroup .revealLabel{position:absolute;left:0;right:0;bottom:1px;text-align:center;color:#e9ce7c;font-size:8px;font-weight:900;letter-spacing:.08em}
@@ -374,6 +374,8 @@ html.still .tile.waitCandidate{animation:none}
 /* ショーダウン: 私牌8枚を2段4列で開く。 */
 .seat .backs.open{display:grid;grid-template-columns:repeat(4,auto);gap:.3cqw;justify-content:center}
 .seat .backs.open .tile.sm{--w:3.1cqw}
+.seat .publicLock{position:absolute;left:50%;top:3.6cqw;transform:translateX(-50%);display:flex;gap:.25cqw;z-index:6}
+.seat .publicLock .tile.sm{--w:2.75cqw}.seat .publicLock .tile.fixedCore::before{display:none}
 .seat.won .bet{border-color:#ffe89a;color:#fff6d2;
   background:linear-gradient(180deg,#8a6a17,#4a3607);box-shadow:0 0 1.6cqw rgba(255,222,120,.9)}
 .seat.won::after{content:"WIN";position:absolute;left:50%;top:-1.6cqw;transform:translateX(-50%);
@@ -428,17 +430,24 @@ html.still .tile.waitCandidate{animation:none}
 .commons .tile.md{--w:7cqw;--ar:1.08}
 .commons .hint{grid-column:1/-1;padding:0;font-size:1.7cqw;color:#cfe3d8}
 
-/* --- +4 I / II --- */
-.revealRail{position:absolute;left:50%;top:39.18%;transform:translateX(-50%);width:36cqw;height:9.75%;
-  margin:0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);gap:2.2cqw}
+/* --- +4 I / II / III --- */
+.revealRail{position:absolute;left:50%;top:39.18%;transform:translateX(-50%);width:51cqw;height:9.75%;
+  margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:1.1cqw}
 .revealGroup{height:100%;align-content:center;padding:.5cqw .3cqw 2.1cqw;gap:.3cqw;border-radius:1.2cqw;
   background:linear-gradient(180deg,rgba(2,30,25,.94),rgba(1,15,12,.98));border:1px solid rgba(239,207,102,.78)}
-.revealGroup .tile{--w:5.2cqw}
+.revealGroup .tile{--w:4.45cqw}
 .revealGroup .revealLabel{font-size:1.9cqw;bottom:.5cqw;color:#eed488}
 .revealGroup.live{border-color:#e4c564;box-shadow:0 0 1.2cqw rgba(226,194,91,.22)}
 .revealGroup.pending{cursor:pointer;border-color:rgba(244,220,150,.95);box-shadow:0 0 1.4cqw rgba(238,206,120,.35)}
 .revealGroup.pending:active{transform:translateY(1px)}
 .revealGroup.locked{opacity:.58;filter:saturate(.55)}
+.tile.fixedCore{opacity:1!important;filter:none!important;z-index:5;box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 .25cqw #f4d066,0 0 1.4cqw rgba(244,208,102,.65)}
+.tile.fixedCore::before{content:"固定";position:absolute;left:50%;top:-1.65cqw;transform:translateX(-50%);z-index:9;padding:.08cqw .45cqw;border-radius:99cqw;background:#f1cf68;color:#221906;font-size:1.05cqw;font-weight:900;white-space:nowrap}
+.lockHud{position:absolute;left:50%;top:49.2%;transform:translateX(-50%);z-index:18;min-width:42cqw;height:3.2%;display:flex;align-items:center;justify-content:center;gap:1.2cqw;padding:0 1.5cqw;border-radius:99cqw;background:linear-gradient(180deg,rgba(15,55,45,.96),rgba(2,20,16,.98));border:.16cqw solid rgba(240,211,122,.75);box-shadow:0 .3cqw 1cqw rgba(0,0,0,.55)}
+.lockHud b{font-size:2.25cqw;color:#ffe694}.lockHud span{font-size:1.65cqw;color:#b8d6cb;letter-spacing:.06em}
+.streetBurst{position:absolute;inset:0;z-index:50;display:none;pointer-events:none;align-items:center;justify-content:center;flex-direction:column;background:radial-gradient(ellipse at center,rgba(27,111,91,.45),transparent 55%)}
+.streetBurst.on{display:flex;animation:burstOut 1.05s ease-out both}.streetBurst strong{font-family:"Shippori Mincho B1",serif;font-size:9cqw;letter-spacing:.18em;color:#fff2b7;text-shadow:0 0 1cqw #164d43,0 0 3cqw #e1b941}.streetBurst small{margin-top:1cqw;font-size:2.4cqw;letter-spacing:.2em;color:#b7fff1}
+@keyframes burstOut{0%{opacity:0;transform:scale(.82)}20%,62%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08)}}html.still .streetBurst{display:none!important}
 
 /* --- MY PRIVATE 8 --- */
 .sourceZone{position:absolute;left:49.36%;top:53.11%;transform:translateX(-50%);width:auto;height:5.08%;
@@ -728,6 +737,8 @@ html[data-skin-frame="sharp"] .betBar .call{font-size:3.4cqw}
   animation:ttlPulse 2.1s ease-in-out infinite}
 @keyframes ttlPulse{0%,100%{opacity:.62;transform:scale(1)}50%{opacity:1;transform:scale(1.035)}}
 .ttl-ver{position:absolute;bottom:3.4cqw;font-size:2.1cqw;letter-spacing:.24em;color:#5E7A70}
+.screen.on{animation:screenArrival .38s cubic-bezier(.2,.8,.2,1) both}
+@keyframes screenArrival{from{opacity:0;transform:scale(1.018)}to{opacity:1;transform:none}}
 
 /* ---------------- ロビー ---------------- */
 #screen-lobby{background:#04120E var(--asset-arena,url("./assets/arena-with-characters-v1.webp"))
@@ -890,17 +901,21 @@ html.has-character .lb-standee .lb-standeecap{display:none}
   text-shadow:0 .4cqw .6cqw rgba(0,0,0,.75)}
 .rs-title.lose{color:#B8CAC3}.rs-summary{margin-top:1cqw;font-size:2.4cqw;color:#A8C2B8;letter-spacing:.06em}
 .rs-pot{margin-top:1.2cqw;font-family:"Shippori Mincho B1",serif;font-size:4.4cqw;color:#F0D273;font-weight:800}
-.rs-handbox{position:absolute;left:3cqw;right:3cqw;top:44cqw;height:16cqw;padding:2cqw;border-radius:1.6cqw;
+.rs-handbox{position:absolute;left:3cqw;right:3cqw;top:43cqw;height:31cqw;padding:1.5cqw 2cqw;border-radius:1.6cqw;
   background:rgba(3,20,16,.9);border:.16cqw solid var(--ui-line)}
-.rs-label{font-size:2cqw;color:#8FA79E;letter-spacing:.2em;margin-bottom:1.3cqw}
-.rs-tiles{display:flex;justify-content:center;gap:.25cqw}.rs-tiles .tile{--w:5.7cqw;cursor:default}
-.rs-ranking{position:absolute;left:3cqw;right:3cqw;top:63cqw;height:49cqw;padding:1.4cqw 2cqw;border-radius:1.6cqw;
+.rs-showtabs{display:flex;gap:.6cqw;overflow-x:auto;margin-bottom:1.1cqw;padding-bottom:.4cqw}
+.rs-showtab{min-width:13cqw;padding:.75cqw .8cqw!important;border-radius:99cqw!important;text-align:center!important;background:rgba(21,67,54,.82)!important;border:.14cqw solid rgba(232,200,100,.25)!important;color:#BFD5CC!important;font-size:1.8cqw!important;font-weight:800!important;white-space:nowrap}
+.rs-showtab.on{color:#172016!important;background:linear-gradient(180deg,#FFF0B7,#C9A227)!important}
+.rs-label{font-size:1.8cqw;color:#8FA79E;letter-spacing:.14em;margin:.25cqw 0 .45cqw}
+.rs-private,.rs-tiles{display:flex;justify-content:center;gap:.18cqw;min-height:5.2cqw}.rs-private .tile{--w:4.6cqw;cursor:default}
+.rs-tiles .tile{--w:5.25cqw;cursor:default}.rs-tiles .tile.fromPrivate{box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 .16cqw #62e5d7}
+.rs-ranking{position:absolute;left:3cqw;right:3cqw;top:77cqw;height:39cqw;padding:1.1cqw 2cqw;border-radius:1.6cqw;
   background:rgba(3,20,16,.92);border:.16cqw solid var(--ui-line);overflow:hidden}
-.rs-rankrow{height:7.5cqw;display:grid;grid-template-columns:7cqw 1fr 20cqw;align-items:center;border-bottom:.1cqw solid rgba(232,200,100,.12)}
+.rs-rankrow{height:6cqw;display:grid;grid-template-columns:7cqw 1fr 20cqw;align-items:center;border-bottom:.1cqw solid rgba(232,200,100,.12)}
 .rs-rankrow:last-child{border-bottom:0}.rs-rankrow.you{background:linear-gradient(90deg,rgba(91,221,199,.16),transparent)}
 .rs-pos{font-family:"Shippori Mincho B1",serif;font-size:3.3cqw;color:#E8C864}.rs-name{font-size:2.6cqw;color:#E8EEE9;font-weight:700}
 .rs-stack{text-align:right;font-size:2.6cqw;color:#F0D273;font-variant-numeric:tabular-nums}
-.rs-reward{position:absolute;left:8cqw;right:8cqw;top:115cqw;height:12cqw;border-radius:1.5cqw;
+.rs-reward{position:absolute;left:8cqw;right:8cqw;top:119cqw;height:10cqw;border-radius:1.5cqw;
   display:flex;align-items:center;justify-content:center;gap:2cqw;background:rgba(8,37,29,.94);border:.18cqw solid var(--ui-line)}
 .rs-reward span{font-size:2.4cqw;color:#9BB8AE;letter-spacing:.08em}.rs-reward b{font-size:4cqw;color:#83E3C9}.rs-reward b.down{color:#E58C78}
 .rs-actions{position:absolute;left:4cqw;right:4cqw;bottom:5cqw;height:11cqw;display:grid;grid-template-columns:1.35fr 1fr;gap:2cqw}
@@ -1116,9 +1131,9 @@ html.calib #calib{display:block}
     <div class="ttl-kicker">麻雀 × ホールデム</div>
     <h1 class="ttl-logo"><span>MAHJONG</span><em>HOLD'EM</em></h1>
     <div class="ttl-rule"></div>
-    <p class="ttl-lead">共通の15枚から、あなただけの14枚を組み上げろ。</p>
+    <p class="ttl-lead">共通15＋4＋4＋4。固定6枚を読み切り、勝負の14枚を組み上げろ。</p>
     <button class="ttl-start" id="bTitleStart"><span class="gold-text">TAP TO START</span></button>
-    <div class="ttl-ver">prototype build</div>
+    <div class="ttl-ver">PLAYABLE PREVIEW — 4→2 LOCK</div>
   </div>
 </section>
 
@@ -1185,7 +1200,7 @@ html.calib #calib{display:block}
   <div class="mt-copy">
     <div class="eyebrow">TABLE FOUND</div>
     <h3>対戦相手が揃いました</h3>
-    <p id="mtRule">6人戦・持ち点制・共通15枚</p>
+    <p id="mtRule">6人戦・固定4→2・共通15＋4＋4＋4</p>
   </div>
   <div class="mt-table" id="mtTable"></div>
   <button class="mt-start" id="bMatchStart">対局開始</button>
@@ -1267,7 +1282,10 @@ html.calib #calib{display:block}
     <div class="rs-pot" id="rsPot"></div>
   </div>
   <div class="rs-handbox">
-    <div class="rs-label">MY FINAL HAND</div>
+    <div class="rs-showtabs" id="rsShowTabs"></div>
+    <div class="rs-label" id="rsInspectLabel">私牌 8枚</div>
+    <div class="rs-private" id="rsPrivateTiles"></div>
+    <div class="rs-label">最終手牌 14枚 <span style="color:#67dfd3">— 私牌由来は青枠</span></div>
     <div class="rs-tiles" id="rsTiles"></div>
   </div>
   <div class="rs-ranking" id="rsRanking"></div>
@@ -1296,6 +1314,7 @@ html.calib #calib{display:block}
       <div class="goldLabel labelCommon">COMMON 15</div>
       <div class="commons" id="commons"></div>
       <div class="revealRail" id="revealRail"></div>
+      <div class="lockHud" id="lockHud"><b id="lockCount">0 / 6</b><span id="lockGuide">プリフロップ：固定なし</span></div>
     </div>
   </div>
 
@@ -1312,6 +1331,7 @@ html.calib #calib{display:block}
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <div class="streetBurst" id="streetBurst"><strong id="burstTitle">COMMON 15</strong><small id="burstSub">情報が開く。確率が変わる。</small></div>
   <div class="winRibbon" id="winRibbon"><strong>ツモ</strong><span>リーチ 1翻</span><span>門前ツモ 1翻</span><strong>2翻</strong></div>
   <div class="status" id="status"></div>
 
@@ -1395,7 +1415,7 @@ const START_STACKS=[3940,4620,4730,4110,4880];
 const SEAT_MODES=["sequence","flush","triplet","pairs","total"];
 const seats=NAMES.map(function(n,i){
   return {n:n,stack:START_STACKS[i],mode:SEAT_MODES[i],bet:0,folded:false,hand:[],best:null,won:false,
-    action:"",thinking:false};
+    locked:[],action:"",thinking:false};
 });
 /* ベットは持ち点に対する割合で決める。固定額だと数局で全員飛ぶ。
    Golden Visual の POT 22,200 は総額28,150のほぼ全部が中央にある山場の絵であって、
@@ -1411,7 +1431,7 @@ const CLOCKWISE_SEATS=[0,1,3,5,4,2];
 function nextClockwiseSeat(i){const at=CLOCKWISE_SEATS.indexOf(i);return CLOCKWISE_SEATS[(at<0?0:at+1)%CLOCKWISE_SEATS.length];}
 let betting=null,dealerSeat=2,userAction="",aiTimer=0,raiseSheetOpen=false;
 const IS_STILL=document.documentElement.classList.contains("still");
-let matchMode="rank",lastResult=null;
+let matchMode="rank",lastResult=null,resultInspectIndex=0,burstTimer=0;
 let rankPoints=(function(){
   try{const n=Number(localStorage.getItem("mh.rankPoints"));return Number.isFinite(n)&&n>=0?n:1240;}catch(e){return 1240;}
 })();
@@ -1433,19 +1453,19 @@ function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i)
 function newHand(){
   ensureTable();
   window.clearTimeout(aiTimer);
-  shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;
+  shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;resultInspectIndex=0;
   phase="play";userFolded=false;resultText="";raiseSheetOpen=false;
   betting=null;userAction="";dealerSeat=nextClockwiseSeat(dealerSeat);
   Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
   seats.forEach(function(s){
-    s.best=null;s.won=false;s.bet=0;s.action="";s.thinking=false;
+    s.best=null;s.won=false;s.bet=0;s.action="";s.thinking=false;s.locked=[];
     s.hand=wall.splice(0,8).sort(function(a,b){return a-b;});
     s.folded=s.stack<=0;            /* 点棒が尽きた席はその局を降りる */
   });
   doraInd=wall.splice(0,1)[0];
   postAnte();
-  openCommon15();
+  beginBettingRound();
   render(true);
   continueBetting();
 }
@@ -1466,10 +1486,23 @@ function ensureTable(){
   userStack=5870;sessionResets++;
   flashToast("新しいセッション。持ち点をリセットしました。");
 }
-/* 共通15枚の公開。開始直後の画面がGolden Visualと同じ構図になるよう newHand から直接呼ぶ。 */
+/* プリフロップの賭けが終わった後に共通15枚を公開する。 */
 function openCommon15(){
   common=wall.splice(0,15);stage=1;dealAnim=1;
   beginBettingRound();
+  flashStreet("COMMON 15","4枚を選び、次の公開まで固定");
+}
+function flashStreet(title,sub){
+  const el=document.getElementById("streetBurst");if(!el||IS_STILL)return;
+  document.getElementById("burstTitle").textContent=title;document.getElementById("burstSub").textContent=sub;
+  el.classList.remove("on");void el.offsetWidth;el.classList.add("on");window.clearTimeout(burstTimer);
+  burstTimer=window.setTimeout(function(){el.classList.remove("on");},1100);
+}
+function lockUserPicks(){picks.forEach(function(p){p.locked=true;});}
+function chooseSeatLocks(s,count){
+  let r=solveFlexible(s.mode,0,s.hand,s.locked),target=r?expand(r.hand):bestFallback(s.hand),available=cnt(s.hand.concat(common)),have=cnt(s.locked);
+  target.forEach(function(id){if(s.locked.length<count&&have[id]<available[id]){s.locked.push(id);have[id]++;}});
+  s.hand.concat(common).forEach(function(id){if(s.locked.length<count&&have[id]<available[id]){s.locked.push(id);have[id]++;}});
 }
 function nextStreet(){
   if(phase!=="play")return;
@@ -1477,7 +1510,17 @@ function nextStreet(){
     flashToast(activeSeat===5?"あなたのアクションを選んでください。":"相手のアクションを待っています。");return;
   }
   if(stage===0){openCommon15();}
-  else if(stage<3){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;raiseSheetOpen=false;beginBettingRound();}
+  else if(stage===1){
+    if(!userFolded&&picks.length!==4){flashToast("固定する4枚を選んでください。");return;}
+    lockUserPicks();seats.forEach(function(s){if(!s.folded)chooseSeatLocks(s,4);});
+    common=common.concat(wall.splice(0,4));stage=2;dealAnim=stage;raiseSheetOpen=false;beginBettingRound();flashStreet("＋4 Ⅰ","あと2枚を追加固定");
+  }
+  else if(stage===2){
+    if(!userFolded&&picks.length!==6){flashToast("追加で2枚選び、固定6枚にしてください。");return;}
+    lockUserPicks();seats.forEach(function(s){if(!s.folded)chooseSeatLocks(s,6);});
+    common=common.concat(wall.splice(0,4));stage=3;dealAnim=stage;raiseSheetOpen=false;beginBettingRound();flashStreet("＋4 Ⅱ","固定6枚はそのまま。自由8枚を読む");
+  }
+  else if(stage<4){common=common.concat(wall.splice(0,4));stage++;dealAnim=stage;raiseSheetOpen=false;beginBettingRound();flashStreet("＋4 Ⅲ","共通27枚。最終14枚を完成");}
   else{showdown();return;}
   notice="";
   render();
@@ -1622,8 +1665,8 @@ function bestFallback(priv){
   return items.slice(0,MAX_HAND).map(function(x){return x.id;});
 }
 function seatBestHand(s){
-  let r=solveFlexible(s.mode,0,s.hand);
-  if(!r&&s.mode!=="total")r=solveFlexible("total",0,s.hand);
+  let r=solveFlexible(s.mode,0,s.hand,s.locked);
+  if(!r&&s.mode!=="total")r=solveFlexible("total",0,s.hand,s.locked);
   return r?expand(r.hand):bestFallback(s.hand);
 }
 function showdown(){
@@ -1634,13 +1677,13 @@ function showdown(){
   const entries=[],finalHand=picks.map(function(x){return x.id;});
   if(!userFolded){
     const userEval=bestEvaluation(finalHand,finalHand[finalHand.length-1]);
-    entries.push({who:"あなた",seat:null,ids:finalHand,score:handScore(finalHand,finalHand[finalHand.length-1]),evaluation:userEval});
+    entries.push({who:"あなた",seat:null,privateIds:my.slice(),ids:finalHand,score:handScore(finalHand,finalHand[finalHand.length-1]),evaluation:userEval});
   }
   seats.forEach(function(s){
     if(s.folded){s.best=null;return;}
     s.best=seatBestHand(s);
     const seatEval=bestEvaluation(s.best);
-    entries.push({who:s.n,seat:s,ids:s.best,score:handScore(s.best),evaluation:seatEval});
+    entries.push({who:s.n,seat:s,privateIds:s.hand.slice(),ids:s.best,score:handScore(s.best),evaluation:seatEval});
   });
 
   phase="result";
@@ -1668,8 +1711,17 @@ function showdown(){
   const userWon=winners.some(function(e){return e.seat===null;});
   const delta=matchMode!=="rank"?0:(userWon?(winners.length>1?12:24):(userFolded?-14:-8));
   rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
+  const showdownData=entries.slice().sort(function(a,b){return b.score-a.score;}).map(function(e,i){return {
+    who:e.who,privateIds:e.privateIds.slice(),finalIds:e.ids.slice(),winner:winners.indexOf(e)>=0,place:i+1,
+    detail:e.evaluation&&e.evaluation.complete?(e.evaluation.yakuNames.join("・")||e.evaluation.summary):"未完成"
+  };});
+  seats.filter(function(s){return s.folded;}).forEach(function(s){
+    const foldedBest=seatBestHand(s);showdownData.push({who:s.n,privateIds:s.hand.slice(),finalIds:foldedBest,
+      winner:false,place:showdownData.length+1,detail:"FOLD（参考手牌）"});
+  });
+  if(userFolded)showdownData.push({who:"あなた",privateIds:my.slice(),finalIds:[],winner:false,place:6,detail:"FOLD"});
   lastResult={userWon:userWon,userFolded:userFolded,winners:winners.map(function(e){return e.who;}),
-    pot:settledPot,detail:detail,hand:userFolded?[]:finalHand.slice(),delta:delta,mode:matchMode,summary:resultText};
+    pot:settledPot,detail:detail,hand:userFolded?[]:finalHand.slice(),showdown:showdownData,delta:delta,mode:matchMode,summary:resultText};
   render();
 }
 
@@ -1713,11 +1765,14 @@ function flashToast(text){
   toastTimer=window.setTimeout(function(){el.classList.remove("on");},1800);
 }
 function isPicked(src,index){return picks.some(function(x){return x.src===src&&x.index===index;});}
+function selectionLimit(){return stage===1?4:stage===2?6:MAX_HAND;}
 function togglePick(src,index,id){
+  if(stage===0){flashToast("プリフロップでは固定しません。参加判断のあと共通15枚が開きます。");return;}
   const at=picks.findIndex(function(x){return x.src===src&&x.index===index;});
-  if(at>=0){picks.splice(at,1);notice="";render();return;}
-  if(picks.length>=MAX_HAND){
-    notice="14枚選択済みです。別の牌を入れるには、先に手牌から1枚外してください。";
+  if(at>=0){if(picks[at].locked){flashToast("金枠の固定牌は外せません。");return;}picks.splice(at,1);notice="";render();return;}
+  const limit=selectionLimit();
+  if(picks.length>=limit){
+    notice=limit+"枚選択済みです。別の牌を入れるには、先に1枚外してください。";
     flashToast(notice);
     render();return;
   }
@@ -1729,6 +1784,7 @@ function removePick(seq){
   const at=picks.findIndex(function(x){return x.seq===seq;});
   if(at>=0){
     const p=picks[at];
+    if(p.locked){flashToast("金枠の固定牌は外せません。");return;}
     pendingReturn={from:"r:"+seq,to:p.src+":"+p.index};
     picks.splice(at,1);
   }
@@ -1736,21 +1792,22 @@ function removePick(seq){
   render();
 }
 function setPicksFromCounts(hand){
-  picks=[];pickSeq=0;
-  const need=hand.slice();
+  const kept=picks.filter(function(p){return p.locked;});picks=kept;
+  const need=hand.slice(),limit=selectionLimit();
+  kept.forEach(function(p){if(need[p.id]>0)need[p.id]--;});
   for(let i=0;i<my.length;i++){
     const id=my[i];
-    if(need[id]>0){picks.push({src:"p",index:i,id:id,seq:pickSeq++});need[id]--;}
+    if(picks.length<limit&&!isPicked("p",i)&&need[id]>0){picks.push({src:"p",index:i,id:id,seq:pickSeq++,locked:false});need[id]--;}
   }
   for(let i=0;i<common.length;i++){
     const id=common[i];
-    if(need[id]>0){picks.push({src:"c",index:i,id:id,seq:pickSeq++});need[id]--;}
+    if(picks.length<limit&&!isPicked("c",i)&&need[id]>0){picks.push({src:"c",index:i,id:id,seq:pickSeq++,locked:false});need[id]--;}
   }
 }
 /* priv を省略すると自分の私牌。相手の手を解かせるときだけ渡す。 */
-function solveFlexible(mode,cursor,priv){
+function solveFlexible(mode,cursor,priv,requiredIds){
   const hand=priv||my;
-  const A=cnt(hand.concat(common)), P=cnt(hand);
+  const A=cnt(hand.concat(common)), P=cnt(hand),required=cnt(requiredIds||[]);
   const use=new Array(34).fill(0);
   const dora=doraOf(doraInd);
   let nodes=0;const solutions=new Map();
@@ -1763,6 +1820,7 @@ function solveFlexible(mode,cursor,priv){
   }
   function take(ts,delta){for(let i=0;i<ts.length;i++)use[ts[i]]+=delta;}
   function evaluate(isChiitoi){
+    for(let t=0;t<34;t++)if(use[t]<required[t])return;
     let d=0,simple=true,privateUse=0,honors=0,triplets=0,pairTypes=0,sequences=0;const suits={},suitCount=[0,0,0];
     for(let t=0;t<34;t++){
       const n=use[t];if(!n)continue;
@@ -1846,30 +1904,31 @@ function fallbackRecommendation(mode){
     return v;
   }
   items.sort(function(a,b){return score(b)-score(a);});
-  picks=items.slice(0,MAX_HAND).map(function(x){return {src:x.src,index:x.index,id:x.id,seq:pickSeq++};});
+  const kept=picks.filter(function(p){return p.locked;}),limit=selectionLimit();picks=kept;
+  items.forEach(function(x){if(picks.length<limit&&!isPicked(x.src,x.index))picks.push({src:x.src,index:x.index,id:x.id,seq:pickSeq++,locked:false});});
 }
 function recommend(mode){
   recOpen=true;recMode=mode||"total";
   const cursor=recCursor[recMode]++;
-  const result=solveFlexible(recMode,cursor);
+  const result=solveFlexible(recMode,cursor,undefined,picks.filter(function(p){return p.locked;}).map(function(p){return p.id;}));
   const modeName={total:"総合",sequence:"順子系",pairs:"対子系",triplet:"刻子系",flush:"染め系"}[recMode];
   if(result){
     setPicksFromCounts(result.hand);
     notice=modeName+"候補 "+(result.index+1)+" / "+Math.min(result.total,99)+"。同じボタンでもう一案を表示します。";
   }else{
-    picks=[];pickSeq=0;fallbackRecommendation(recMode);
-    notice=modeName+"の完成形がないため、近い14枚を仮選択しました。";
+    fallbackRecommendation(recMode);
+    notice=modeName+"の完成形がないため、近い候補を仮選択しました。";
   }
   render();
 }
-function clearRack(){picks=[];notice="";recOpen=false;recMode="total";render();}
+function clearRack(){picks=picks.filter(function(p){return p.locked;});notice="";recOpen=false;recMode="total";render();}
 
 function isComplete14(ids){
   return MahjongScore.evaluate(ids,ids[ids.length-1],{dora:doraOf(doraInd)}).complete;
 }
 
 /* ===== render ===== */
-const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23"];
+const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23","+4 III · 27"];
 
 /* ===== 動き =====
    render() は毎回 innerHTML="" でDOMを作り直すので CSS transition が効かない。
@@ -2050,6 +2109,10 @@ function renderCore(fresh){
       for(let i=0;i<4;i++)b.appendChild(backTile("sm"));
     }
     el.appendChild(b);
+    if(stage>=3&&s.locked.length>=6&&!showing){
+      const publicLock=document.createElement("div");publicLock.className="publicLock";publicLock.title="追加固定2枚（公開）";
+      s.locked.slice(4,6).forEach(function(id){publicLock.appendChild(tile(id,"sm fixedCore"));});el.appendChild(publicLock);
+    }
     const action=document.createElement("div");action.className="seatAction"+(s.thinking?" thinking":"");
     action.textContent=s.action||"";el.appendChild(action);
     /* 数字はベット額ではなく持ち点。Golden Visual の 3,940 等と同じ意味になる。 */
@@ -2069,13 +2132,13 @@ function renderCore(fresh){
   else{
     common.slice(0,15).forEach(function(id,i){
       const isUsed=isPicked("c",i);
-      const cls="md"+(isUsed?" used":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":"");
+      const pick=picks.find(function(x){return x.src==="c"&&x.index===i;}),cls="md"+(isUsed?" used":"")+(pick&&pick.locked?" fixedCore":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":"");
       const t=tile(id,cls);t.dataset.k="c:"+i;
       t.onclick=function(){togglePick("c",i,id);};
       c.appendChild(t);});
   }
   const rr=document.getElementById("revealRail");rr.innerHTML="";
-  for(let g=0;g<2;g++){
+  for(let g=0;g<3;g++){
     const revealed=stage>=g+2, wantsNext=!revealed&&g===stage-1;
     const isNext=wantsNext&&(!betting||betting.phase==="complete");
     const group=document.createElement("div");
@@ -2083,24 +2146,24 @@ function renderCore(fresh){
     if(isNext){
       /* 次の+4はこの枠自体をタップして公開する。picksには触らないので選択済みの手牌は保持される。 */
       group.setAttribute("role","button");group.tabIndex=0;
-      group.setAttribute("aria-label","+4 "+["I","II"][g]+" を公開");
+      group.setAttribute("aria-label","+4 "+["I","II","III"][g]+" を公開");
       group.onclick=nextStreet;
       group.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();nextStreet();}};
     }
     for(let k=0;k<4;k++){
       const index=15+g*4+k,id=common[index];
       if(id!==undefined){
-        const used=isPicked("c",index),t=tile(id,(used?"used ":"")+(id===dora?"doraMark ":"")+(!used&&waitSet.has(id)?"waitCandidate ":""));
+        const used=isPicked("c",index),pick=picks.find(function(x){return x.src==="c"&&x.index===index;}),t=tile(id,(used?"used ":"")+(pick&&pick.locked?"fixedCore ":"")+(id===dora?"doraMark ":"")+(!used&&waitSet.has(id)?"waitCandidate ":""));
         t.dataset.k="c:"+index;t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
-    const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II"][g];group.appendChild(label);rr.appendChild(group);
+    const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
   }
 
   const mr=document.getElementById("myrow");mr.innerHTML="";
   my.forEach(function(id,i){
     const isUsed=isPicked("p",i);
-    const t=tile(id,(isUsed?"used":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":""));
+    const pick=picks.find(function(x){return x.src==="p"&&x.index===i;}),t=tile(id,(isUsed?"used":"")+(pick&&pick.locked?" fixedCore":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":""));
     t.dataset.k="p:"+i;t.onclick=function(){togglePick("p",i,id);};
     mr.appendChild(t);});
   const privateCount=picks.filter(function(x){return x.src==="p";}).length;
@@ -2123,7 +2186,7 @@ function renderCore(fresh){
   for(let i=0;i<MAX_HAND;i++){
     if(i<ordered.length){
       const pick=ordered[i];
-      const t=tile(pick.id,"rk pop"+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
+      const t=tile(pick.id,"rk pop"+(pick.locked?" fixedCore":"")+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
       t.dataset.k="r:"+pick.seq;t.style.setProperty("--i",i);
       t.onclick=function(){removePick(pick.seq);};
       rk.appendChild(t);
@@ -2164,6 +2227,10 @@ function renderCore(fresh){
   }
   wasComplete=complete;
 
+  const fixedCount=picks.filter(function(p){return p.locked;}).length;
+  document.getElementById("lockCount").textContent=fixedCount+" / 6";
+  document.getElementById("lockGuide").textContent=stage===0?"プリフロップ：固定なし":stage===1?"4枚選んで固定":stage===2?"あと2枚を追加固定":stage<4?"固定6枚＋自由8枚":"共通27枚から最終14枚";
+
   const st=document.getElementById("status");
   if(stage===0){st.innerHTML="共通牌が開くまで手牌は組めません。";}
   else if(notice){st.innerHTML="<b>"+notice+"</b>";}
@@ -2181,7 +2248,7 @@ function renderCore(fresh){
   /* 局の進行はこのボタンが持つ。+4 枠のタップも従来どおり効くが、
      そちらは隠れた操作なので、明示的な導線をこちらに置く。 */
   const bn=document.getElementById("bNext");
-  const ROMAN=["Ⅰ","Ⅱ"];
+  const ROMAN=["Ⅰ","Ⅱ","Ⅲ"];
   bn.classList.remove("hot","afterResult");bn.disabled=false;
   if(phase==="result"){bn.innerHTML='<span class="btn-label">結果を見る</span>';
     bn.classList.add("hot","afterResult");}
@@ -2189,7 +2256,9 @@ function renderCore(fresh){
   else if(betting&&betting.phase==="acting"){
     const who=activeSeat===5?"YOUR TURN":(activeSeat>=0?seats[activeSeat].n+" THINKING":"BETTING");
     bn.innerHTML='<span class="btn-label">'+who+'</span>';bn.disabled=true;}
-  else if(stage<3)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
+  else if(stage===1&&!userFolded&&picks.length!==4){bn.innerHTML='<span class="btn-label">固定4枚を選ぶ（'+picks.length+' / 4）</span>';bn.disabled=true;}
+  else if(stage===2&&!userFolded&&picks.length!==6){bn.innerHTML='<span class="btn-label">追加2枚を選ぶ（'+Math.max(0,picks.length-4)+' / 2）</span>';bn.disabled=true;}
+  else if(stage<4)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
   else if(!userFolded&&picks.length<MAX_HAND){
     /* 14枚そろわないとショーダウンできない。押してから叱るのではなく、先に何が足りないかを見せる。 */
     bn.innerHTML='<span class="btn-label">あと '+(MAX_HAND-picks.length)+' 枚えらぶ</span>';
@@ -2284,8 +2353,8 @@ function matchRender(){
   const rank=matchMode==="rank";
   document.getElementById("mtMode").textContent=rank?"ランク戦":"リング戦";
   document.getElementById("mtRule").textContent=rank
-    ?"6人戦・レート変動あり・共通15枚"
-    :"6人戦・持ち点制・共通15枚";
+    ?"6人戦・レート変動あり・固定4→2・共通27枚"
+    :"6人戦・持ち点制・固定4→2・共通27枚";
   const table=document.getElementById("mtTable");table.innerHTML="";
   const roster=[seats[0],seats[1],seats[2],{n:"YOU",mode:"四段",you:true},seats[3],seats[4]];
   roster.forEach(function(s,i){
@@ -2305,8 +2374,15 @@ function resultRender(){
   document.getElementById("rsSummary").textContent=r.userFolded&&!r.userWon?"FOLD / "+r.summary:r.summary;
   document.getElementById("rsPot").textContent="POT "+Number(r.pot||0).toLocaleString();
 
-  const tiles=document.getElementById("rsTiles");tiles.innerHTML="";
-  (r.hand||[]).slice(0,14).sort(function(a,b){return a-b;}).forEach(function(id){tiles.appendChild(tile(id));});
+  const show=(r.showdown&&r.showdown.length?r.showdown:[{who:"あなた",privateIds:my.slice(),finalIds:r.hand||[],winner:r.userWon,detail:r.detail}]);
+  resultInspectIndex=Math.max(0,Math.min(resultInspectIndex,show.length-1));
+  const tabs=document.getElementById("rsShowTabs");tabs.innerHTML="";
+  show.forEach(function(p,i){const b=document.createElement("button");b.className="rs-showtab"+(i===resultInspectIndex?" on":"");b.textContent=(p.winner?"♛ ":"")+p.who;b.onclick=function(){resultInspectIndex=i;resultRender();};tabs.appendChild(b);});
+  const inspected=show[resultInspectIndex],priv=document.getElementById("rsPrivateTiles");priv.innerHTML="";
+  document.getElementById("rsInspectLabel").textContent=inspected.who+" — 私牌 8枚 / "+(inspected.detail||"");
+  (inspected.privateIds||[]).slice().sort(function(a,b){return a-b;}).forEach(function(id){priv.appendChild(tile(id));});
+  const tiles=document.getElementById("rsTiles");tiles.innerHTML="",privateRemain=cnt(inspected.privateIds||[]);
+  (inspected.finalIds||[]).slice(0,14).sort(function(a,b){return a-b;}).forEach(function(id){const from=privateRemain[id]>0;if(from)privateRemain[id]--;tiles.appendChild(tile(id,from?"fromPrivate":""));});
   if(!tiles.childElementCount){
     const empty=document.createElement("div");empty.className="rs-summary";empty.textContent="FOLD — 手牌は公開されません";tiles.appendChild(empty);
   }

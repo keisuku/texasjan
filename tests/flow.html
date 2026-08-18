@@ -21,23 +21,23 @@ f.onload=function(){setTimeout(function(){
 
     d.getElementById("bMatchStart").click();
     ok(on("game"),"対局開始で卓へ入る");
-    ok(w.eval("stage")===1&&d.querySelectorAll("#commons .tile").length===15,
-       "対局は共通15枚公開済みで始まる");
-
-    for(let k=0;k<2;k++){w.fastForwardBetting();d.getElementById("bNext").click();}
-    w.fastForwardBetting();
-    d.getElementById("bRec").click();
-    if(w.eval("picks.length")<14){
-      [].slice.call(d.querySelectorAll("#commons .tile:not(.used)")).some(function(t){
-        t.click();return w.eval("picks.length")===14;
-      });
-    }
-    ok(w.eval("stage")===3&&w.eval("common.length")===23&&w.eval("picks.length")===14,"共通23枚でショーダウン可能な状態まで進む");
+    ok(w.eval("stage")===0&&w.eval("common.length")===0,"対局は固定なしのプリフロップで始まる");
+    w.fastForwardBetting();d.getElementById("bNext").click();
+    ok(w.eval("stage")===1&&w.eval("common.length")===15,"プリフロップ後に共通15枚を公開");
+    w.fastForwardBetting();d.getElementById("bRec").click();d.getElementById("bNext").click();
+    ok(w.eval("stage")===2&&w.eval("picks.filter(function(p){return p.locked;}).length")===4,"15枚で4枚固定");
+    w.fastForwardBetting();d.getElementById("bRec").click();d.getElementById("bNext").click();
+    ok(w.eval("stage")===3&&w.eval("picks.filter(function(p){return p.locked;}).length")===6,"最初の+4で追加2枚固定");
+    w.fastForwardBetting();d.getElementById("bNext").click();
+    ok(w.eval("stage")===4&&w.eval("common.length")===27,"公開は15+4+4+4で共通27枚");
+    w.fastForwardBetting();d.getElementById("bRec").click();
+    ok(w.eval("picks.length")===14,"固定6枚を含めて最終14枚を完成");
     d.getElementById("bNext").click();
     ok(w.eval('phase')==="result","ショーダウンで勝敗が確定する");
     d.getElementById("bNext").click();
     ok(on("result"),"卓上の決着確認後に独立した結果画面へ進む");
     ok(d.querySelectorAll("#rsRanking .rs-rankrow").length===6,"結果画面に6人の順位がある");
+    ok(d.querySelectorAll("#rsShowTabs .rs-showtab").length===6,"結果画面で6人の手牌を切り替えられる");
     ok(d.getElementById("rsDelta").textContent.length>0,"ランクポイント増減が表示される");
 
     d.getElementById("bResultLobby").click();
