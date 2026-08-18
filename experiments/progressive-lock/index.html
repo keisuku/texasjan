@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
   <meta name="theme-color" content="#082e29">
-  <title>段階固定4→4｜操作モック</title>
+  <title>段階固定4→2｜比較操作モック</title>
   <style>
     :root{color-scheme:dark;--jade:#0b4b43;--jade2:#0f675b;--ink:#071c1a;--ivory:#f5efe2;--gold:#d2ae62;--cyan:#5de6e2;--red:#a94033;--tile-w:clamp(27px,7.55vw,58px);--tile-h:calc(var(--tile-w)*1.38)}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -16,13 +16,16 @@
     .brand{font-family:Georgia,"Yu Mincho",serif;font-weight:700;letter-spacing:.12em;font-size:clamp(14px,3.8vw,26px)}
     .brand small{display:block;margin-top:2px;font:600 9px/1.2 -apple-system,sans-serif;letter-spacing:.18em;color:#d8c899}
     .round{border:1px solid rgba(220,193,126,.55);background:rgba(4,24,22,.82);border-radius:999px;padding:7px 10px;font-size:11px;color:#eee1bc}
+    .ruleSwitch{display:grid;grid-template-columns:1fr 1fr;gap:5px;padding:0 10px 7px}.ruleButton{min-height:44px;border:1px solid rgba(255,255,255,.18);border-radius:9px;background:rgba(3,20,18,.76);color:#a9bdb7;font-size:11px;font-weight:700}.ruleButton[aria-pressed="true"]{border-color:var(--gold);background:rgba(105,75,27,.82);color:#fff0bd;box-shadow:inset 0 0 0 1px rgba(255,239,185,.22)}
     .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;padding:0 10px 8px}
     .step{min-height:44px;border:0;border-bottom:2px solid rgba(255,255,255,.16);border-radius:5px 5px 0 0;background:rgba(3,20,18,.68);padding:6px 2px 5px;font-size:11px;line-height:1.15;color:#a9bdb7;cursor:pointer}
     .step.current{color:#fff;border-color:var(--cyan);background:rgba(12,87,78,.88)}
     .step.done{color:#dfcb93;border-color:var(--gold)}
     .table{margin:0 9px;border:1px solid rgba(226,199,130,.47);border-radius:28px 28px 18px 18px;background:linear-gradient(150deg,rgba(12,77,67,.91),rgba(5,45,40,.94));box-shadow:inset 0 0 55px rgba(0,0,0,.34),0 14px 35px rgba(0,0,0,.38);padding:10px 9px 12px;min-height:440px}
-    .seatline{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:7px}
+    .seatline{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:7px}
+    .seatcard{min-width:0;padding:5px 6px;border:1px solid rgba(255,255,255,.1);border-radius:10px;background:rgba(3,26,23,.55)}
     .seat{display:flex;align-items:center;gap:6px;color:#d7ded9;font-size:9px}
+    .seatcard.right .seat{justify-content:flex-end;text-align:right}.opplocks{display:flex;align-items:center;justify-content:space-between;gap:5px;margin-top:4px}.hiddenFour{display:flex;align-items:center;gap:3px;color:#c8b983;font-size:8px;white-space:nowrap}.hiddenBacks{display:flex;gap:1px}.hiddenBacks .back{width:6px;height:10px;border-width:1px;box-shadow:inset 0 0 0 1px #0c6555}.laterOpen{min-width:58px;min-height:44px;padding:3px 4px;border:1px solid rgba(93,230,226,.7);border-radius:8px;background:#0b4942;color:#dffdf9;cursor:pointer}.laterOpen[hidden]{display:none}.laterOpen small{display:block;margin-top:1px;font-size:7px}.miniPair{display:flex;justify-content:center;gap:2px}.miniTile{display:block;width:17px;height:23px;border-radius:2px;background:#eee7d9;box-shadow:0 1px 0 #a7a092}.miniTile img{display:block;width:100%;height:100%;object-fit:contain;border-radius:2px}
     .face{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;border:1px solid rgba(218,192,123,.6);background:#153b36;color:#e9d8a9;font-family:Georgia,serif}
     .backs{display:flex;gap:2px}.back{width:12px;height:18px;border-radius:2px;background:#143f36;border:1px solid #c9b985;box-shadow:inset 0 0 0 2px #0c6555}
     .pot{text-align:center;margin:1px auto 8px;width:max-content;min-width:128px;padding:5px 17px 6px;border:1px solid rgba(225,195,120,.75);background:rgba(2,19,18,.86);box-shadow:0 3px 12px rgba(0,0,0,.35);font:700 clamp(18px,5vw,36px)/1 Georgia,serif;color:#f5e4ad}
@@ -47,26 +50,31 @@
     .actions{display:grid;grid-template-columns:1fr 1.2fr 1fr;gap:6px;margin-top:7px}.action{min-height:48px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:#102723;font-weight:800;font-size:13px}.fold{background:#6f291f}.call{background:#145064}.raise{background:#8d6425}.actions.dim{opacity:.38;pointer-events:none}.actions[hidden]{display:none}
     .hint{text-align:center;font-size:9px;color:#9db2ac;margin-top:7px}
     .toast{position:fixed;left:50%;bottom:125px;translate:-50% 12px;max-width:330px;padding:9px 13px;border-radius:99px;background:rgba(1,15,14,.94);border:1px solid rgba(221,194,120,.6);font-size:11px;opacity:0;pointer-events:none;transition:.2s;z-index:10}.toast.on{opacity:1;translate:-50% 0}
+    .opponentDialog{width:min(88vw,430px);padding:18px;border:1px solid var(--gold);border-radius:16px;background:#082d29;color:#fff;box-shadow:0 24px 80px rgba(0,0,0,.65)}.opponentDialog::backdrop{background:rgba(0,0,0,.72);backdrop-filter:blur(4px)}.dialogHead{display:flex;align-items:center;justify-content:space-between;gap:12px}.dialogHead h2{margin:0;font-size:17px;color:#f0d58b}.dialogClose{width:44px;height:44px;border:1px solid rgba(255,255,255,.25);border-radius:50%;background:#173d37;font-size:21px}.dialogText{margin:8px 0 12px;color:#c5d4cf;font-size:12px}.zoomPair{display:flex;justify-content:center;gap:12px}.zoomPair .tile{--tile-w:74px;cursor:default}
     .showdown{display:none;margin:8px 0 0;padding:11px;border-radius:14px;background:rgba(2,17,16,.9);border:1px solid rgba(225,197,125,.55)}
     .showdown.on{display:block}.winner{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px}.winner strong{font-family:Georgia,"Yu Mincho",serif;color:#f0d58b;font-size:17px}.ranking{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px}.rank{min-height:44px;border:1px solid rgba(255,255,255,.15);border-radius:8px;background:#102c28;padding:6px 3px;color:#b9c7c2;font-size:9px}.rank.active{border-color:var(--cyan);background:#155148;color:#fff}.final{display:grid;grid-template-columns:repeat(14,1fr);gap:2px}.final .tile,.shownPrivate .tile{width:100%;height:auto;aspect-ratio:.72;box-shadow:0 2px 0 #a7a092}.shownPrivate{display:grid;grid-template-columns:repeat(8,1fr);gap:3px;width:64%;margin-top:4px}.revealLabel{display:block;margin-top:8px;color:#d8c78d;font-size:9px}.origin{display:block;margin-top:6px;color:#a9bbb6;font-size:9px}.origin i{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--cyan);margin-right:4px}.final .from-private:before{content:"";position:absolute;left:2px;bottom:2px;width:7px;height:7px;border-radius:50%;background:var(--cyan);z-index:2;box-shadow:0 0 5px var(--cyan)}
     button:focus-visible{outline:3px solid #fff;outline-offset:3px}.tile:focus-visible{outline-color:var(--cyan)}
     @media(max-width:420px){.final{grid-template-columns:repeat(7,1fr);gap:3px}.shownPrivate{width:100%}}
-    @media(min-width:700px){.table{padding:18px 24px 22px}.steps{padding-inline:18px}.step{font-size:13px}.instruction span,.zonehead,.seat,.hint{font-size:14px}.corepanel{padding:13px}.decision{padding-inline:22px}.actions,.confirm{font-size:18px}.back{width:20px;height:30px}}
+    @media(min-width:700px){.table{padding:18px 24px 22px}.steps,.ruleSwitch{padding-inline:18px}.step,.ruleButton{font-size:13px}.instruction span,.zonehead,.seat,.hint{font-size:14px}.corepanel{padding:13px}.decision{padding-inline:22px}.actions,.confirm{font-size:18px}.back{width:20px;height:30px}.hiddenBacks .back{width:9px;height:14px}.hiddenFour{font-size:11px}.miniTile{width:25px;height:34px}.laterOpen{min-width:78px}}
     @media(prefers-reduced-motion:reduce){*{transition:none!important}}
   </style>
 </head>
 <body>
   <main class="app" id="app">
-    <header class="top"><div class="brand">麻雀ホールデム<small>段階固定 4 → 4　操作検証</small></div><div class="round">東1局　残り 5人</div></header>
+    <header class="top"><div class="brand">麻雀ホールデム<small id="ruleSummary">段階固定 4 → 2　操作検証</small></div><div class="round">東1局　残り 5人</div></header>
+    <nav class="ruleSwitch" aria-label="固定ルールを比較する"><button class="ruleButton" type="button" data-rule="4-2">4 → 2　承認案</button><button class="ruleButton" type="button" data-rule="4-4">4 → 4　比較用</button></nav>
     <nav class="steps" id="steps" aria-label="状態を切り替える"></nav>
     <section class="table">
-      <div class="seatline"><div class="seat"><span class="face">九</span><span>九蓮<br>4,620</span></div><div class="backs" aria-label="相手の固定牌"><i class="back"></i><i class="back"></i><i class="back"></i><i class="back"></i></div><div class="seat"><span>カムイ<br>4,730</span><span class="face">神</span></div></div>
+      <div class="seatline">
+        <div class="seatcard"><div class="seat"><span class="face">九</span><span>九蓮<br>4,620</span></div><div class="opplocks"><span class="hiddenFour" aria-label="九蓮の最初の固定4枚は非公開"><span class="hiddenBacks"><i class="back"></i><i class="back"></i><i class="back"></i><i class="back"></i></span>初回4枚</span><button class="laterOpen" type="button" data-opponent-lock="0" hidden></button></div></div>
+        <div class="seatcard right"><div class="seat"><span>カムイ<br>4,730</span><span class="face">神</span></div><div class="opplocks"><span class="hiddenFour" aria-label="カムイの最初の固定4枚は非公開"><span class="hiddenBacks"><i class="back"></i><i class="back"></i><i class="back"></i><i class="back"></i></span>初回4枚</span><button class="laterOpen" type="button" data-opponent-lock="1" hidden></button></div></div>
+      </div>
       <div class="pot"><small>場の賭け点</small><span id="pot">1,800</span></div>
       <div class="instruction" id="instruction" aria-live="polite"></div>
       <div class="zone" id="commonZone"><div class="zonehead"><b>共通牌</b><span id="commonCount">0枚</span></div><div id="common" class="tiles grid15"></div><div id="turn" class="reveal"></div><div id="river" class="reveal"></div></div>
       <div class="zone"><div class="zonehead"><b>私牌</b><span>自分だけに見える8枚</span></div><div id="private" class="tiles private"></div></div>
-      <section class="corepanel"><div class="zonehead"><b>この局の中核牌</b><span class="count" id="coreCount">0 / 8</span></div><div class="core" id="core"></div></section>
-      <section class="showdown" id="showdown"><div class="ranking" id="ranking"></div><div class="winner"><strong id="shownName">1位　あなた</strong><span id="shownScore">獲得 3,600点</span></div><div class="final" id="final"></div><small class="origin"><i></i>私牌から採用した牌</small><b class="revealLabel">この人が最初に持っていた私牌8枚</b><div class="shownPrivate" id="shownPrivate"></div></section>
+      <section class="corepanel"><div class="zonehead"><b>この局の固定牌</b><span class="count" id="coreCount">0 / 6</span></div><div class="core" id="core"></div></section>
+      <section class="showdown" id="showdown"><div class="ranking" id="ranking" role="group" aria-label="決着した人を切り替える"></div><div class="winner" aria-live="polite"><strong id="shownName">1位　あなた</strong><span id="shownScore">獲得 3,600点</span></div><div class="final" id="final"></div><small class="origin"><i></i>私牌から採用した牌</small><b class="revealLabel">この人が最初に持っていた私牌8枚</b><div class="shownPrivate" id="shownPrivate"></div></section>
     </section>
     <footer class="decision">
       <button id="confirm" class="confirm" type="button"></button>
@@ -75,6 +83,7 @@
     </footer>
   </main>
   <div class="toast" id="toast" role="status"></div>
+  <dialog class="opponentDialog" id="opponentDialog"><div class="dialogHead"><h2 id="dialogTitle"></h2><button class="dialogClose" id="dialogClose" type="button" aria-label="閉じる">×</button></div><p class="dialogText" id="dialogText"></p><div class="zoomPair" id="zoomPair"></div></dialog>
   <script src="app.js"></script>
 </body>
 </html>
