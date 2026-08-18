@@ -5,7 +5,7 @@ const fs = require("fs");
 const path = require("path");
 const { MahjongScore } = require(path.join(__dirname, "..", "..", "mahjong-score.js"));
 
-const VARIANTS = ["free", "lock8_flop", "lock4_4"];
+const VARIANTS = ["free", "lock8_flop", "lock4_4", "lock4_2"];
 const MODES = ["total", "sequence", "flush", "triplet", "pairs", "total"];
 const MODE_SET = ["total", "sequence", "flush", "triplet", "pairs"];
 
@@ -314,10 +314,10 @@ function locksForVariant(variant, priv, streets, dora, mode, nodeCap) {
   if (variant === "lock8_flop") {
     const choice = chooseLocks(priv, streets[0], dora, [], 8, mode, nodeCap);
     locked = choice.locked; flopRoute = choice.route; capHit ||= choice.solverCapHit;
-  } else if (variant === "lock4_4") {
+  } else if (variant === "lock4_4" || variant === "lock4_2") {
     const first = chooseLocks(priv, streets[0], dora, [], 4, mode, nodeCap);
     locked = first.locked; flopRoute = first.route; capHit ||= first.solverCapHit;
-    const second = chooseLocks(priv, streets[1], dora, locked, 4, mode, nodeCap);
+    const second = chooseLocks(priv, streets[1], dora, locked, variant === "lock4_2" ? 2 : 4, mode, nodeCap);
     locked = second.locked; capHit ||= second.solverCapHit;
   }
   return { locked, flopRoute, capHit };
@@ -508,7 +508,7 @@ function renderReport(report) {
     const m = report.metrics[v];
     return `| ${v} | ${m.finalCompletionPct}% | ${m.lockRegretPct}% | ${m.splitPotPct}% | ${m.averagePrivateAttributed} | ${m.sharedCoreCollisionPairPct == null ? "—" : m.sharedCoreCollisionPairPct + "%"} |`;
   }).join("\n");
-  return `# 段階固定 4→4 — paired-seed pilot\n\n状態: **PROPOSED / 実験結果**\n\n同じ seed **${report.seed}** の ${report.deals} deals を、\`free\` / \`lock8_flop\` / \`lock4_4\` の3条件へ同時に通した。production scorer と既存5方針を再利用し、固定処理には未来の +4 を渡していない。\n\n| 条件 | 最終完成 | 固定後悔 | split pot | 私牌由来平均 | 共通core衝突(pair) |\n|---|---:|---:|---:|---:|---:|\n${rows}\n\n## 追加指標\n\n${VARIANTS.map(v => { const m = report.metrics[v]; return `- **${v}**: winner route ${JSON.stringify(m.winnerRouteSharePct)}; route pivot ${m.winnerRoutePivotPct == null ? "—" : m.winnerRoutePivotPct + "%"}; equity leader change 15→19 / 19→23 = ${m.equityLeaderChangePct.join("% / ")}%`; }).join("\n")}\n\n## 読み方\n\n- **固定後悔**は、同一dealで free なら完成するのに、その固定条件では完成不能になったplayer-state率。\n- **共通core衝突**は、2席が固定した「共通由来」の牌型に1枚以上のmultiset overlapがあるplayer-pair率。\n- **route pivot**は、勝者の初回固定方針と最終完成ルートが異なる率。\n- **equity movement** は ${report.equitySampleDeals} deals × ${report.equityRollouts} fair runouts の方向性指標。sampleが小さいため採用判断には使わない。\n\n## 判定\n\nこの結果はルール採用ではない。次はdeal数とequity sampleを増やし、固定UI playtestと合わせて判断する。\n`;
+  return `# 段階固定 4→4 / 4→2 — paired-seed pilot\n\n状態: **PROPOSED / 実験結果**\n\n同じ seed **${report.seed}** の ${report.deals} deals を、${VARIANTS.map(v => `\`${v}\``).join(" / ")} の${VARIANTS.length}条件へ同時に通した。production scorer と既存5方針を再利用し、固定処理には未来の +4 を渡していない。\n\n| 条件 | 最終完成 | 固定後悔 | split pot | 私牌由来平均 | 共通core衝突(pair) |\n|---|---:|---:|---:|---:|---:|\n${rows}\n\n## 追加指標\n\n${VARIANTS.map(v => { const m = report.metrics[v]; return `- **${v}**: winner route ${JSON.stringify(m.winnerRouteSharePct)}; route pivot ${m.winnerRoutePivotPct == null ? "—" : m.winnerRoutePivotPct + "%"}; equity leader change 15→19 / 19→23 = ${m.equityLeaderChangePct.join("% / ")}%`; }).join("\n")}\n\n## 読み方\n\n- **固定後悔**は、同一dealで free なら完成するのに、その固定条件では完成不能になったplayer-state率。\n- **共通core衝突**は、2席が固定した「共通由来」の牌型に1枚以上のmultiset overlapがあるplayer-pair率。\n- **route pivot**は、勝者の初回固定方針と最終完成ルートが異なる率。\n- **equity movement** は ${report.equitySampleDeals} deals × ${report.equityRollouts} fair runouts の方向性指標。sampleが小さいため採用判断には使わない。\n\n## 判定\n\nこの結果はルール採用ではない。4→2は4→4より完成率と固定後悔を改善したが初期合格帯には未達。次は固定UI playtestとlock picker調整を先に行い、その後にdeal数とequity sampleを増やす。\n`;
 }
 
 function main() {
