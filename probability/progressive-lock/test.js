@@ -19,9 +19,15 @@ const visible = counts(deal.privates[0].concat(deal.streets[1]));
 const fixed = counts(second.locked.map(x => x.type));
 for (let t = 0; t < 34; t++) assert(fixed[t] <= visible[t], "locked copies must be visible");
 
+const fourThenTwo = chooseLocks(deal.privates[0], deal.streets[1], deal.dora, a.locked, 2, "pairs", cfg.solverNodeCap);
+assert.strictEqual(fourThenTwo.locked.length, 6, "4→2 must finish with six locked tiles");
+const changedRiver = deal.streets[1].concat([33, 33, 33, 33]);
+const fourThenTwoAgain = chooseLocks(deal.privates[0], changedRiver.slice(0, 19), deal.dora, a.locked, 2, "pairs", cfg.solverNodeCap);
+assert.deepStrictEqual(fourThenTwo.locked, fourThenTwoAgain.locked, "second lock must not depend on future +4");
+
 const first = run(cfg), again = run(cfg);
 assert.deepStrictEqual(first, again, "same seed must be deterministic");
 assert.strictEqual(first.metrics.free.lockRegretPct, 0);
-assert.strictEqual(Object.keys(first.metrics).join(","), "free,lock8_flop,lock4_4");
+assert.strictEqual(Object.keys(first.metrics).join(","), "free,lock8_flop,lock4_4,lock4_2");
 
 console.log("progressive-lock tests: ok");
