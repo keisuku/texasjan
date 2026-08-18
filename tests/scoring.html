@@ -37,7 +37,7 @@ f.onload=function(){setTimeout(function(){
     ok(high.length===2&&high[0].tile===4&&high[0].result.points>high[1].result.points,
       "点数差のある待ちは高めから並ぶ: "+high.map(function(x){return x.tile+"="+x.result.points;}).join(","));
 
-    w.eval("my=[18,7,8,10,11,12,24,25];common=[0,1,2,3,4,5,15,16,17,19,20,13,13,21,30];stage=1;picks=[];pickSeq=0");
+    w.eval("my=[18,7,8,10,11,12,24,25];common=[0,1,2,3,4,5,15,16,17,19,20,13,13,21,30];stage=4;picks=[];pickSeq=0");
     w.eval("setPicksFromCounts(MahjongScore.counts([0,1,2,3,4,5,15,16,17,19,20,13,13]));render()");
     ok(w.eval("picks.length")===13,"画面を13枚選択状態にできる");
     ok(d.getElementById("winRibbon").classList.contains("waiting"),"13枚時にTENPAI HUDが表示される");

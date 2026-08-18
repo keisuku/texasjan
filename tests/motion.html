@@ -11,6 +11,7 @@ f.onload=function(){
      検査直前に新しい局を配り、生成されたばかりのアニメーションを決定的に測る。 */
   ["rail","commons","revealRail","myrow","rack"].forEach(function(id){d.getElementById(id).innerHTML="";});
   w.newHand();
+  w.fastForwardBetting();w.nextStreet(); /* PREFLOP → COMMON 15 */
   const dealAnims=d.getAnimations().length;
   ok(dealAnims>0,"配牌でアニメーションが生成された（"+dealAnims+"件）");
   settle();
