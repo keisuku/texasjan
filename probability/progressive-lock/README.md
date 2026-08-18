@@ -7,6 +7,7 @@ It compares three conditions on the exact same seeded deals:
 - `free`: final 14 chosen freely from private 8 + communal 15 + 4 + 4.
 - `lock8_flop`: lock 8 after communal 15 is visible.
 - `lock4_4`: lock 4 after communal 15, then 4 more after communal 19.
+- `lock4_2`: lock 4 after communal 15, then 2 more after communal 19; final hand is locked 6 + free 8.
 
 ## Reproduce
 
@@ -32,7 +33,7 @@ node probability/progressive-lock/simulate.js --quick \
 - Candidate generation and the `total / sequence / flush / triplet / pairs` ranks are copied from `probability/simulate.js` at base commit `bc9213b2945bc209a27031674ff9e9e295f21490`.
 - The only solver addition is a mandatory locked-tile multiset.
 - One deal is generated once, then all three variants evaluate it. There is no variant-specific deal RNG.
-- `chooseLocks()` accepts no wall or future-reveal argument. The test locks this invariant.
+- `chooseLocks()` accepts no wall or future-reveal argument. The test locks this invariant at both the first and second lock.
 
 ## Metric cautions
 
