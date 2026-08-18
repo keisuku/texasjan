@@ -1115,6 +1115,69 @@ html.has-tile-body-flat .cos-prevstage .tile:not(.back){
 @media (prefers-reduced-motion:reduce){.ttl-start{animation:none;opacity:1}}
 html.still .ttl-start{animation:none;opacity:1}
 
+/* ======================================================================
+   GOLDEN VISUAL SHELL — image-first playable prototype
+
+   これは最終UIではない。承認済みのGolden Visualを一時的な表面として使い、
+   画面遷移だけを実物のボタンで通す。薄いCSS製プレースホルダーを本番に見せないための
+   仮設レイヤーであり、対局・得点・固定4→2のロジックには触れない。
+   ====================================================================== */
+.golden-shell-art{position:absolute;inset:0;z-index:1;width:100%;height:100%;object-fit:cover;
+  display:block;pointer-events:none;user-select:none;-webkit-user-drag:none}
+.golden-shell-ui{position:absolute;inset:0;z-index:3;pointer-events:none}
+.golden-shell-ui button{position:absolute;pointer-events:auto;display:flex;align-items:center;justify-content:center;
+  min-width:44px;min-height:44px;color:#fff5d4!important;background:rgba(2,18,14,.54)!important;
+  border:.18cqw solid rgba(255,227,145,.74)!important;border-radius:1.4cqw!important;
+  box-shadow:0 .45cqw 1.4cqw rgba(0,0,0,.48),inset 0 .1cqw 0 rgba(255,255,255,.18)!important;
+  font-weight:900!important;letter-spacing:.08em!important;text-align:center!important;
+  text-shadow:0 .2cqw .4cqw rgba(0,0,0,.92)}
+.golden-shell-ui button:active{transform:translateY(.25cqw) scale(.985)}
+.golden-shell-ui button:focus-visible{outline:.45cqw solid #79fff0;outline-offset:.35cqw}
+.golden-shell-ui .shell-back{left:2%;top:1.2%;width:10%;height:5.8%;border-radius:50%!important;font-size:3.2cqw!important}
+.golden-shell-ui .shell-main{left:17%;right:17%;bottom:4.1%;height:6.6%;font-size:3.2cqw!important;
+  background:rgba(3,30,23,.76)!important}
+
+/* 元のCSSメタ画面はDOMに残して既存ロジックとテストを維持するが、表示面からは退役。 */
+#screen-title.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
+#screen-lobby.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
+#screen-match.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
+#screen-cosmetics.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
+#screen-shop.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui):not(.gc-modal){display:none!important}
+
+/* タイトル */
+#screen-title .shell-start{left:21%;right:21%;bottom:4.2%;height:6.4%;font-size:3.2cqw!important}
+
+/* Clean Masterロビー上の実操作。画像に焼かれた英語UIへ日本語の操作名を重ねる。 */
+#screen-lobby .shell-mode{left:49%;width:48%;height:7.4%;font:800 3.3cqw/1 "Shippori Mincho B1",serif!important;
+  justify-content:flex-end;padding-right:3.2cqw!important;background:rgba(2,18,14,.34)!important}
+#screen-lobby .shell-rank{top:37.2%}
+#screen-lobby .shell-ring{top:55.4%}
+#screen-lobby .shell-meta{bottom:1.1%;height:7.2%;width:18%;font-size:2.25cqw!important;
+  padding-top:4.1cqw!important;background:rgba(2,18,14,.18)!important;border-color:rgba(255,227,145,.32)!important}
+#screen-lobby .shell-cosmetics{left:40.5%}
+#screen-lobby .shell-gacha{right:.8%}
+
+/* ユーザー評価の高いモード選択画面。 */
+#screen-match .shell-ranked{left:6%;right:6%;top:51.7%;height:13.3%;font-size:4.4cqw!important;
+  align-items:flex-end;padding-bottom:2cqw!important;background:rgba(2,24,18,.20)!important}
+#screen-match .shell-quick{left:6%;width:43%;top:67.2%;height:11.5%;font-size:3.1cqw!important;
+  align-items:flex-end;padding-bottom:1.5cqw!important;background:rgba(8,25,52,.28)!important}
+
+/* カスタマイズは選択グリッドを画像として見せ、戻る／対局だけを本物にする。 */
+#screen-cosmetics .shell-equip{left:49%;right:4%;bottom:2%;height:6.7%;font-size:2.8cqw!important;
+  background:rgba(5,49,36,.72)!important}
+
+/* ガチャはClean Masterを主役にし、引く操作だけを実物として通す。 */
+#screen-shop .shell-draw{bottom:7.4%;height:7.2%;font:800 2.8cqw/1.15 "Shippori Mincho B1",serif!important}
+#screen-shop .shell-ten{left:8%;width:42%;background:rgba(82,15,18,.68)!important}
+#screen-shop .shell-free{right:8%;width:40%;background:rgba(8,36,70,.68)!important}
+#screen-shop .gc-modal{z-index:8}
+
+@media(max-width:380px){
+  .golden-shell-ui button{min-width:40px;min-height:40px}
+  #screen-lobby .shell-mode{font-size:3.05cqw!important}
+}
+
 /* --- dev-only calibration overlay: ?calib puts the Golden Visual on top --- */
 #calib{display:none;position:absolute;inset:0;z-index:99;pointer-events:none;opacity:.45;
   background:url("./claude-handoff/visual/golden-target.webp") center/100% 100% no-repeat}
@@ -1125,7 +1188,11 @@ html.calib #calib{display:block}
 <div id="app">
 
 <!-- ============ タイトル ============ -->
-<section id="screen-title" class="screen">
+<section id="screen-title" class="screen golden-shell-screen">
+  <img class="golden-shell-art" src="./art/visual-archive/v2/01-title-opening.webp" alt="明るいアリーナに麻雀ホールデムのキャラクターが集うタイトル画面">
+  <div class="golden-shell-ui">
+    <button class="shell-start" data-go="lobby">タップして始める</button>
+  </div>
   <div class="ttl-veil"></div>
   <div class="ttl-body">
     <div class="ttl-kicker">麻雀 × ホールデム</div>
@@ -1138,7 +1205,14 @@ html.calib #calib{display:block}
 </section>
 
 <!-- ============ ロビー ============ -->
-<section id="screen-lobby" class="screen">
+<section id="screen-lobby" class="screen golden-shell-screen">
+  <img class="golden-shell-art" src="./art/clean-masters/clean-master-lobby.webp" alt="キャラクターと対戦モードを大きく見せる麻雀ホールデムのロビー">
+  <div class="golden-shell-ui">
+    <button class="shell-mode shell-rank" data-match="rank">ランク戦</button>
+    <button class="shell-mode shell-ring" data-match="ring">リング戦</button>
+    <button class="shell-meta shell-cosmetics" data-go="cosmetics">装飾品</button>
+    <button class="shell-meta shell-gacha" data-go="shop">ガチャ</button>
+  </div>
   <div class="lb-veil"></div>
   <header class="lb-top">
     <div class="lb-id">
@@ -1190,7 +1264,13 @@ html.calib #calib{display:block}
 </section>
 
 <!-- ============ マッチング／卓入場 ============ -->
-<section id="screen-match" class="screen">
+<section id="screen-match" class="screen golden-shell-screen">
+  <img class="golden-shell-art" src="./art/visual-archive/v2/03-mode-select.webp" alt="キャラクターとランク章を中心に据えた対戦モード選択画面">
+  <div class="golden-shell-ui">
+    <button class="shell-back" data-go="lobby" aria-label="ロビーへ戻る">◀</button>
+    <button class="shell-ranked" id="bGoldenRankStart">6人ランク戦を開始</button>
+    <button class="shell-quick" id="bGoldenQuickStart">すぐに対戦</button>
+  </div>
   <div class="mt-veil"></div>
   <header class="mt-top">
     <button class="backBtn" data-go="lobby">◀</button>
@@ -1207,7 +1287,12 @@ html.calib #calib{display:block}
 </section>
 
 <!-- ============ 装飾品設定 ============ -->
-<section id="screen-cosmetics" class="screen">
+<section id="screen-cosmetics" class="screen golden-shell-screen">
+  <img class="golden-shell-art" src="./art/visual-archive/v2/08-customization.webp" alt="キャラクター、卓、牌、チップを同時に確認できる装飾品設定画面">
+  <div class="golden-shell-ui">
+    <button class="shell-back" data-go="lobby" aria-label="ロビーへ戻る">◀</button>
+    <button class="shell-equip" data-go="match">この装いで対局する</button>
+  </div>
   <div class="cos-veil"></div>
   <header class="cos-top">
     <button class="backBtn" data-go="lobby">◀</button>
@@ -1231,7 +1316,13 @@ html.calib #calib{display:block}
 </section>
 
 <!-- ============ 装飾品ガチャ（決済は繋がない） ============ -->
-<section id="screen-shop" class="screen">
+<section id="screen-shop" class="screen golden-shell-screen">
+  <img class="golden-shell-art" src="./art/clean-masters/clean-master-gacha.webp" alt="二人のキャラクターと装飾品報酬を大きく見せるガチャ画面">
+  <div class="golden-shell-ui">
+    <button class="shell-back" data-go="lobby" aria-label="ロビーへ戻る">◀</button>
+    <button class="shell-draw shell-ten" data-draw="10">10回引く</button>
+    <button class="shell-draw shell-free" data-draw="free">無料で1回</button>
+  </div>
   <div class="cos-veil"></div>
   <header class="cos-top">
     <button class="backBtn" data-go="lobby">◀</button>
@@ -2402,6 +2493,8 @@ function resultRender(){
 }
 
 document.getElementById("bMatchStart").onclick=function(){newHand();go("game");};
+document.getElementById("bGoldenRankStart").onclick=function(){matchMode="rank";newHand();go("game");};
+document.getElementById("bGoldenQuickStart").onclick=function(){matchMode="ring";newHand();go("game");};
 document.getElementById("bResultAgain").onclick=function(){newHand();go("game");};
 document.getElementById("bResultLobby").onclick=function(){go("lobby");};
 
@@ -2583,7 +2676,7 @@ function shopPaint(){
     feat.appendChild(d);
   });
   document.getElementById("bExchange").disabled=wallet().pity<200;
-  document.querySelector('.gc-draw[data-draw="free"]').disabled=!!wallet().freeUsed;
+  document.querySelectorAll('[data-draw="free"]').forEach(function(b){b.disabled=!!wallet().freeUsed;});
 }
 
 function shopRender(){walletPaint();shopPaint();}

@@ -8,14 +8,14 @@ const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
 const f=document.createElement("iframe");f.src="../index.html?still=1&screen=title";document.body.appendChild(f);
 f.onload=function(){setTimeout(function(){
   const d=f.contentDocument,w=f.contentWindow;
-  const target={title:"#bTitleStart",lobby:".lb-nav",match:"#bMatchStart",game:"#bNext",result:".rs-actions"};
+  const target={title:".shell-start",lobby:".shell-rank",match:"#bGoldenRankStart",game:"#bNext",result:".rs-actions"};
   ["title","lobby","match","game","result"].forEach(function(name){
     w.go(name);
     const app=d.getElementById("app"),a=app.getBoundingClientRect(),t=d.querySelector(target[name]).getBoundingClientRect();
     ok(app.scrollWidth<=app.clientWidth&&app.scrollHeight<=app.clientHeight,
       name+": 390px幅で画面外へのはみ出しが無い");
-    ok(t.left>=a.left-1&&t.right<=a.right+1&&t.top>=a.top-1&&t.bottom<=a.bottom+1,
-      name+": 主要操作が画面内に収まる");
+    ok(t.width>=40&&t.height>=40&&t.left>=a.left-1&&t.right<=a.right+1&&t.top>=a.top-1&&t.bottom<=a.bottom+1,
+      name+": 見えている主要操作が40px以上で画面内に収まる");
   });
   w.go("game");
   const raise=d.getElementById("bRaise");
