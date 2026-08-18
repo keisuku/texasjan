@@ -2,12 +2,12 @@
 
 Status: **PROPOSED experiment.** This directory does not change production gameplay.
 
-It compares three conditions on the exact same seeded deals:
+It compares four conditions on the exact same seeded deals. Every condition uses communal **15 + 4 + 4 + 4 = 27**; only the lock rule changes:
 
-- `free`: final 14 chosen freely from private 8 + communal 15 + 4 + 4.
+- `free`: final 14 chosen freely from private 8 + communal 15 + 4 + 4 + 4.
 - `lock8_flop`: lock 8 after communal 15 is visible.
 - `lock4_4`: lock 4 after communal 15, then 4 more after communal 19.
-- `lock4_2`: lock 4 after communal 15, then 2 more after communal 19; final hand is locked 6 + free 8.
+- `lock4_2`: lock 4 after communal 15, then 2 more after communal 19; the later 4 + 4 change information but add no locks; final hand is locked 6 + free 8.
 
 ## Reproduce
 

@@ -6,6 +6,8 @@ const { chooseLocks, counts, dealOne, mulberry32, run } = require("./simulate.js
 
 const cfg = { seed: 77, deals: 2, equitySampleDeals: 0, equityRollouts: 2, solverNodeCap: 120000 };
 const deal = dealOne(cfg, mulberry32(cfg.seed));
+assert.strictEqual(deal.streets.length, 4, "15＋4＋4＋4 must create four communal streets");
+assert.deepStrictEqual(deal.streets.map(x => x.length), [15, 19, 23, 27]);
 
 const a = chooseLocks(deal.privates[0], deal.streets[0], deal.dora, [], 4, "pairs", cfg.solverNodeCap);
 const alteredFuture = deal.streets[0].concat([0, 0, 0, 0]);
@@ -29,5 +31,7 @@ const first = run(cfg), again = run(cfg);
 assert.deepStrictEqual(first, again, "same seed must be deterministic");
 assert.strictEqual(first.metrics.free.lockRegretPct, 0);
 assert.strictEqual(Object.keys(first.metrics).join(","), "free,lock8_flop,lock4_4,lock4_2");
+assert.deepStrictEqual(first.rules.communalGroups, [15, 4, 4, 4]);
+assert.strictEqual(first.metrics.lock4_2.equityLeaderChangePct.length, 3);
 
 console.log("progressive-lock tests: ok");
