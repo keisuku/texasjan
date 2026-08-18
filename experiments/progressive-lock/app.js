@@ -82,7 +82,7 @@
     const data=showData(),n=el("final"),p=el("shownPrivate");n.innerHTML="";p.innerHTML="";
     data.final.forEach((name,i)=>n.appendChild(displayTile(name,data.from.includes(i))));data.private.forEach(name=>p.appendChild(displayTile(name,false)));
     el("shownName").textContent=(shownPlayer+1)+"位　"+data.name;el("shownScore").textContent=data.score;
-    const ranking=el("ranking");ranking.innerHTML="";["あなた",...opponents.map(x=>x.name)].forEach((name,i)=>{const b=document.createElement("button");b.type="button";b.className="rank"+(i===shownPlayer?" active":"");b.textContent=(i+1)+"位 "+name;b.addEventListener("click",()=>{shownPlayer=i;renderFinal();});ranking.appendChild(b);});
+    const ranking=el("ranking");ranking.innerHTML="";["あなた",...opponents.map(x=>x.name)].forEach((name,i)=>{const b=document.createElement("button");b.type="button";b.className="rank"+(i===shownPlayer?" active":"");b.textContent=(i+1)+"位 "+name;b.setAttribute("aria-pressed",i===shownPlayer?"true":"false");b.addEventListener("click",()=>{shownPlayer=i;renderFinal();});ranking.appendChild(b);});
   }
   function render(){
     renderSteps();const s=STAGES[stage];el("instruction").innerHTML="<strong>"+s.title+"</strong><span>"+s.sub+"</span>";
