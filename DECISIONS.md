@@ -38,6 +38,8 @@ This is the short, append-only decision register. Detailed evidence belongs in l
 | 2026-08-18 | ACCEPTED | ショーダウンの一次表示は勝者の最終14枚だけを大きく出し、私牌由来の牌へ印を付ける。 | 全員分を同時表示して情報過多にしない。他家は順位行タップで同じ領域へ切り替え、元の私牌8枚も確認可能にする。 |
 | 2026-08-18 | REPRODUCIBLE BASELINE | 私牌8枚だけの運差を、共通15＋4＋4、全員同一方針、5,000局と10/100局各100万シーズンで固定seed測定した。 | 最終14枚の私牌由来は平均4.28枚。100点アンティ時の首位―最下位差中央値は10局1,800点、100局5,450点。probability/STARTING_EIGHT_LUCK_2026-08-18.md |
 
+| 2026-08-18 | PROPOSED | プリフロップは固定なし、共通15公開後に4枚、次の＋4公開後に追加4枚を固定し、最後は固定8＋自由6で最終14枚を作る。 | 操作モックと同一seed比較仕様を追加。experiments/progressive-lock/ / probability/PROGRESSIVE_LOCK_EXPERIMENT_2026-08-18.md |
+
 ## States
 
 - ACCEPTED: explicitly approved direction.
