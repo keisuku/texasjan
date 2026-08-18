@@ -38,6 +38,10 @@ for(const control of [
   if(!html.includes(control))throw new Error(`playable control missing: ${control}`);
 }
 
+const resultAsset="art/visual-archive/v2/07-gacha-result.webp";
+if(!html.includes(`url("./${resultAsset}")`))throw new Error("gacha result Golden Visual is not wired");
+if(!fs.existsSync(path.join(root,resultAsset)))throw new Error("gacha result asset is missing");
+
 if(!html.includes("これは最終UIではない")){
   throw new Error("temporary-shell boundary must remain explicit");
 }
