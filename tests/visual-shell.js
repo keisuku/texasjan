@@ -38,6 +38,18 @@ for(const control of [
   if(!html.includes(control))throw new Error(`playable control missing: ${control}`);
 }
 
+for(const screen of ["lobby","match"]){
+  const start=html.indexOf(`<section id="screen-${screen}"`);
+  const end=html.indexOf("</section>",start);
+  const section=html.slice(start,end);
+  if(!section.includes('class="production-meta-ui"')){
+    throw new Error(`${screen}: visible production UI layer missing`);
+  }
+  if(section.includes('class="golden-shell-ui"')){
+    throw new Error(`${screen}: invisible hotspot layer must not remain`);
+  }
+}
+
 const resultAsset="art/visual-archive/v2/07-gacha-result.webp";
 if(!html.includes(`url("./${resultAsset}")`))throw new Error("gacha result Golden Visual is not wired");
 if(!fs.existsSync(path.join(root,resultAsset)))throw new Error("gacha result asset is missing");
@@ -46,4 +58,4 @@ if(!html.includes("これは最終UIではない")){
   throw new Error("temporary-shell boundary must remain explicit");
 }
 
-console.log("visual shell: PASS (5 screens, assets and playable controls)");
+console.log("visual shell: PASS (5 screens, real lobby/mode UI, assets and playable controls)");

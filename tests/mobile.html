@@ -8,7 +8,7 @@ const log=[];function ok(c,m){log.push((c?"PASS  ":"FAIL  ")+m);}
 const f=document.createElement("iframe");f.src="../index.html?still=1&screen=title";document.body.appendChild(f);
 f.onload=function(){setTimeout(function(){
   const d=f.contentDocument,w=f.contentWindow;
-  const target={title:".shell-start",lobby:".shell-rank",match:"#bGoldenRankStart",game:"#bNext",result:".rs-actions"};
+  const target={title:".shell-start",lobby:".pm-match-card",match:"#bGoldenRankStart",game:"#bNext",result:".rs-actions"};
   ["title","lobby","match","game","result"].forEach(function(name){
     w.go(name);
     const app=d.getElementById("app"),a=app.getBoundingClientRect(),t=d.querySelector(target[name]).getBoundingClientRect();
