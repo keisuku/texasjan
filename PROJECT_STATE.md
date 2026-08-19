@@ -1,74 +1,75 @@
-# PROJECT STATE — MAHJONG HOLD'EM
+# MAHJONG HOLD'EM — Project State
 
-最終更新: 2026-08-19
+Updated: **2026-08-20 JST**  
+Repository: `keisuku/texasjan`  
+Product promise: **Mahjong Texas Hold'em**
 
-## 現在地
+## One-minute state
 
-- GitHub mainには、タイトルから対局・結果までのプレイ可能なHTML検証版がある。
-- 6人のCHECK / CALL / BET / RAISE / FOLD / ALL-IN、時計回りの手番、レイズ金額バーが実装済み。
-- 本番の通常進行は、プリフロップ固定なし→共通15枚で4固定→最初の＋4で追加2固定→＋4→＋4＝共通27枚。
-- タイトル、ロビー、マッチング、対局、局所公開演出、決着、6人ショーダウン・インスペクターまでをプチ完成版として接続した。
-- タイトルの低品質なCSS仮画面を退役し、評価済みGolden Visualを使うimage-first開始画面へ交換した。
-- ロビー、モード選択、装飾品、ガチャは次段階へ進み、Golden Visualを人物・空間のキーアートとして残しつつ、通貨、ランク、日本語ラベル、操作、選択状態を実DOMへ分離した。透明ホットスポットはメタ4画面から撤去済み。
-- 装飾品は実所持／選択グリッドと対局内の実物プレビューを表示する。ガチャは実ウォレット・抽選・交換ポイント・獲得結果・もう一度引く操作を表示する。
-- ガチャ排出対象は、実プレビューと対局反映を確認できる「白磁線画」「静謐の卓」「精密金縁」「静光」に限定した。黒曜・夜想・翡翠チップ・黒檀など素材未完成の予約枠は、排出と装飾品一覧の表示から外す。
-- 対局と結果のプレイヤー向け表示は日本語を主にし、共通牌・私牌・最終手牌・手番・思考中・ベット操作を一読で理解できる表記へ統一した。ポーカー固有概念も「降りる／コール／レイズ／オールイン」として表示する。
-- オールインは実ベッティングのALL-IN成立時だけ中央の局所演出を出し、勝利結果は実勝敗データに連動して和了演出素材を結果ヒーローへ限定表示する。
-- Gate Aのビジュアルレビューは26/26回答済み。
-- Gate Bの新規統合モックは、作成済み1枚が明示的に却下されたため、有効候補0枚。低品質な初稿はGitHubから削除する。
-- 次のPlayable課題は、固定後悔を20%以下へ下げる微調整と、実機プレイテストで演出・文字密度を磨くこと。
+The repository contains a playable six-player browser prototype from title screen through lobby, matching, match, showdown, result, and rematch. Betting, scoring, waits, progressive tile locking, opponent showdown inspection, and several meta screens are implemented.
 
-## 採用するビジュアル統合
+The gameplay implementation is usable as a **WORKING BASELINE**. The visual direction is **not approved**. In particular, the 29 images merged in PR #43 were later rejected in full by the user and must be treated as archive material, not as a chosen art direction.
 
-旧V2の「押したくなる高揚感」を主軸にする。Cleanは通常対局の簡潔さ、Aは現代日本の高級感、Cはキャラクターの感情、Dは工芸素材として限定的に混ぜる。
+## Implemented gameplay
 
-### 強い基準
+- Six-player betting with clockwise action order.
+- Fold, call/check, raise, and all-in; raise amount can be adjusted with a slider.
+- Independent mahjong scoring and wait calculation.
+- Tap-to-select final hand. Do not add dragging, automatic replacement, or selection reset on reveal.
+- Showdown/result flow with opponent private/final-hand inspection.
+- Title, lobby, matching, cosmetics, gacha/shop stubs, match, showdown, and result are reachable.
+- Japanese-first interface copy is present in the main flow.
 
-- タイトル・開始画面
-- キャラクターロビー
-- モード選択
-- キャラクター一覧（構造のみ。画質とキャラは改善）
-- 着せ替え（ページの雰囲気。卓は改善）
-- 4枚公開
+## Current working rule
 
-### 部分採用
+- 136-tile set, six players.
+- Eight private tiles per player.
+- Start with 15 communal tiles; no preflop lock.
+- First `+4`: lock four tiles.
+- Second `+4`: lock two additional tiles.
+- Third and fourth `+4`: reveal only; no additional lock.
+- Showdown uses 27 communal tiles, fixed six, and free selection of the remaining eight tiles to form the final 14.
 
-- 通常対局のシンプルさ
-- ロビーの方向性
-- ガチャのコンセプト
-- A、C、Dの局所要素
-- ALL-INの緊張、アガリ・勝利の演出
+This is not final game balance. The last paired 500-deal comparison for the fixed-4-then-2 / common-27 rule reported approximately 76.3% completion, 23.7% lock regret, and 23.4% split rate. The regret target was not met, so further simulation and playtesting remain necessary.
 
-### 今回使わない
+## Visual status — important
 
-- B｜日本発フューチャーリーグ
-- E｜日本グラフィックポップ
-- 現行のガチャ告知、ガチャ結果、ショップ・シーズンパス
-- ランク進行、ミッション・イベント、テンパイ注目
+### Positive historical signals, not a final style
 
-## レーン状況
+- Excitement and immediacy from earlier V2 screens.
+- Clarity and restraint from the Clean Master set.
+- A modern Japanese premium-club concept.
+- Strong character emotion and high-quality material texture.
+- The earlier `audition-r5` format is a useful example of exploring character art styles, but its exact style or meaning must not be inferred without asking the user.
 
-- Control Tower: Gate Bの品質ゲートとショーダウン公開仕様を更新中。
-- Match Visual: 有効な新規統合モックは0枚。承認済み基準を固定したMaster 0から再開する。
-- Meta / Gacha: キャラクター一覧・着せ替え・獲得結果の集約案を作成待ち。
-- Probability: 固定4→2・共通27枚の同一seed 500局比較を追加。次はストリート別ベット価値と戦略別ROI。
-- Playable: 時計回り、レイズ金額バー、固定4→2、公開15＋4＋4＋4、全員の私牌8＋最終14切替を本番へ統合する。
+### Explicitly rejected
 
-## 確率ベースライン
+- All 29 images merged in PR #43. They remain in `main` only as historical files.
+- PR #44: match-screen proposals; closed unmerged and rejected.
+- PR #45: character-style R6; closed unmerged and rejected.
+- Cheap CSS-gradient buttons and generic placeholder-looking UI.
+- Arbitrary changes of camera angle or game premise when the request is to compare art style, character rendering, material treatment, and world tone.
+- Train, print, white-room, toy-city, ocean, theater, and sky-arena detours from the failed exploration.
 
-公開進行は15＋4＋4＋4＝27枚を採用。旧23枚版の10万局ベッティング値は比較基準として残し、4ストリート版のPOT基準は次回更新する。
+### Current visual gate
 
-独立実験の固定4→2では、同一seed 500局で23枚版から27枚版へ戻すと完成率63.7667%→76.3%、固定後悔34.1%→23.7%、split pot 32.2%→23.4%。完成率は初期合格帯へ入ったが、固定後悔は20%以下へわずかに未達。
+- Newly approved art style: **0**.
+- Newly approved world/material direction: **0**.
+- Valid current comparison candidates: **0**.
+- Do not generate, implement, or merge a new visual direction until the user gives a new scoped instruction.
 
-## 直近の事実
+## Verification status
 
-決着時は勝敗計算に使った全参加者の私牌8枚・最終14枚・役要約を保存し、結果画面の人物タブで一人ずつ切り替える。最終14枚の私牌由来牌は青枠で示す。
+PR #42 recorded passing acceptance, hands, skins, flow, mobile, scoring, visual-event, and Node checks. Motion testing had an intermittent Web Animations virtual-time issue. A mobile result-screen control was also reported below the 44 px target. Re-run the documented browser checks before claiming a later implementation is verified.
 
-## 次の一手
+## Canonical continuity
 
-1. 本番でタイトル→ロビー→モード選択→対局→結果まで実機プレイし、実UIの押しやすさと画像との重複を確認する。
-2. 対局・結果の平常時密度と、＋4／オールイン／勝利の局所演出を実機で磨く。
-3. 素材未制作の予約枠は、承認済みの実アセットができたものから1件ずつガチャへ追加する。
-4. 4ストリート版ベッティング基準と固定後悔を再測定する。
+GitHub is the project memory; chat sessions are temporary. Every new session must begin with:
 
-詳細な人間判断: docs/visual/HUMAN_REVIEW_2026-08-17.md
+1. `NEW_SESSION_START_HERE.md`
+2. `PROJECT_STATE.md`
+3. `CURRENT_TASK.md`
+4. `DECISIONS.md`
+5. only then, the relevant lane prompt or source files
+
+Do not preload the archive or infer approval from a merged PR. A merge proves that files reached `main`; it does not prove that the user approved the visual result.
