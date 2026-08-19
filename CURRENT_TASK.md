@@ -1,6 +1,6 @@
 # CURRENT TASK — Golden Visual仮設レイヤー＋ショーダウン公開性
 
-今日の7時間スプリントの実行順は `TODAY_GOAL.md` を参照する。
+今日の7時間スプリントの実行順は `TODAY_GOAL.md` を参照する。Claude Codeは `CLAUDE_CODE_QUEUE.md` のREADYを1件だけ担当する。
 
 最終更新: 2026-08-19
 

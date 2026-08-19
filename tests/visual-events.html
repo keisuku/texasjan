@@ -1,0 +1,35 @@
+<!doctype html>
+<meta charset="utf-8">
+<title>RUNNING</title>
+<body>
+<pre id="out">running</pre>
+<iframe id="app" src="../index.html?screen=game" style="width:390px;height:844px"></iframe>
+<script>
+const log=[];
+function ok(condition,message){log.push((condition?"PASS  ":"FAIL  ")+message);}
+function done(){document.getElementById("out").textContent=log.join("\n");document.title="DONE";}
+
+document.getElementById("app").addEventListener("load",()=>setTimeout(()=>{
+  try{
+    const frame=document.getElementById("app");
+    const w=frame.contentWindow;
+    const d=frame.contentDocument;
+
+    w.flashAllIn("あなた",1200);
+    ok(d.getElementById("allInBurst").classList.contains("on"),"実ALL-IN演出が表示される");
+    ok(d.getElementById("allInPlayer").textContent==="あなた","ALL-INしたプレイヤー名が実データになる");
+    ok(d.getElementById("allInAmount").textContent.includes("1,200"),"ALL-IN額が実データになる");
+
+    w.eval('lastResult={userWon:true,userFolded:false,winners:["あなた"],pot:1200,detail:"テスト",hand:[],delta:16,mode:"rank",summary:"勝利"}');
+    w.go("result");
+    ok(d.getElementById("screen-result").classList.contains("user-win"),"勝利時だけ勝利演出状態になる");
+
+    w.eval('lastResult={userWon:false,userFolded:false,winners:["BOT"],pot:1200,detail:"テスト",hand:[],delta:-16,mode:"rank",summary:"敗北"}');
+    w.resultRender();
+    ok(!d.getElementById("screen-result").classList.contains("user-win"),"敗北時は勝利演出状態を解除する");
+  }catch(error){
+    log.push("THROWN  "+error.stack);
+  }
+  done();
+},700));
+</script>
