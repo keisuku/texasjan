@@ -9,7 +9,15 @@ const f=document.createElement("iframe");
 f.src="../index.html?still=1&screen=game";
 document.body.appendChild(f);
 
+/* 例外が出ると setTimeout の中で握りつぶされ、#out が "running" のまま残る。
+   run-regression.sh は "running" をFAIL扱いにするので検出はされるが、
+   何が起きたか分からない。原因を必ず出力へ残す。 */
+function report(){
+  document.getElementById("out").textContent=
+    log.join("\n")+"\n\n"+log.filter(function(l){return l[0]==="F";}).length+" FAIL / "+log.length+" total";
+}
 f.onload=function(){setTimeout(function(){
+ try{
   const d=f.contentDocument, w=f.contentWindow, root=d.documentElement;
   const bg=function(sel){return w.getComputedStyle(d.querySelector(sel)).backgroundImage;};
   const commons=function(){return d.querySelectorAll("#commons .tile").length;};
@@ -34,6 +42,16 @@ f.onload=function(){setTimeout(function(){
   ok(/arena-with-characters/.test(bg("#screen-game")),"既定の卓は arena-with-characters");
 
   const before=commons();
+
+  /* PR #36 以降、sharp / empty / line は「完成済みだが未所持」のガチャ報酬になった。
+     未所持スキンを装備できないのは正しい挙動なので、切替の検査の前に入手させる。
+     未所持のまま選べないことは、下の obsidian で別途検査する。 */
+  ["frame:sharp","arena:empty","tile:line"].forEach(function(key){
+    const p=key.split(":");
+    const s=w.skinsForSlot(p[0]).filter(function(x){return x.id===p[1];})[0];
+    ok(!!s,"カタログに "+key+" がある");
+    if(s)w.skinGrant(s);
+  });
 
   /* ---- 枠スキンを切り替える ---- */
   w.skinSelect("frame","sharp");
@@ -133,6 +151,8 @@ f.onload=function(){setTimeout(function(){
   ok(d.querySelectorAll("#commons .tile").length===0,"新しい局は共通牌未公開");
 
   /* ---- ガチャ: 引く → 所持する → 装備できる ---- */
+  /* 上の装備検査で入手させた分を戻し、未所持からの抽選として検査する。 */
+  w.eval("ownMemory=[]");
   w.go("shop");
   const pool=w.gachaPool();
   ok(pool.length>0,"排出対象がある ("+pool.length+"件)");
@@ -140,17 +160,21 @@ f.onload=function(){setTimeout(function(){
   const target=pool[0];
   ok(!w.skinOwned(target),"引く前は「"+target.name+"」は未所持");
 
+  /* PR #34 の再設計で「1回引く」ボタンは廃止され、UIは「1日1回無料」と「10回引く」の2つ。
+     .gc-draw は旧画面のクラスで現在のDOMには無いので、data-draw で引く。 */
   const gem0=w.wallet().gem;
-  d.querySelector('.gc-draw[data-draw="1"]').click();
-  ok(w.wallet().gem===gem0-200,"1回引くと宝玉が200減る ("+gem0+" -> "+w.wallet().gem+")");
+  d.querySelector('[data-draw="free"]').click();
+  ok(w.wallet().gem===gem0,"無料引きでは宝玉が減らない ("+gem0+" -> "+w.wallet().gem+")");
+  ok(w.wallet().freeUsed===true,"無料引きは1日1回として消費される");
   ok(w.wallet().pity===1,"天井Pが1増える");
   ok(d.getElementById("gcModal").classList.contains("on"),"入手演出が出る");
-  ok(d.querySelectorAll("#gcCards .gc-card").length===1,"1回引きはカード1枚");
+  ok(d.querySelectorAll("#gcCards .gc-card").length===1,"無料引きはカード1枚");
   d.getElementById("bGachaClose").click();
-  ok(!d.getElementById("gcModal").classList.contains("on"),"OKで閉じる");
+  ok(!d.getElementById("gcModal").classList.contains("on"),"結果を閉じるで閉じる");
+  ok(d.querySelector('[data-draw="free"]').disabled,"使用後の無料引きは押せない");
 
   const gem1=w.wallet().gem;
-  d.querySelector('.gc-draw[data-draw="10"]').click();
+  d.querySelector('[data-draw="10"]').click();
   ok(w.wallet().gem===gem1-2000,"10連で宝玉が2000減る");
   ok(d.querySelectorAll("#gcCards .gc-card").length===10,"10連はカード10枚");
   ok(w.gachaUnowned().length===0||w.gachaPool().some(function(s){return w.skinOwned(s);}),
@@ -187,7 +211,10 @@ f.onload=function(){setTimeout(function(){
   ok(w.gachaUnowned().length===un0-1,"天井交換で未所持が1つ減った");
   d.getElementById("bGachaClose").click();
 
-  document.getElementById("out").textContent=
-    log.join("\n")+"\n\n"+log.filter(function(l){return l[0]==="F";}).length+" FAIL / "+log.length+" total";
+  report();
+ }catch(e){
+  log.push("FAIL  検査が例外で中断した: "+(e&&e.message)+" @ "+((e&&e.stack||"").split("\n")[1]||"").trim());
+  report();
+ }
 },700);};
 </script>
