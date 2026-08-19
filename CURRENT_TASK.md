@@ -1,72 +1,38 @@
-# CURRENT TASK — Golden Visual仮設レイヤー＋ショーダウン公開性
+# Current Task
 
-今日の7時間スプリントの実行順は `TODAY_GOAL.md` を参照する。Claude Codeは `CLAUDE_CODE_QUEUE.md` のREADYを1件だけ担当する。
+Updated: **2026-08-20 JST**
 
-最終更新: 2026-08-19
+## Current status
 
-## いま最優先すること
+There is no active image-generation or visual-implementation task. The previous visual attempts were rejected:
 
-本番プチ完成版を、プリフロップから全員の勝敗根拠確認まで一続きで遊べる状態へ進める。
+- PR #43: merged, but all 29 images were subsequently rejected.
+- PR #44: closed unmerged and rejected.
+- PR #45: closed unmerged and rejected.
 
-メタ画面の「ハリボテ」は、薄いCSSプレースホルダーではなく、評価済みGolden Visualを全面に使い、操作だけを実物として通すimage-first仮実装から段階的に外す。ロビー、モード選択、装飾品、ガチャは通貨・ランク・日本語ラベル・操作・選択状態を実DOMへ分離し、透明ホットスポットを撤去した。装飾品は実所持／選択と実物プレビュー、ガチャは実抽選結果と再抽選まで接続済み。排出対象は実プレビューと対局反映を確認できる完成済み4種だけに絞り、未完成の色見本は画面と抽選から外した。対局・結果は共通牌、私牌、最終手牌、手番、ベット操作を日本語中心へ統一した。次は＋4／オールイン／勝利の局所演出を実機で磨く。
+The next session must not continue those directions by default.
 
-ゲームプレイ基準は、**固定4→2・公開4→4→4**。プリフロップ固定なし、共通15枚で4固定、最初の＋4で追加2固定、その後の＋4と＋4では固定を増やさない。人間の明示承認を受け、本番ループへ反映する。
+## Required first response in a new session
 
-結果画面には全員の私牌8枚と最終14枚を一人ずつ切り替えるインスペクターを実装し、私牌由来牌を青枠で識別する。
+After reading `NEW_SESSION_START_HERE.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, and `DECISIONS.md`:
 
-## Playable：次の実装候補
+1. Inspect the current repository and relevant PR state read-only.
+2. Summarize, in no more than ten items, what is implemented, unapproved, rejected, and unresolved.
+3. Stop and wait for the user to assign the next scoped task.
 
-1. ショーダウン時の全参加者について、次を結果データへ保存する。
-   - 私牌8枚
-   - 実際に採用した最終14枚
-   - 役名、翻・符・評価点
-   - 最終14枚のうち私牌から採用した牌
-   - 勝敗順位、獲得POT
-2. 対局画面の極小8枚公開は、席ごとの要約表示へ縮退する。
-3. 結果画面に「ショーダウン・インスペクター」を1つ追加する。
-   - 上部: 生存者の順位タブ
-   - 中段: PRIVATE 8
-   - 下段: FINAL 14
-   - 私牌由来の牌へ識別マーク
-   - 勝者を最初に展開し、他家へ横スワイプまたはタップで切替
-4. ALL-INかつ全員のベット行動が終わった時点では、残り公開前に生存者の私牌8枚を開く。
-5. 通常ショーダウンでは、非フォールドの全員を公開するデジタルゲーム基準を比較テストする。
+## Do not do before a new instruction
 
-詳細: docs/rules/SHOWDOWN_VISIBILITY_2026-08-18.md
+- Do not generate more images.
+- Do not reuse PR #43, #44, or #45 visuals as an approved baseline.
+- Do not infer a requested art style from `audition-r5`; ask when a concrete choice is needed.
+- Do not merge visual work.
+- Do not bulk-generate similar variants.
+- Do not redesign gameplay rules or replace tested flow.
+- Do not ingest the entire archive into context.
 
-## Gate Bモック：現在地
+## Safe work that remains available after assignment
 
-- 前回から作られた新規統合モック: 1枚。
-- 人間が明示的に却下: 1枚。
-- 現在の有効な新規統合モック: 0枚。
-- 却下画像はリポジトリから削除し、候補・参考・再生成元として使わない。
-
-## Gate Bを再開する条件
-
-まず1枚だけ「Master 0」を作り、次をすべて満たしてから残りへ展開する。
-
-- 941×1672と約25%縮小の両方で主役が読める。
-- 承認済みの旧V2 / Clean / A / C / Dのどこを継承したか説明できる。
-- 同じ卓・同じキャラクター・同じカメラを再利用できる。
-- 6席、共通15＋4＋4、自分の最終14枚、主要操作の構造が破綻していない。
-- 牌面・文字・人数・指・家具・光源に目立つ破綻がない。
-- 人物写真を並べただけの一般的な高級カジノ画像にしない。
-- 内部確認を通らない初稿をGitHubや人間レビューへ出さない。
-
-Master 0が人間に承認されたら、タイトル、ロビー、モード選択、一覧、着せ替え、通常対局、＋4 I、＋4 II、ALL-IN、勝利の状態差へ展開する。
-
-## 完了条件
-
-- どのプレイヤーがどの私牌8枚を持っていたか読める。
-- どの14枚で評価されたか読める。
-- その14枚のどれが私牌由来か読める。
-- 役名・勝者・POTの根拠を一画面内の切替で確認できる。
-- モックはMaster 0が承認されるまで「進捗枚数」に数えない。
-
-## 今回しないこと
-
-- 却下画像の修正・流用・参考化
-- 低品質な画像の枚数量産
-- 5人分の私牌8枚＋最終14枚を一度に卓上へ並べる
-- 未承認の公開ルールを黙って本仕様へ昇格
-- フレームワーク移行
+- Gameplay/probability: continue reproducible simulations from the current fixed-4-then-2 / common-27 working rule.
+- Implementation: diagnose or implement narrowly scoped changes while preserving tested scoring and flow.
+- Visual exploration: only after the user supplies a new scoped brief, compare genuinely distinct art-rendering/material/world treatments while keeping the existing game structure.
+- Documentation: keep the four canonical handoff files current at every material checkpoint.
