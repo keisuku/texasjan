@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>全ボタン品質選定 — MAHJONG HOLD'EM</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@600;700;800&family=Zen+Kaku+Gothic+New:wght@500;700;900&display=swap');
+*{box-sizing:border-box}html{background:#03110d;color:#f6edda;font-family:"Zen Kaku Gothic New",system-ui,sans-serif}
+body{margin:0;background:radial-gradient(circle at 50% 0,rgba(38,107,88,.34),transparent 34rem),#03110d;min-height:100vh}
+button,textarea{font:inherit}.wrap{width:min(1120px,100%);margin:auto;padding:32px 18px 96px}
+.hero{padding:28px 26px;border:1px solid rgba(226,193,101,.42);background:rgba(5,29,23,.88);box-shadow:0 24px 70px rgba(0,0,0,.42)}
+.eyebrow{font-size:12px;letter-spacing:.28em;color:#8ce0cb}.hero h1{margin:8px 0 12px;font:800 clamp(28px,5vw,52px)/1.14 "Shippori Mincho B1",serif;letter-spacing:.05em}
+.hero p{margin:0;max-width:850px;color:#bdd0c8;line-height:1.9}.rule{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+.rule span{padding:7px 11px;border:1px solid rgba(226,193,101,.28);color:#ead79e;background:#08251e;font-size:12px}
+.reject{margin:22px 0;padding:16px 18px;border-left:5px solid #c84c3e;background:#210f0d;color:#ffd8d1}.reject b{display:block;margin-bottom:5px}.reject small{color:#d8aaa3}
+.cards{display:grid;gap:24px}.card{overflow:hidden;border:1px solid rgba(226,193,101,.4);background:#061b16;box-shadow:0 18px 45px rgba(0,0,0,.34)}
+.card.selected{outline:3px solid #f0d273;outline-offset:4px}.card-head{display:flex;gap:18px;align-items:center;padding:20px 22px;background:#0a2a22;border-bottom:1px solid rgba(226,193,101,.28)}
+.code{display:grid;place-items:center;flex:none;width:46px;height:46px;border:1px solid #e1c368;color:#f8e6a7;font:800 24px/1 "Shippori Mincho B1",serif}
+.card-head h2{margin:0;font:800 clamp(20px,3.2vw,31px)/1.2 "Shippori Mincho B1",serif;letter-spacing:.06em}.card-head p{margin:4px 0 0;color:#93b1a5;font-size:13px}
+.stage{position:relative;min-height:410px;padding:25px;background:#071d17 url('../art/clean-masters/clean-master-match.webp') center 34%/cover no-repeat}
+.stage::before{content:"";position:absolute;inset:0;background:rgba(1,13,10,.76)}.stage>*{position:relative}
+.sample-title{margin:0 0 10px;color:#d7c27f;font-size:11px;letter-spacing:.2em}.sample-grid{display:grid;grid-template-columns:1.45fr 1fr;gap:20px}
+.column{display:flex;flex-direction:column;gap:14px}.mode{width:100%;min-height:82px;display:flex;align-items:center;justify-content:space-between;text-align:left;color:#fff2d2}
+.mode b{display:block;font:800 24px/1.1 "Shippori Mincho B1",serif;letter-spacing:.08em}.mode small{display:block;margin-top:7px;color:#c0d2ca;font-size:12px}.arrow{font-size:22px}
+.actions{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.actions button{min-width:0;height:74px;color:#fff4d7;font-weight:900;letter-spacing:.06em;text-shadow:0 2px 3px rgba(0,0,0,.75)}
+.nav{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nav button{height:53px;color:#f4e7bf;font-size:12px;font-weight:800}.nav b{display:block;font-size:16px;line-height:1}
+.states{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.states button{height:48px;color:#f8ebc8;font-size:11px;font-weight:900}.states button:nth-child(2){transform:translateY(3px);filter:brightness(.72)}.states button:nth-child(3){filter:saturate(.2) brightness(.52);color:#9c978c}.states button:nth-child(4){outline:3px solid #6ff5df;outline-offset:3px}
+.a-button{border:16px solid transparent;background:none;border-image:url('../assets/ui/svg/frame-gold-ribbon.svg') 17 42 17 42 fill stretch;color:#f9ebc2;text-shadow:0 2px 3px #000}
+.a-button.mode{border-width:19px 42px}.a-button:active{transform:translateY(3px);filter:brightness(.82)}
+.b-button{border:0;background:transparent center/100% 100% no-repeat}.b-red{background-image:url('../assets/ui/btn-fold.png')}.b-blue{background-image:url('../assets/ui/btn-call.png')}.b-gold{background-image:url('../assets/ui/btn-raise.png');color:#241604!important;text-shadow:0 1px 1px rgba(255,255,255,.36)!important}.b-button:active{transform:translateY(3px) scale(.985);filter:brightness(.84)}
+.c-button{border:18px solid transparent;background:none;border-image:url('../assets/ui/svg/frame-gold-plate.svg') 28 38 28 38 fill stretch;color:#38240c;text-shadow:0 1px 0 rgba(255,255,255,.5)}
+.c-button.mode{border-width:24px 46px}.c-button small{color:#684b22}.c-button:active{transform:translateY(3px);filter:brightness(.85)}
+.vote{padding:20px 22px 24px;background:#081f19;border-top:1px solid rgba(226,193,101,.22)}.vote h3{margin:0 0 12px;font-size:14px;color:#e9d38f}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.choice{min-height:49px;padding:8px;border:1px solid rgba(229,200,113,.42);background:#0d352b;color:#dbe9e2;font-weight:800;cursor:pointer}.choice.on{background:#e4cb78;color:#16362d;border-color:#fff0b3;box-shadow:0 0 20px rgba(238,205,109,.28)}
+.vote textarea{width:100%;min-height:68px;margin-top:12px;padding:11px 12px;resize:vertical;border:1px solid rgba(229,200,113,.3);background:#04130f;color:#fff1ca;line-height:1.55}.vote textarea::placeholder{color:#6f8d81}
+.summary{position:sticky;bottom:12px;margin-top:26px;padding:15px 18px;display:flex;align-items:center;gap:14px;background:rgba(5,25,20,.96);border:1px solid #d1b65d;box-shadow:0 15px 44px rgba(0,0,0,.5);backdrop-filter:blur(10px)}
+.summary strong{font-family:"Shippori Mincho B1",serif;color:#f1d77e}.summary span{color:#a8beb4;font-size:13px}.summary button{margin-left:auto;min-width:150px;height:46px;border:16px solid transparent;border-image:url('../assets/ui/svg/frame-gold-ribbon.svg') 17 42 17 42 fill stretch;background:none;color:#fff0bf;font-weight:900;cursor:pointer}
+.saved{color:#70ddc3!important}
+@media(max-width:700px){.wrap{padding:16px 10px 70px}.hero{padding:22px 18px}.sample-grid{grid-template-columns:1fr}.stage{padding:20px 13px;min-height:560px}.actions button{height:68px;font-size:12px}.states{grid-template-columns:repeat(2,1fr)}.choices{grid-template-columns:1fr}.summary{align-items:flex-start;flex-wrap:wrap}.summary button{width:100%;margin:0}.card-head,.vote{padding-left:15px;padding-right:15px}}
+</style>
+</head>
+<body>
+<main class="wrap">
+  <section class="hero">
+    <div class="eyebrow">MAHJONG HOLD'EM — BUTTON QUALITY GATE</div>
+    <h1>全ボタンを、背景より格好良くする。</h1>
+    <p>同じ実装文言を、リポジトリ内の実PNG／SVGアセット3系統で比較します。色だけではなく、縁・素材・厚み・押したくなる感覚を見てください。最も良い方向を1つ選べば、タイトルからガチャまで全画面へ統一展開します。</p>
+    <div class="rule"><span>文字は実DOM</span><span>外殻は実アセット</span><span>押下・無効・フォーカスを確認</span><span>英語の選定用語なし</span></div>
+  </section>
+  <div class="reject"><b>現在の白い長方形・単色長方形・透明ピルは全て不採用</b><small>今回は「今より少し良い」ではなく、製品として押したくなる品質だけを残します。</small></div>
+  <section class="cards" id="cards"></section>
+  <aside class="summary"><div><strong>選定結果はこの端末に自動保存</strong><br><span id="saveText">各案を回答してください</span></div><button id="copy">回答文をコピー</button></aside>
+</main>
+<script>
+const options=[
+  {id:"A",name:"精密金属 × 深緑ラッカー",sub:"日本プレミアムクラブの本命。全画面を静かに統一",cls:"a-button",actions:["a-button","a-button","a-button"]},
+  {id:"B",name:"宝石色 × ゲームアクション",sub:"FOLD／CALL／RAISEを一瞬で判別。対局の熱量を最大化",cls:"b-button b-gold",actions:["b-button b-red","b-button b-blue","b-button b-gold"]},
+  {id:"C",name:"白磁 × 金属エッジ",sub:"明るいロビー・装飾品・結果画面向けの工芸的な面",cls:"c-button",actions:["c-button","c-button","c-button"]}
+];
+const labels={adopt:"この方向を採用",mix:"良い部分だけ使う",drop:"今回は使わない"};
+const saved=JSON.parse(localStorage.getItem("texasjan-button-vote")||"{}");
+const cards=document.getElementById("cards");
+options.forEach(o=>{
+  const article=document.createElement("article");article.className="card";article.dataset.id=o.id;
+  article.innerHTML=`<header class="card-head"><span class="code">${o.id}</span><div><h2>${o.name}</h2><p>${o.sub}</p></div></header>
+  <div class="stage"><div class="sample-grid"><div class="column"><div><p class="sample-title">主要CTA／モード選択</p><button class="mode ${o.cls}"><span><b>6人ランク戦</b><small>四段・レート変動あり</small></span><span class="arrow">›</span></button></div><div><p class="sample-title">対局アクション</p><div class="actions"><button class="${o.actions[0]}">降りる</button><button class="${o.actions[1]}">コール</button><button class="${o.actions[2]}">レイズ</button></div></div><div><p class="sample-title">下部ナビ</p><div class="nav"><button class="${o.cls}"><b>◆</b>ホーム</button><button class="${o.cls}"><b>◇</b>装飾品</button><button class="${o.cls}"><b>✦</b>ガチャ</button></div></div></div><div class="column"><div><p class="sample-title">状態差</p><div class="states"><button class="${o.cls}">通常</button><button class="${o.cls}">押下</button><button class="${o.cls}" disabled>無効</button><button class="${o.cls}">選択中</button></div></div></div></div></div>
+  <div class="vote"><h3>この方向をどう使いますか？</h3><div class="choices">${Object.entries(labels).map(([k,v])=>`<button class="choice${saved[o.id]?.choice===k?' on':''}" data-choice="${k}">${v}</button>`).join("")}</div><textarea placeholder="良い点・嫌な点・混ぜたい部分（任意）">${saved[o.id]?.note||""}</textarea></div>`;
+  article.querySelectorAll(".choice").forEach(b=>b.onclick=()=>{saved[o.id]=saved[o.id]||{};saved[o.id].choice=b.dataset.choice;article.querySelectorAll(".choice").forEach(x=>x.classList.toggle("on",x===b));persist();});
+  article.querySelector("textarea").addEventListener("input",e=>{saved[o.id]=saved[o.id]||{};saved[o.id].note=e.target.value;persist();});
+  cards.appendChild(article);
+});
+function persist(){localStorage.setItem("texasjan-button-vote",JSON.stringify(saved));document.getElementById("saveText").textContent="保存しました";document.getElementById("saveText").className="saved";cards.querySelectorAll(".card").forEach(c=>c.classList.toggle("selected",saved[c.dataset.id]?.choice==="adopt"));}
+function answer(){return ["麻雀ホールデム　全ボタン選定結果","",...options.map(o=>`・${o.id}｜${o.name}：${labels[saved[o.id]?.choice]||"未回答"}${saved[o.id]?.note?`\n  ${saved[o.id].note}`:""}`),"",`未回答：${options.filter(o=>!saved[o.id]?.choice).length}件`].join("\n");}
+document.getElementById("copy").onclick=async()=>{await navigator.clipboard.writeText(answer());document.getElementById("saveText").textContent="回答文をコピーしました。このチャットへ貼り付けてください";document.getElementById("saveText").className="saved";};
+persist();
+</script>
+</body>
+</html>
