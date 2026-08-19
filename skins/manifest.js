@@ -49,9 +49,9 @@ window.MH_SKINS = {
         "tile-body-upright": "./assets/ui/tile-body-upright.png",
         "tile-back-flat":    "./assets/ui/tile-back-flat.png"
       } },
-    { slot:"tile", id:"line", name:"線画", note:"素材を使わず輪郭で描く。軽くて明快",
-      owned:true, swatch:"linear-gradient(160deg,#F6EFDC,#D6C6B6 60%,#5E5246)",
-      assets:{} },
+    { slot:"tile", id:"line", name:"白磁線画", note:"余白を活かした軽く明快な牌",
+      owned:false, ready:true, price:600, previewAsset:"./assets/tiles/Chun.svg",
+      swatch:"linear-gradient(160deg,#F6EFDC,#D6C6B6 60%,#5E5246)", assets:{} },
     { slot:"tile", id:"obsidian", name:"黒曜", note:"漆黒の牌に金の彫り",
       owned:false, price:1200, swatch:"linear-gradient(160deg,#4A4450,#1A1A1E)", assets:{} },
 
@@ -59,8 +59,8 @@ window.MH_SKINS = {
     { slot:"arena", id:"jade", name:"翡翠の間", note:"標準の卓。深緑の羅紗に金の縁",
       owned:true, swatch:"linear-gradient(160deg,#2C7A5E,#0C2A22)",
       assets:{ "arena":"./assets/arena-with-characters-v1.webp" } },
-    { slot:"arena", id:"empty", name:"無人卓", note:"対局者のいない静かな卓",
-      owned:true, swatch:"linear-gradient(160deg,#3B6E58,#10251E)",
+    { slot:"arena", id:"empty", name:"静謐の卓", note:"人物を外し、牌と判断へ集中する卓",
+      owned:false, ready:true, price:2400, swatch:"linear-gradient(160deg,#3B6E58,#10251E)",
       assets:{ "arena":"./assets/golden-arena-backplate-v1.webp" } },
     { slot:"arena", id:"night", name:"夜想", note:"深夜の会員制ラウンジ",
       owned:false, price:2400, swatch:"linear-gradient(160deg,#3A2A6B,#0A0A1E)", assets:{} },
@@ -78,8 +78,8 @@ window.MH_SKINS = {
         "btn-raise":         "./assets/ui/btn-raise.png",
         "dial":              "./assets/ui/dial.png"
       } },
-    { slot:"frame", id:"sharp", name:"シャープ", note:"角丸と縁が全部品で揃ったベクター版",
-      owned:true, swatch:"linear-gradient(160deg,#FFF3C4,#C98A3E 45%,#5A3A14)",
+    { slot:"frame", id:"sharp", name:"精密金縁", note:"角丸と縁を揃えた現代工芸の枠",
+      owned:false, ready:true, price:1200, swatch:"linear-gradient(160deg,#FFF3C4,#C98A3E 45%,#5A3A14)",
       assets:{
         "frame-gold-plate":  "./assets/ui/svg/frame-gold-plate.svg",
         "frame-gold-ribbon": "./assets/ui/svg/frame-gold-ribbon.svg",
@@ -112,9 +112,9 @@ window.MH_SKINS = {
         "fx-glow":   "./assets/ui/fx-glow.png",
         "fx-sparkle":"./assets/ui/fx-sparkle.png"
       } },
-    { slot:"effect", id:"quiet", name:"静", note:"演出を控えめにする",
-      owned:true, swatch:"radial-gradient(circle,#9FB6AC,rgba(159,182,172,0))",
-      assets:{} },
+    { slot:"effect", id:"quiet", name:"静光", note:"余韻だけを残す控えめな和了演出",
+      owned:false, ready:true, price:800, previewAsset:"./assets/ui/fx-sparkle.png",
+      swatch:"radial-gradient(circle,#9FB6AC,rgba(159,182,172,0))", assets:{} },
 
     /* ---------- キャラクター ---------- */
     { slot:"character", id:"none", name:"なし", note:"立ち絵を表示しない",
