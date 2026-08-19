@@ -527,7 +527,10 @@ html.still .allInBurst{display:none!important}
 /* 局の進行ボタン。私牌8枚(〜58.2%)と MY FINAL HAND の見出し(67.1%)の間が空いているので、
    ここに置く。牌を選び終えて視線が落ちてくる位置でもある。 */
 .streetNext{position:absolute;left:50%;top:59.45%;transform:translateX(-50%);z-index:16;
-  width:52cqw;height:3.25%;margin:0;padding:0;border:0;border-radius:99cqw;
+  /* 高さは画面比だが、実機幅ではそれだけだと指で押せない大きさになる。
+     390×844 では app 高さ693pxの3.25%＝22.5pxしかなかった。
+     941幅では 54px で min-height は効かないので、Golden Visual の見た目は変わらない。 */
+  width:52cqw;height:3.25%;min-height:44px;margin:0;padding:0;border:0;border-radius:99cqw;
   font-size:2.55cqw;font-weight:900;letter-spacing:.14em;color:#1B1508;
   background:linear-gradient(180deg,#FFF3CE 0%,#F0D273 26%,#C9942A 62%,#8A5E12 100%);
   box-shadow:0 .45cqw 1.1cqw rgba(0,0,0,.55),0 0 2.2cqw rgba(232,200,100,.28),
@@ -546,7 +549,11 @@ html.still .allInBurst{display:none!important}
 html.still .streetNext.hot{animation:none}
 @media (prefers-reduced-motion:reduce){.streetNext.hot{animation:none}}
 /* 決着時は結果表示が上に入るので、進行ボタンを下段へ寄せて少し細くする */
-.streetNext.afterResult{top:62.5%;height:4.0%;font-size:2.8cqw}
+/* 決着時は上に結果表示が入り、私牌の下端から MY FINAL HAND の見出しまでの帯は
+   390×844 で 61.4px しかない。結果表示21px＋44pxは収まらず、min-height を効かせると
+   見出しへ被る。ここは帯そのものを設計し直さないと44pxにできないので、
+   min-height の対象外にしてある（CC-03 / 人間判断へ申し送り）。 */
+.streetNext.afterResult{top:62.5%;height:4.0%;min-height:0;font-size:2.8cqw}
 
 .recommendPanel{position:absolute;left:21.25%;top:79.07%;width:54.73%;height:3.89%;margin:0;padding:0;
   background:none;border:0;border-radius:0;z-index:20}
