@@ -6,10 +6,11 @@ This repository is the canonical implementation and handoff for **MAHJONG HOLD'E
 
 Start with the smallest useful context:
 
-1. `PROJECT_STATE.md`
-2. `CURRENT_TASK.md`
-3. `DECISIONS.md`
-4. the relevant lane prompt under `orchestration/prompts/`
+1. `NEW_SESSION_START_HERE.md`
+2. `PROJECT_STATE.md`
+3. `CURRENT_TASK.md`
+4. `DECISIONS.md`
+5. the relevant lane prompt under `orchestration/prompts/`
 
 Read older handoffs and archives only when the active task links them or a specific ambiguity requires them. Do not preload the full project history.
 
