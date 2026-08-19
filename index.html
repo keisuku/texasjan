@@ -1139,8 +1139,8 @@ html.still .ttl-start{animation:none;opacity:1}
 
 /* 元のCSSメタ画面はDOMに残して既存ロジックとテストを維持するが、表示面からは退役。 */
 #screen-title.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
-#screen-lobby.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
-#screen-match.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
+#screen-lobby.golden-shell-screen>:not(.golden-shell-art):not(.production-meta-ui),
+#screen-match.golden-shell-screen>:not(.golden-shell-art):not(.production-meta-ui),
 #screen-cosmetics.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui),
 #screen-shop.golden-shell-screen>:not(.golden-shell-art):not(.golden-shell-ui):not(.gc-modal){display:none!important}
 
@@ -1189,6 +1189,104 @@ html.still .ttl-start{animation:none;opacity:1}
   -webkit-text-stroke:0 transparent!important}
 #screen-shop .gc-ok:focus-visible{outline:.45cqw solid #79fff0;outline-offset:.35cqw}
 
+/* ======================================================================
+   PRODUCTION META UI — Lobby / mode select
+
+   Golden Visualは人物と空間のキーアートとしてだけ残し、操作、数値、日本語ラベルは
+   すべて実DOMで描画する。透明ホットスポットをやめ、見えている面と押せる面を一致させる。
+   ====================================================================== */
+.production-meta-ui{
+  --pm-green:#0d3f34;--pm-green-2:#155548;--pm-paper:#f3eee2;--pm-paper-2:#e7ddc8;
+  --pm-gold:#b69035;--pm-gold-light:#dfc678;--pm-text:#12362d;--pm-muted:#6e7c75;
+  position:absolute;inset:0;z-index:4;pointer-events:none;color:var(--pm-text)
+}
+.production-meta-ui button{pointer-events:auto;min-width:44px;min-height:44px}
+.production-meta-ui button:focus-visible{outline:.45cqw solid #72ece1;outline-offset:.35cqw}
+.pm-topbar{position:absolute;left:0;right:0;top:0;height:8.5%;padding:1.15% 2.2%;
+  display:flex;align-items:center;justify-content:space-between;gap:1.4cqw;
+  background:rgba(9,48,39,.98);border-bottom:.22cqw solid var(--pm-gold);
+  box-shadow:0 1.1cqw 2.5cqw rgba(0,0,0,.24)}
+.pm-profile{display:flex;align-items:center;gap:1.3cqw;min-width:0}
+.pm-mon{width:6.8cqw;height:6.8cqw;border-radius:50%;display:grid;place-items:center;flex:none;
+  font:800 3.4cqw/1 "Shippori Mincho B1",serif;color:#17382f;background:#ead58e;
+  border:.22cqw solid #fff0b1;box-shadow:0 0 0 .36cqw rgba(20,64,53,.95)}
+.pm-profile-copy{display:flex;flex-direction:column;min-width:0;line-height:1.18}
+.pm-profile-copy b{font-size:2.7cqw;color:#fff7df;letter-spacing:.07em;white-space:nowrap}
+.pm-profile-copy small{font-size:1.9cqw;color:#b9d3c8;letter-spacing:.06em;white-space:nowrap}
+.pm-wallet{display:flex;gap:.8cqw;flex:none}
+.pm-wallet span{height:5.2cqw;min-width:12.2cqw;padding:0 1.35cqw;display:flex;align-items:center;justify-content:center;gap:.8cqw;
+  border:.14cqw solid rgba(223,198,120,.58);border-radius:99cqw;background:#082b23;color:#fff3cf;
+  font-size:2.25cqw;font-weight:900;font-variant-numeric:tabular-nums}
+.pm-wallet i{width:2.2cqw;height:2.2cqw;border-radius:50%;background:#d5ae42;box-shadow:inset 0 0 0 .18cqw #f8df8c}
+.pm-wallet .gem-dot{background:#55b8dc;box-shadow:inset 0 0 0 .18cqw #a3eafb}
+
+.pm-lobby-actions{position:absolute;left:48.2%;right:2.2%;top:35.8%;height:39.5%;padding:2.1cqw;
+  display:flex;flex-direction:column;gap:1.5cqw;background:var(--pm-paper);
+  border:.18cqw solid var(--pm-gold);box-shadow:0 1.3cqw 3cqw rgba(30,45,38,.2)}
+.pm-section-title{display:flex;align-items:center;justify-content:space-between;padding:0 .4cqw .4cqw;
+  font:800 2.25cqw/1 "Shippori Mincho B1",serif;letter-spacing:.18em;color:#315047}
+.pm-section-title small{font:700 1.75cqw/1 "Zen Kaku Gothic New",sans-serif;letter-spacing:.04em;color:#718078}
+.pm-match-card{position:relative;width:100%;height:11.1cqw;padding:0 2.1cqw 0 11.2cqw!important;
+  display:flex;flex-direction:column;justify-content:center;text-align:left!important;
+  background:#fffaf0!important;border:.18cqw solid #b89b5a!important;
+  box-shadow:0 .55cqw 1.1cqw rgba(41,50,45,.16)!important;color:var(--pm-text)!important}
+.pm-match-card::after{content:"›";position:absolute;right:2.1cqw;top:50%;transform:translateY(-54%);
+  font:800 5cqw/1 serif;color:#9a782e}
+.pm-match-card:active{transform:translateY(.25cqw)}
+.pm-match-icon{position:absolute;left:0;top:0;bottom:0;width:9.2cqw;display:grid;place-items:center;
+  background:var(--pm-green);border-right:.18cqw solid #b89b5a}
+.pm-match-icon img{width:5.2cqw;height:7.1cqw;object-fit:contain;filter:drop-shadow(0 .3cqw .3cqw rgba(0,0,0,.3))}
+.pm-match-card b{font:800 3.25cqw/1.1 "Shippori Mincho B1",serif;letter-spacing:.12em}
+.pm-match-card small{margin-top:.65cqw;font-size:1.8cqw;color:#6b7c74;letter-spacing:.07em}
+.pm-soon{height:4.2cqw;display:flex;align-items:center;justify-content:center;color:#77847e;
+  border-top:.12cqw solid #d7c9a8;font-size:1.8cqw;letter-spacing:.08em}
+
+.pm-rule-card{position:absolute;left:48.2%;right:2.2%;top:77%;height:11.2%;padding:1.5cqw 2.1cqw;
+  background:rgba(12,62,50,.97);border:.18cqw solid var(--pm-gold);color:#f8efd7;
+  box-shadow:0 .8cqw 1.8cqw rgba(0,0,0,.25)}
+.pm-rule-card b{display:block;font:800 2.25cqw/1.2 "Shippori Mincho B1",serif;letter-spacing:.14em;color:#efd789}
+.pm-rule-card strong{display:block;margin-top:.75cqw;font-size:2.65cqw;letter-spacing:.06em}
+.pm-rule-card small{display:block;margin-top:.45cqw;font-size:1.75cqw;color:#b9d3c8}
+
+.pm-bottom-nav{position:absolute;left:0;right:0;bottom:0;height:9.2%;padding:.75cqw 1.3cqw;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:.7cqw;background:rgba(8,45,36,.99);
+  border-top:.2cqw solid var(--pm-gold);pointer-events:auto}
+.pm-nav-button{display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:.45cqw;
+  color:#e8ddbd!important;background:transparent!important;border:0!important}
+.pm-nav-button b{font-size:2.8cqw;line-height:1;color:#ddc269}
+.pm-nav-button span{font-size:2cqw;letter-spacing:.1em}
+.pm-nav-button.is-current{background:#153e34!important;box-shadow:inset 0 0 0 .14cqw rgba(223,198,120,.5)!important}
+.pm-nav-button:active{transform:translateY(.2cqw)}
+
+.pm-mode-top .pm-back{width:6.2cqw;height:6.2cqw;border-radius:50%;display:grid;place-items:center;
+  background:#ead58e!important;color:#17382f!important;font-size:2.5cqw!important;font-weight:900!important}
+.pm-mode-heading{display:flex;flex-direction:column;line-height:1.12;margin-right:auto}
+.pm-mode-heading b{font:800 2.7cqw/1.1 "Shippori Mincho B1",serif;color:#fff4d0;letter-spacing:.12em}
+.pm-mode-heading small{font-size:1.75cqw;color:#a9c7bc;letter-spacing:.06em}
+.pm-mode-main{position:absolute;left:5.3%;right:5.3%;top:51.6%;height:14.1%;padding:0 4cqw!important;
+  display:flex;align-items:center;justify-content:space-between;text-align:left!important;background:#0c4d3e!important;
+  color:#fff4cf!important;border:.24cqw solid #e0c675!important;box-shadow:0 .9cqw 2.2cqw rgba(0,0,0,.35)!important}
+.pm-mode-main .copy{display:flex;flex-direction:column}
+.pm-mode-main b{font:800 5cqw/1 "Shippori Mincho B1",serif;letter-spacing:.09em}
+.pm-mode-main small{margin-top:1cqw;font-size:2.1cqw;color:#cbe0d7;letter-spacing:.08em}
+.pm-mode-main .go{padding:1.2cqw 2.2cqw;border:.16cqw solid #e0c675;color:#ffe79a;font-size:2.1cqw;font-weight:900;letter-spacing:.08em}
+.pm-mode-main:active{transform:translateY(.3cqw)}
+.pm-mode-subrow{position:absolute;left:5.3%;right:5.3%;top:67.6%;height:11.8%;display:grid;grid-template-columns:1fr 1fr;gap:1.7cqw}
+.pm-mode-sub{padding:0 2.5cqw!important;display:flex;flex-direction:column;justify-content:center;text-align:left!important;
+  color:#fff2d5!important;border:.2cqw solid #d9ba69!important;box-shadow:0 .75cqw 1.8cqw rgba(0,0,0,.3)!important}
+.pm-mode-sub.quick{background:#173d64!important}.pm-mode-sub.private{background:#503762!important}
+.pm-mode-sub b{font:800 3.4cqw/1.15 "Shippori Mincho B1",serif;letter-spacing:.08em}
+.pm-mode-sub small{margin-top:.7cqw;font-size:1.8cqw;color:#d5d5d0;letter-spacing:.05em}
+.pm-mode-sub:disabled{opacity:.72;cursor:default}
+.pm-mode-note{position:absolute;left:24%;right:24%;top:81.3%;height:5.2%;display:flex;align-items:center;justify-content:center;
+  color:#f1dfab;background:rgba(8,43,35,.97);border:.16cqw solid #b69035;
+  font-size:2cqw;font-weight:800;letter-spacing:.12em}
+
+@media(max-width:380px){
+  .pm-wallet span{min-width:11.3cqw;padding:0 1cqw}.pm-match-card{min-height:44px}
+  .pm-profile-copy small,.pm-section-title small{display:none}
+}
+
 @media(max-width:380px){
   .golden-shell-ui button{min-width:40px;min-height:40px}
   #screen-lobby .shell-mode{font-size:3.05cqw!important}
@@ -1223,11 +1321,42 @@ html.calib #calib{display:block}
 <!-- ============ ロビー ============ -->
 <section id="screen-lobby" class="screen golden-shell-screen">
   <img class="golden-shell-art" src="./art/clean-masters/clean-master-lobby.webp" alt="キャラクターと対戦モードを大きく見せる麻雀ホールデムのロビー">
-  <div class="golden-shell-ui">
-    <button class="shell-mode shell-rank" data-match="rank">ランク戦</button>
-    <button class="shell-mode shell-ring" data-match="ring">リング戦</button>
-    <button class="shell-meta shell-cosmetics" data-go="cosmetics">装飾品</button>
-    <button class="shell-meta shell-gacha" data-go="shop">ガチャ</button>
+  <div class="production-meta-ui" aria-label="ロビー">
+    <header class="pm-topbar">
+      <div class="pm-profile">
+        <span class="pm-mon" aria-hidden="true">雀</span>
+        <span class="pm-profile-copy"><b>keisuku</b><small id="pmLobbyRank">四段・1,240 pt</small></span>
+      </div>
+      <div class="pm-wallet" aria-label="所持通貨">
+        <span><i aria-hidden="true"></i><b id="pmLobbyCoin">10,000</b></span>
+        <span><i class="gem-dot" aria-hidden="true"></i><b id="pmLobbyGem">3,000</b></span>
+      </div>
+    </header>
+
+    <div class="pm-lobby-actions">
+      <div class="pm-section-title"><span>対局モード</span><small>6人で勝負</small></div>
+      <button class="pm-match-card" data-match="rank">
+        <span class="pm-match-icon"><img src="./assets/tiles/Hatsu.svg" alt=""></span>
+        <b>ランク戦</b><small>実力を競うレート対局</small>
+      </button>
+      <button class="pm-match-card" data-match="ring">
+        <span class="pm-match-icon"><img src="./assets/tiles/Ton.svg" alt=""></span>
+        <b>リング戦</b><small>持ち点だけで気軽に対局</small>
+      </button>
+      <div class="pm-soon">大会・友人戦は準備中</div>
+    </div>
+
+    <div class="pm-rule-card">
+      <b>現在の対局ルール</b>
+      <strong>共通 15＋4＋4＋4</strong>
+      <small>4枚固定 → 追加2枚固定 → 最終14枚</small>
+    </div>
+
+    <nav class="pm-bottom-nav" aria-label="主要メニュー">
+      <button class="pm-nav-button is-current" aria-current="page"><b aria-hidden="true">◆</b><span>ホーム</span></button>
+      <button class="pm-nav-button" data-go="cosmetics"><b aria-hidden="true">◇</b><span>装飾品</span></button>
+      <button class="pm-nav-button" data-go="shop"><b aria-hidden="true">✦</b><span>ガチャ</span></button>
+    </nav>
   </div>
   <div class="lb-veil"></div>
   <header class="lb-top">
@@ -1282,10 +1411,28 @@ html.calib #calib{display:block}
 <!-- ============ マッチング／卓入場 ============ -->
 <section id="screen-match" class="screen golden-shell-screen">
   <img class="golden-shell-art" src="./art/visual-archive/v2/03-mode-select.webp" alt="キャラクターとランク章を中心に据えた対戦モード選択画面">
-  <div class="golden-shell-ui">
-    <button class="shell-back" data-go="lobby" aria-label="ロビーへ戻る">◀</button>
-    <button class="shell-ranked" id="bGoldenRankStart">6人ランク戦を開始</button>
-    <button class="shell-quick" id="bGoldenQuickStart">すぐに対戦</button>
+  <div class="production-meta-ui" aria-label="対局モード選択">
+    <header class="pm-topbar pm-mode-top">
+      <button class="pm-back" data-go="lobby" aria-label="ロビーへ戻る">◀</button>
+      <span class="pm-mode-heading"><b>対局モード</b><small>遊び方を選ぶ</small></span>
+      <div class="pm-wallet" aria-label="所持通貨">
+        <span><i aria-hidden="true"></i><b id="pmModeCoin">10,000</b></span>
+        <span><i class="gem-dot" aria-hidden="true"></i><b id="pmModeGem">3,000</b></span>
+      </div>
+    </header>
+    <button class="pm-mode-main" id="bGoldenRankStart">
+      <span class="copy"><b>6人ランク戦</b><small>四段・レート変動あり</small></span><span class="go">対局開始</span>
+    </button>
+    <div class="pm-mode-subrow">
+      <button class="pm-mode-sub quick" id="bGoldenQuickStart"><b>すぐに対戦</b><small>持ち点制・レート変動なし</small></button>
+      <button class="pm-mode-sub private" disabled><b>友人と対戦</b><small>準備中</small></button>
+    </div>
+    <div class="pm-mode-note">大会モードは準備中</div>
+    <nav class="pm-bottom-nav" aria-label="主要メニュー">
+      <button class="pm-nav-button" data-go="lobby"><b aria-hidden="true">◆</b><span>ホーム</span></button>
+      <button class="pm-nav-button is-current" aria-current="page"><b aria-hidden="true">◇</b><span>対局</span></button>
+      <button class="pm-nav-button" data-go="shop"><b aria-hidden="true">✦</b><span>ガチャ</span></button>
+    </nav>
   </div>
   <div class="mt-veil"></div>
   <header class="mt-top">
@@ -2444,6 +2591,7 @@ function go(name){
   if(currentScreen==="shop")shopRender();
   if(currentScreen==="lobby"){
     document.getElementById("lbRank").textContent="四段 ・ "+rankPoints.toLocaleString()+"pt";
+    document.getElementById("pmLobbyRank").textContent="四段・"+rankPoints.toLocaleString()+" pt";
     walletPaint();
   }
 }
@@ -2604,7 +2752,8 @@ function wallet(){
 function walletSave(){try{localStorage.setItem(WALLET_KEY,JSON.stringify(wallet()));}catch(e){}}
 function walletPaint(){
   const w=wallet();
-  [["shCoin",w.coin],["lbCoin",w.coin],["shGem",w.gem],["lbGem",w.gem]].forEach(function(p){
+  [["shCoin",w.coin],["lbCoin",w.coin],["pmLobbyCoin",w.coin],["pmModeCoin",w.coin],
+   ["shGem",w.gem],["lbGem",w.gem],["pmLobbyGem",w.gem],["pmModeGem",w.gem]].forEach(function(p){
     const el=document.getElementById(p[0]);if(el)el.textContent=p[1].toLocaleString();
   });
   const p=document.getElementById("gcPity");if(p)p.textContent=w.pity;
