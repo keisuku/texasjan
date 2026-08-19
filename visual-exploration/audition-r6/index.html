@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#f3efe6">
+  <title>麻雀ホールデム｜画風オーディション R6</title>
+  <style>
+    :root{--paper:#f3efe6;--ink:#171616;--muted:#6d6860;--line:#c7bca9;--accent:#8c2f23;--blue:#223c67;--green:#315643}
+    *{box-sizing:border-box}html,body{margin:0;background:var(--paper);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif}
+    body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}button,textarea{font:inherit}
+    .app{width:min(100%,1080px);margin:auto;padding:16px 14px 36px}.head{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:start;margin-bottom:14px}
+    h1{font-family:"Yu Mincho","Hiragino Mincho ProN",serif;font-size:clamp(22px,4vw,38px);margin:0 0 7px;letter-spacing:.04em}.lead{font-size:13px;line-height:1.7;color:var(--muted);max-width:760px}.count{border:1px solid var(--ink);padding:9px 13px;font-weight:900;background:#fff}
+    .rule{border-block:1px solid var(--line);padding:11px 2px;margin-bottom:14px;font-size:12px;line-height:1.7}.rule strong{color:var(--accent)}
+    .card{border:1px solid var(--ink);background:#fff;box-shadow:8px 8px 0 #d6cbbc;overflow:hidden}.meta{display:grid;grid-template-columns:1fr auto;gap:8px;padding:13px 15px;border-bottom:1px solid var(--line)}
+    .number{font-family:Georgia,serif;color:var(--accent);font-weight:900;letter-spacing:.12em}.title{font-size:21px;font-weight:900;margin-top:2px}.desc{font-size:12px;line-height:1.65;color:var(--muted);margin-top:4px}.axis{font-size:11px;color:var(--blue);font-weight:800;text-align:right}
+    .frame{position:relative;background:#ece7de}.frame img{display:block;width:100%;height:auto}.nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;pointer-events:none}.nav button{pointer-events:auto;width:48px;height:68px;border:1px solid #fff8;background:#151515cc;color:#fff;font-size:28px;margin:7px;box-shadow:0 4px 16px #0004}
+    .vote{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:12px;border-top:1px solid var(--line)}.vote button{min-height:55px;border:1px solid var(--ink);background:#fff;color:var(--ink);font-weight:900;line-height:1.3}.vote button.on[data-v=main]{background:var(--accent);color:#fff}.vote button.on[data-v=parts]{background:var(--blue);color:#fff}.vote button.on[data-v=no]{background:#343434;color:#fff}
+    .details{padding:0 12px 14px}.label{font-size:12px;font-weight:900;margin:3px 0 8px}.chips{display:flex;gap:7px;flex-wrap:wrap}.chip{min-height:40px;border:1px solid var(--line);border-radius:99px;background:#faf8f2;padding:0 13px;color:#4f4a44;font-weight:800}.chip.on{background:var(--green);border-color:var(--green);color:#fff}
+    textarea{width:100%;min-height:68px;margin-top:10px;border:1px solid var(--line);padding:10px;background:#faf8f2;resize:vertical;color:var(--ink)}
+    .bottom{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center;margin-top:14px;padding:14px;border:1px solid var(--line);background:#e9e2d6}.totals{font-size:13px;line-height:1.7}.copy{min-height:50px;border:1px solid var(--ink);background:var(--ink);color:#fff;padding:0 18px;font-weight:900}.hint{font-size:11px;color:var(--muted);margin-top:7px}
+    @media(max-width:600px){.app{padding-inline:8px}.head{padding-inline:5px}.meta{grid-template-columns:1fr}.axis{text-align:left}.vote{gap:5px;padding:8px}.vote button{font-size:12px;padding:4px}.bottom{grid-template-columns:1fr}.copy{width:100%}.card{box-shadow:4px 4px 0 #d6cbbc}.nav button{width:42px;height:58px;margin:3px}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="head"><div><h1>画風オーディション R6</h1><div class="lead">対局画面を選ぶ場ではありません。同じ代表3人を使い、線・顔・塗り・頭身と「通常立ち絵／勝負顔」の落差だけを比べます。</div></div><div class="count" id="count">1 / 8</div></header>
+  <div class="rule"><strong>まだ決めない：</strong>キャラクター設定、衣装、背景、卓、UI。　<strong>今回決める：</strong>このゲームを誰が描いたように見せたいか。</div>
+  <section class="card">
+    <div class="meta"><div><div class="number" id="number"></div><div class="title" id="title"></div><div class="desc" id="desc"></div></div><div class="axis" id="axis"></div></div>
+    <div class="frame"><img id="image" alt=""><div class="nav"><button id="prev" aria-label="前の画風">‹</button><button id="next" aria-label="次の画風">›</button></div></div>
+    <div class="vote"><button data-v="main">この画風を<br>本線にしたい</button><button data-v="parts">良い要素だけ<br>使いたい</button><button data-v="no">今回は<br>使わない</button></div>
+    <div class="details"><div class="label">特に良いところ（複数可）</div><div class="chips" id="chips"></div><textarea id="memo" placeholder="例：顔は良い。通常立ち絵はもう少し簡潔に。"></textarea></div>
+  </section>
+  <section class="bottom"><div><div class="totals" id="totals"></div><div class="hint">回答は端末内へ自動保存されます。最後に結果をコピーし、この会話へ貼ってください。</div></div><button class="copy" id="copy">選定結果をコピー</button></section>
+</main>
+<script>
+const items=[
+ {id:'01',file:'01-delicate-watercolor-anime.webp',title:'繊細水彩アニメ',desc:'細い線、透ける色、紙の質感。通常立ち絵は軽く、勝負顔だけ漫画表紙級に密度を上げる。',axis:'繊細さ／所有感'},
+ {id:'02',file:'02-theatrical-cel-anime.webp',title:'劇場セルアニメ',desc:'形を整理した明快な線と影。小さく表示しても顔とシルエットが崩れにくい。',axis:'視認性／量産性'},
+ {id:'03',file:'03-psychological-seinen-paint.webp',title:'心理青年漫画ペイント',desc:'乾いた筆致と沈んだ色。華やかさより、読み合いと頭脳戦の圧力を強くする。',axis:'心理戦／大人感'},
+ {id:'04',file:'04-adult-fashion-game.webp',title:'大人向けファッション・ゲーム',desc:'長い頭身と現代服の構築感。キャラクターを子ども扱いせず、知的な競技者として描く。',axis:'衣装性／高級感'},
+ {id:'05',file:'05-warm-collectible.webp',title:'温度のあるコレクティブル',desc:'親しみやすい通常顔と、静かな勝負顔の落差。キャラを集めたくなる感情を優先。',axis:'親密さ／収集性'},
+ {id:'06',file:'06-competitive-cel-ink.webp',title:'競技アニメ強線',desc:'太さのある線、鋭い影、強い色面。対戦ゲームとしての速さとアイコン性を作る。',axis:'競技性／一瞬理解'},
+ {id:'07',file:'07-hard-seinen-ink.webp',title:'鋭角青年漫画インク',desc:'黒インクとハッチングを主役にした最も硬質な案。勝負顔の緊張を最大化する。',axis:'緊迫感／独自性'},
+ {id:'08',file:'08-luxury-fashion-line.webp',title:'余白の高級ファッション線画',desc:'長い線、薄い色、広い余白。キャラクターと衣服の美しさを静かに見せる。',axis:'洗練／静けさ'}
+];
+const aspects=['線','顔','塗り','頭身','通常立ち絵','勝負顔','二層の落差'];
+const key='mahjong-holdem-audition-r6';let i=0,state={};try{state=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+const $=s=>document.querySelector(s);const img=$('#image'),memo=$('#memo');
+function current(){return items[i]}function save(){localStorage.setItem(key,JSON.stringify(state))}
+function render(){const x=current(),s=state[x.id]||{aspects:[]};$('#count').textContent=`${i+1} / ${items.length}`;$('#number').textContent=`R6 — ${x.id}`;$('#title').textContent=x.title;$('#desc').textContent=x.desc;$('#axis').textContent=x.axis;img.src='assets/'+x.file;img.alt=x.title;memo.value=s.memo||'';document.querySelectorAll('.vote button').forEach(b=>b.classList.toggle('on',s.vote===b.dataset.v));$('#chips').innerHTML='';aspects.forEach(a=>{const b=document.createElement('button');b.className='chip'+(s.aspects?.includes(a)?' on':'');b.textContent=a;b.onclick=()=>toggleAspect(a);$('#chips').appendChild(b)});totals()}
+function move(d){i=(i+d+items.length)%items.length;render();scrollTo({top:0,behavior:'smooth'})}
+function ensure(){return state[current().id]||(state[current().id]={aspects:[]})}
+function toggleAspect(a){const s=ensure(),set=new Set(s.aspects||[]);set.has(a)?set.delete(a):set.add(a);s.aspects=[...set];save();render()}
+function totals(){const c={main:0,parts:0,no:0};Object.values(state).forEach(s=>{if(c[s.vote]!==undefined)c[s.vote]++});$('#totals').innerHTML=`本線 ${c.main}件　／　要素採用 ${c.parts}件　／　使わない ${c.no}件<br>未回答 ${items.length-c.main-c.parts-c.no}件`}
+document.querySelectorAll('.vote button').forEach(b=>b.onclick=()=>{ensure().vote=b.dataset.v;save();render();setTimeout(()=>move(1),180)});memo.oninput=()=>{ensure().memo=memo.value;save()};$('#prev').onclick=()=>move(-1);$('#next').onclick=()=>move(1);
+$('#copy').onclick=async()=>{const labels={main:'この画風を本線にしたい',parts:'良い要素だけ使いたい',no:'今回は使わない'};let out='麻雀ホールデム　画風オーディションR6結果\n\n';['main','parts','no'].forEach(v=>{out+=labels[v]+'\n';items.filter(x=>state[x.id]?.vote===v).forEach(x=>{const s=state[x.id];out+=`・${x.title}`+(s.aspects?.length?`［良い：${s.aspects.join('・')}］`:'')+(s.memo?`\n　${s.memo}`:'')+'\n'});out+='\n'});out+='未回答：'+items.filter(x=>!state[x.id]?.vote).length+'件';await navigator.clipboard.writeText(out);$('#copy').textContent='コピーしました';setTimeout(()=>$('#copy').textContent='選定結果をコピー',1300)};
+render();
+</script>
+</body>
+</html>
