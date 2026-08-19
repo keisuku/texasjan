@@ -2777,6 +2777,7 @@ function cosPreviewBuild(){
    そのスキンが見本用ロールの素材を持っていれば画像、無ければ色見本にする。 */
 function cosSwatchStyle(def,s){
   const p=def&&def.preview;
+  if(s.previewAsset)return "background:#EFE6D2 url('"+s.previewAsset+"') center/contain no-repeat";
   const url=p&&s.assets&&s.assets[p.role];
   /* innerHTML の style 属性に入るので、URLは必ずシングルクォートで囲む */
   if(url)return "background:rgba(0,0,0,.28) url('"+url+"') center/"+p.fit+" no-repeat";
@@ -2804,7 +2805,7 @@ function cosRender(){
   const selectedSkin=skinsForSlot(cosSlot).filter(function(s){return s.id===chosen;})[0];
   const selectedLabel=document.getElementById("pmCosSelected");
   if(selectedLabel)selectedLabel.textContent=(def?def.name:"装飾品")+"・"+(selectedSkin?selectedSkin.name:"未選択");
-  skinsForSlot(cosSlot).forEach(function(s){
+  skinsForSlot(cosSlot).filter(function(s){return s.owned!==false||s.ready===true;}).forEach(function(s){
     const locked=!skinOwned(s);
     const el=document.createElement("button");
     el.className="cos-item"+(s.id===chosen?" on":"")+(locked?" locked":"");
@@ -2851,7 +2852,7 @@ function walletPaint(){
 const GACHA_COST={"1":200,"10":2000,"free":0};
 let lastGachaKind="1";
 /* 価格の無いもの（素材待ちの予約枠）は排出対象にしない */
-function gachaPool(){return SKIN_DATA.skins.filter(function(s){return s.owned===false&&s.price;});}
+function gachaPool(){return SKIN_DATA.skins.filter(function(s){return s.owned===false&&s.ready===true&&s.price;});}
 function gachaUnowned(){return gachaPool().filter(function(s){return !skinOwned(s);});}
 
 function gachaNote(text,warn){
@@ -2873,13 +2874,13 @@ function gachaDraw(kind){
      無ければ重複としてコインに変える。 */
   const results=[];
   for(let i=0;i<n;i++){
-    const un=gachaUnowned();
+    const un=gachaUnowned(),owned=gachaPool().filter(function(s){return skinOwned(s);});
     const guarantee=(kind==="10"&&i===n-1&&results.every(function(r){return r.dup;}));
-    if(un.length&&(guarantee||Math.random()<0.34)){
+    if(un.length&&(guarantee||!owned.length||Math.random()<0.34)){
       const s=un[Math.floor(Math.random()*un.length)];
       skinGrant(s);results.push({skin:s,dup:false});
     }else{
-      const s=gachaPool()[Math.floor(Math.random()*gachaPool().length)];
+      const pool=owned.length?owned:gachaPool(),s=pool[Math.floor(Math.random()*pool.length)];
       w.coin+=500;results.push({skin:s,dup:true});
     }
   }
