@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#071b17">
+  <title>麻雀ホールデム 最終ビジュアル選定</title>
+  <style>
+    :root{color-scheme:dark;--bg:#061712;--panel:#0c221c;--line:#b99652;--ivory:#f7efd9;--muted:#9eaea8;--cyan:#45e9df;--keep:#e4bc58;--mix:#5cc8ff;--drop:#ba7777}
+    *{box-sizing:border-box}html,body{margin:0;background:radial-gradient(circle at 50% 0,#153b30 0,#071b17 34%,#030b09 100%);color:var(--ivory);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic UI",sans-serif}
+    body{min-height:100dvh;padding:env(safe-area-inset-top) 0 env(safe-area-inset-bottom)}button,select{font:inherit}
+    .app{width:min(100%,720px);margin:auto;padding:14px 14px 36px}.top{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:start;margin-bottom:12px}
+    h1{font-size:20px;line-height:1.35;margin:0 0 4px}.sub{font-size:12px;color:var(--muted);line-height:1.6}.progress{padding:8px 12px;border:1px solid #7e6c42;border-radius:999px;background:#08130f;font-weight:800;white-space:nowrap}
+    .filters{display:flex;gap:8px;overflow:auto;padding:2px 0 12px;scrollbar-width:none}.filters::-webkit-scrollbar{display:none}.filter{min-height:44px;white-space:nowrap;border:1px solid #52655d;border-radius:999px;padding:0 16px;background:#0a1713;color:#d9e2de;font-weight:800}.filter.on{color:#07130f;background:linear-gradient(#fff3cf,#c9a04b);border-color:#f5d77e}
+    .stage{border:1px solid #8a7342;background:linear-gradient(180deg,#0c211b,#07130f);border-radius:22px;overflow:hidden;box-shadow:0 24px 70px #000b}.meta{padding:16px 16px 12px;display:grid;gap:6px}.eyebrow{font-size:11px;letter-spacing:.16em;color:#8de9df;font-weight:900}.title{font-size:22px;font-weight:900;line-height:1.35}.note{font-size:13px;color:#bfcac5;line-height:1.65}
+    .frame{position:relative;background:#020503;border-block:1px solid #3d4c46;display:grid;place-items:center;min-height:60vh}.frame img{display:block;width:100%;height:auto;max-height:72dvh;object-fit:contain;background:#020503}.nav{position:absolute;inset:0;display:flex;align-items:center;justify-content:space-between;pointer-events:none}.nav button{pointer-events:auto;width:52px;height:72px;margin:8px;border:1px solid #d4b45d;border-radius:16px;background:#07130fdd;color:#fff3cf;font-size:28px;box-shadow:0 8px 20px #0008}
+    .choices{padding:14px;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.choice{min-height:58px;border-radius:15px;border:1px solid #4b5b55;background:#0a1713;color:#eef2ef;font-weight:900;line-height:1.25;padding:8px}.choice[data-v=keep]{border-color:#9d7b31}.choice[data-v=mix]{border-color:#397693}.choice[data-v=drop]{border-color:#744b4b}.choice.on[data-v=keep]{background:linear-gradient(#ffe6a1,#b87e1d);color:#181007}.choice.on[data-v=mix]{background:linear-gradient(#b9edff,#328fb8);color:#051117}.choice.on[data-v=drop]{background:linear-gradient(#e6b9b9,#945555);color:#170909}
+    .summary{margin-top:14px;border:1px solid #4b5b55;background:#081611;border-radius:18px;padding:14px}.summary-row{display:flex;gap:8px;justify-content:space-between;align-items:center}.counts{font-size:13px;color:#c8d2ce;line-height:1.8}.copy{min-height:48px;border:1px solid #c5a04c;border-radius:13px;background:linear-gradient(#fff0c8,#b7862c);color:#171005;font-weight:900;padding:0 16px}.hint{font-size:11px;color:#8fa099;margin-top:9px;line-height:1.6}
+    @media (max-width:480px){.app{padding-inline:8px}.top{padding-inline:6px}.choices{gap:6px;padding:10px}.choice{font-size:13px;padding:6px}.frame img{max-height:70dvh}.nav button{width:44px;height:64px;margin:4px}.summary-row{align-items:stretch;flex-direction:column}.copy{width:100%}}
+  </style>
+</head>
+<body>
+<main class="app">
+  <header class="top"><div><h1>麻雀ホールデム 最終ビジュアル選定</h1><div class="sub">1画面ずつ直感で選んでください。英語の内部コードは表示しません。</div></div><div class="progress" id="progress">1 / 29</div></header>
+  <nav class="filters" id="filters" aria-label="画面の絞り込み"></nav>
+  <section class="stage">
+    <div class="meta"><div class="eyebrow" id="eyebrow"></div><div class="title" id="title"></div><div class="note" id="note"></div></div>
+    <div class="frame"><img id="image" alt=""><div class="nav"><button id="prev" aria-label="前の案">‹</button><button id="next" aria-label="次の案">›</button></div></div>
+    <div class="choices" aria-label="この案をどうするか">
+      <button class="choice" data-v="keep">この方向で<br>進めたい</button>
+      <button class="choice" data-v="mix">良い部分だけ<br>使いたい</button>
+      <button class="choice" data-v="drop">今回は<br>使わない</button>
+    </div>
+  </section>
+  <section class="summary"><div class="summary-row"><div class="counts" id="counts"></div><button class="copy" id="copy">選定結果をコピー</button></div><div class="hint">結果はこの端末に自動保存されます。コピーした文章をChatGPT Workへ貼るだけで次の実装判断に進めます。</div></section>
+</main>
+<script>
+const items=[
+ {id:'01',file:'01-modern-japanese-premium-master0.webp',group:'方向比較',dir:'現代日本プレミアム',title:'対局マスター｜現代日本プレミアムクラブ',note:'最もバランスの良い基準案。明るい和の建築、深緑の卓、物理感の強い主操作。'},
+ {id:'02',file:'02-character-showdown-master0.webp',group:'方向比較',dir:'キャラクター対決',title:'対局マスター｜キャラクター対決',note:'顔と対戦感を強めた案。盤面を隠さず、キャラクター収集の魅力を上げる。'},
+ {id:'03',file:'03-modern-japanese-craft-master0.webp',group:'方向比較',dir:'現代日本工芸',title:'対局マスター｜現代日本工芸',note:'黒漆、藍、木、金属加工をUI部品の価値に変える案。'},
+ {id:'04',file:'04-bright-grand-casino-master0.webp',group:'方向比較',dir:'明るいグランドカジノ',title:'対局マスター｜明るいグランドカジノ',note:'世界大会の華やかさと抜群の明るさ。和の個性はやや弱い。'},
+ {id:'05',file:'05-tokyo-night-salon-master0.webp',group:'方向比較',dir:'東京ナイト・サロン',title:'対局マスター｜東京ナイト・サロン',note:'都会の夜と緊張感。暗い背景でも牌と操作を明るく保つ。'},
+ {id:'06',file:'06-modern-premium-title.webp',group:'入口',dir:'現代日本プレミアム',title:'タイトル・開始｜現代日本プレミアム',note:'主役、卓、開始ボタンを一画面で伝える明るい入口。'},
+ {id:'07',file:'07-character-showdown-title.webp',group:'入口',dir:'キャラクター対決',title:'タイトル・開始｜キャラクター対決',note:'二人の視線で対戦への期待を作る。中央はロゴ用の余白。'},
+ {id:'08',file:'08-modern-craft-title.webp',group:'入口',dir:'現代日本工芸',title:'タイトル・開始｜現代日本工芸',note:'静かな建築と本物感のある開始機構。'},
+ {id:'09',file:'09-modern-premium-lobby-mode.webp',group:'入口',dir:'現代日本プレミアム',title:'キャラクターロビー｜現代日本プレミアム',note:'キャラクターと4つの遊び方を同時に見せる。'},
+ {id:'10',file:'10-character-showdown-lobby-mode.webp',group:'入口',dir:'キャラクター対決',title:'キャラクターロビー｜対戦相手を意識',note:'主役と注目ライバルの関係を前面に出す。'},
+ {id:'11',file:'11-modern-craft-lobby-mode.webp',group:'入口',dir:'現代日本工芸',title:'キャラクターロビー｜現代日本工芸',note:'物理パネルとして押したくなるモード操作。'},
+ {id:'29',file:'29-dedicated-mode-select.webp',group:'入口',dir:'現代日本プレミアム',title:'専用モード選択',note:'ランク戦、リング戦、大会を情景ごと大きく選ぶ。'},
+ {id:'28',file:'28-matchmaking-six-player-intro.webp',group:'入口',dir:'現代日本プレミアム',title:'6人マッチング・卓紹介',note:'誰とどの席で戦うかを、対局前に一目で理解する。'},
+ {id:'12',file:'12-modern-premium-plus4-reveal.webp',group:'対局',dir:'現代日本プレミアム',title:'4枚公開｜現代日本プレミアム',note:'追加4枚だけを機械的に持ち上げ、情報変化を主役にする。'},
+ {id:'13',file:'13-character-showdown-plus4-reveal.webp',group:'対局',dir:'キャラクター対決',title:'4枚公開｜キャラクター対決',note:'追加4枚に対する各キャラクターの反応も見せる。'},
+ {id:'14',file:'14-modern-craft-plus4-reveal.webp',group:'対局',dir:'現代日本工芸',title:'4枚公開｜現代日本工芸',note:'黒漆の4つの引き出しから新しい情報が現れる。'},
+ {id:'26',file:'26-lock-four-selection.webp',group:'対局',dir:'現代日本プレミアム',title:'最初の4枚固定',note:'公開元は残し、選んだ4枚を固定レールへ鏡写しする。'},
+ {id:'27',file:'27-lock-two-more-selection.webp',group:'対局',dir:'現代日本プレミアム',title:'追加2枚固定',note:'既存4枚を保ったまま、追加2枚だけを選び固定6枚へ進む。'},
+ {id:'15',file:'15-modern-premium-all-in.webp',group:'対局',dir:'現代日本プレミアム',title:'オールイン操作｜現代日本プレミアム',note:'高級時計のような調整レールと決定ボタン。'},
+ {id:'16',file:'16-character-showdown-all-in.webp',group:'対局',dir:'キャラクター対決',title:'オールイン操作｜キャラクター対決',note:'相手の表情とチップの線で心理戦を強める。'},
+ {id:'17',file:'17-modern-craft-all-in.webp',group:'対局',dir:'現代日本工芸',title:'オールイン操作｜現代日本工芸',note:'藍のレール、象牙色のつまみ、朱の決定機構。'},
+ {id:'18',file:'18-modern-premium-win-tsumo.webp',group:'決着',dir:'現代日本プレミアム',title:'勝利・ツモ',note:'勝ち手14枚を最前面に出し、全員の私牌も同時公開。'},
+ {id:'21',file:'21-showdown-hand-review.webp',group:'決着',dir:'現代日本プレミアム',title:'全員の8枚＋最終14枚を読む画面',note:'6人の行を切り替え、1人ずつ大きく8枚と14枚を確認する。'},
+ {id:'31',file:'31-first-match-onboarding.webp',group:'対局',dir:'現代日本プレミアム',title:'初回対局の3段階ガイド',note:'共通牌、私牌8、最終14の順に、画面を隠さず教える。'},
+ {id:'22',file:'22-character-roster.webp',group:'キャラクター',dir:'現代日本プレミアム',title:'キャラクター一覧',note:'ガビガビ感をなくし、9人を同じ品質で比較できる。'},
+ {id:'30',file:'30-character-detail.webp',group:'キャラクター',dir:'現代日本プレミアム',title:'キャラクター詳細',note:'管理量を増やしすぎず、衣装と3要素だけに絞る。'},
+ {id:'23',file:'23-cosmetic-customization.webp',group:'収集・装飾',dir:'現代日本プレミアム',title:'装飾品設定',note:'実際の対局プレビューと素材差が見える4候補。'},
+ {id:'24',file:'24-gacha-pickup.webp',group:'収集・装飾',dir:'現代日本プレミアム',title:'装飾品ガチャ',note:'現代服、3つの目玉商品、2つの大きな抽選操作へ集約。'},
+ {id:'25',file:'25-gacha-result-tabs.webp',group:'収集・装飾',dir:'現代日本プレミアム',title:'ガチャ結果｜10件タブ切替',note:'選択中の1品を大きく見せ、10件は横タブで瞬時に切り替える。'}
+];
+const groups=['すべて',...new Set(items.map(x=>x.group))];
+const key='mahjong-holdem-final-visual-2026-08-19';let filter='すべて',list=[...items],index=0;
+let votes={};try{votes=JSON.parse(localStorage.getItem(key)||'{}')}catch(e){}
+const $=s=>document.querySelector(s), image=$('#image'),title=$('#title'),note=$('#note'),eyebrow=$('#eyebrow'),progress=$('#progress');
+function save(){localStorage.setItem(key,JSON.stringify(votes))}
+function updateCounts(){const c={keep:0,mix:0,drop:0};Object.values(votes).forEach(v=>c[v]++);$('#counts').innerHTML=`この方向で進めたい ${c.keep}件<br>良い部分だけ使いたい ${c.mix}件<br>今回は使わない ${c.drop}件<br>未回答 ${items.length-c.keep-c.mix-c.drop}件`}
+function render(){const x=list[index];if(!x)return;image.src='assets/'+x.file;image.alt=x.title;title.textContent=x.title;note.textContent=x.note;eyebrow.textContent=x.group+' ／ '+x.dir;progress.textContent=(index+1)+' / '+list.length;document.querySelectorAll('.choice').forEach(b=>b.classList.toggle('on',votes[x.id]===b.dataset.v));updateCounts();window.scrollTo({top:0,behavior:'smooth'})}
+function move(d){index=(index+d+list.length)%list.length;render()}
+function setFilter(g){filter=g;list=g==='すべて'?[...items]:items.filter(x=>x.group===g);index=0;document.querySelectorAll('.filter').forEach(b=>b.classList.toggle('on',b.dataset.g===g));render()}
+groups.forEach(g=>{const b=document.createElement('button');b.className='filter'+(g==='すべて'?' on':'');b.dataset.g=g;b.textContent=g;b.onclick=()=>setFilter(g);$('#filters').appendChild(b)});
+$('#prev').onclick=()=>move(-1);$('#next').onclick=()=>move(1);document.querySelectorAll('.choice').forEach(b=>b.onclick=()=>{votes[list[index].id]=b.dataset.v;save();render();setTimeout(()=>move(1),180)});
+document.addEventListener('keydown',e=>{if(e.key==='ArrowLeft')move(-1);if(e.key==='ArrowRight')move(1)});
+$('#copy').onclick=async()=>{const label={keep:'この方向で進めたい',mix:'良い部分だけ使いたい',drop:'今回は使わない'};let out='麻雀ホールデム　最終ビジュアル選定結果\n\n';['keep','mix','drop'].forEach(v=>{out+=label[v]+'\n';items.filter(x=>votes[x.id]===v).forEach(x=>out+='・'+x.title+'\n');out+='\n'});out+='未回答：'+items.filter(x=>!votes[x.id]).length+'件';await navigator.clipboard.writeText(out);$('#copy').textContent='コピーしました';setTimeout(()=>$('#copy').textContent='選定結果をコピー',1400)};
+render();
+</script>
+</body>
+</html>
