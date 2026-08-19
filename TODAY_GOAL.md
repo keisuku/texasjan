@@ -10,7 +10,8 @@
 - [x] PR #34: 装飾品／ガチャを実所持・実通貨・実抽選・実結果へ接続
 - [x] PR #35: 対局／結果の内部英語を日本語中心へ統一
 - [x] PR #36: 未完成の色見本を非表示・非排出にし、完成済み装飾品4種だけを公開
-- [ ] オールインと勝利の局所演出をmainへ反映
+- [x] PR #37: オールインと勝利の局所演出をmainへ反映
+- [ ] PR #38: ローカル1コマンド回帰検査とClaude Code専用キューをmainへ反映
 
 ## 残りの優先順
 
@@ -32,12 +33,12 @@
 
 - ChatGPT Work: ビジュアルディレクター。新規画像は1枚ずつ内部品質確認し、承認済み基準との差分を提示する。
 - Codex: 実装、テスト、GitHub、PR、main反映。本ファイルの優先順を止めずに進める。
-- Claude Code: ローカルChromiumの回帰検査と、再現できた不具合だけを専用ブランチで修正する。
+- Claude Code: `CLAUDE_CODE_QUEUE.md` のREADYを1件だけ担当する。ローカルChromiumの回帰検査、境界テスト、390px点検など、短く再現できる仕事に限定する。
 
 ## Claude Codeへそのまま渡す文
 
 ```text
-keisuku/texasjan の最新mainで回帰検査を担当してください。最初に PROJECT_STATE.md、CURRENT_TASK.md、DECISIONS.md、TODAY_GOAL.md、tests/README.md を読みます。acceptance / hands / motion / skins / flow / mobile / scoring をローカルChromiumで実行し、失敗を再現できたものだけ修正してください。ゲームルール、得点、固定4→2、公開15＋4＋4＋4は変更しません。branchは claude/regression-2026-08-19、1不具合1コミット、Draft PRで結果と再現手順を残してください。
+keisuku/texasjan の最新mainで CLAUDE_CODE_QUEUE.md のREADYを1件だけ担当してください。PROJECT_STATE.md → CURRENT_TASK.md → DECISIONS.md → TODAY_GOAL.md → CLAUDE_CODE_QUEUE.md → tests/README.md の順に読み、bash tests/run-regression.sh を実行してください。再現できて原因を説明できる失敗だけを修正します。ゲームルール、得点、固定4→2、公開15＋4＋4＋4は変更禁止です。1不具合1コミット、Draft PRで結果と再現手順を残し、mainへはマージしないでください。
 ```
 
 ## 次の1アクション

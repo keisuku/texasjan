@@ -11,6 +11,7 @@
 | `flow.html` | タイトル → ロビー → マッチング → 対局 → 結果 → ロビーの製品フロー |
 | `mobile.html` | 390px実機幅で主要5画面が溢れず、操作が画面内に収まること |
 | `scoring.html` | 平和・七対子・四暗刻・国士、翻符点数、13枚の待ちHUDと発光 |
+| `visual-events.html` | 実データ連動のALL-IN表示と、勝利時だけ有効になる局所演出 |
 | `progressive-lock.html` | プリフロップ固定なし→4枚固定→追加2枚固定→固定を増やさない＋4→最後の＋4→最終14枚の独立操作モック |
 | `visual-shell.js` | タイトル、ロビー、モード選択、装飾品、ガチャが評価済みGolden Visualへ接続され、主要操作が残っていること |
 | `cosmetic-catalog.js` | ガチャ排出物が実プレビュー素材を持ち、未完成の色見本が排出・装飾品一覧へ混入しないこと |
@@ -45,3 +46,11 @@ Chromium で自動実行する場合:
 chrome --headless --allow-file-access-from-files --virtual-time-budget=90000 \
   --dump-dom tests/acceptance.html | grep -oE '(PASS|FAIL)  [^<]{5,}'
 ```
+
+主要ブラウザ検査・静的検査・構文検査をまとめて実行する場合:
+
+```bash
+bash tests/run-regression.sh
+```
+
+Chromeを自動検出できない環境では、`BROWSER_BIN=/path/to/chrome bash tests/run-regression.sh` と指定します。終了コード0が全PASS、1がテスト失敗、2がブラウザ未検出です。

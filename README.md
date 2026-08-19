@@ -6,7 +6,7 @@
 
 ## Control Room
 
-**新しいセッションは [`PROJECT_STATE.md`](PROJECT_STATE.md) → [`CURRENT_TASK.md`](CURRENT_TASK.md) → [`DECISIONS.md`](DECISIONS.md) の順に読みます。**
+**新しいセッションは [`PROJECT_STATE.md`](PROJECT_STATE.md) → [`CURRENT_TASK.md`](CURRENT_TASK.md) → [`DECISIONS.md`](DECISIONS.md) の順に読みます。今日の実行順は [`TODAY_GOAL.md`](TODAY_GOAL.md)、Claude Codeの小タスクは [`CLAUDE_CODE_QUEUE.md`](CLAUDE_CODE_QUEUE.md) が正典です。**
 
 [`orchestration/index.html`](orchestration/index.html) は、親のChatGPT Workと4つの専門レーンを起動する管制盤です。各カードから起動プロンプトをコピーし、ChatGPT Work / Codexへ貼り付けて開始できます。長い会話ログではなく、GitHubの短い状態ファイル・成果物・PRを正典にします。
 
