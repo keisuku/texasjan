@@ -66,6 +66,12 @@ for(const label of ["共通牌 15枚","私牌 8枚","最終手牌 13枚 ＋ ツ�
 for(const stale of [">FOLD<",">CALL<",">RAISE<",">ALL-IN<",">MY PRIVATE 8<",">MY FINAL HAND"]){
   if(gameMarkup.includes(stale))throw new Error(`stale game label remains: ${stale}`);
 }
+if(!gameMarkup.includes('id="allInBurst"')||!html.includes("function flashAllIn(player,target)")){
+  throw new Error("localized ALL-IN pressure effect is missing");
+}
+if(!html.includes('classList.toggle("user-win",!!r.userWon)')){
+  throw new Error("victory result state is not connected to real match data");
+}
 
 if(!html.includes("これは最終UIではない")){
   throw new Error("temporary-shell boundary must remain explicit");

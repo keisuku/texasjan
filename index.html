@@ -449,6 +449,22 @@ html.still .tile.waitCandidate{animation:none}
 .streetBurst.on{display:flex;animation:burstOut 1.05s ease-out both}.streetBurst strong{font-family:"Shippori Mincho B1",serif;font-size:9cqw;letter-spacing:.18em;color:#fff2b7;text-shadow:0 0 1cqw #164d43,0 0 3cqw #e1b941}.streetBurst small{margin-top:1cqw;font-size:2.4cqw;letter-spacing:.2em;color:#b7fff1}
 @keyframes burstOut{0%{opacity:0;transform:scale(.82)}20%,62%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(1.08)}}html.still .streetBurst{display:none!important}
 
+/* オールインは通常ベットと同じ小ラベルで済ませず、意思決定の頂点として局所演出する。 */
+.allInBurst{position:absolute;inset:0;z-index:60;display:none;pointer-events:none;align-items:center;justify-content:center;
+  background:rgba(2,13,11,.72)}
+.allInBurst.on{display:flex;animation:allInCurtain 1.45s cubic-bezier(.18,.78,.22,1) both}
+.allInBurstInner{position:relative;width:82cqw;height:25cqw;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:#092f28;border:.28cqw solid #edcf72;box-shadow:0 0 0 .7cqw rgba(7,31,26,.9),0 0 4cqw rgba(236,195,75,.5)}
+.allInBurstInner::before,.allInBurstInner::after{content:"";position:absolute;left:6cqw;right:6cqw;height:.16cqw;background:#d8b85d}
+.allInBurstInner::before{top:3cqw}.allInBurstInner::after{bottom:3cqw}
+.allInBurst small{font-size:2.3cqw;font-weight:900;letter-spacing:.24em;color:#9ee9d8}
+.allInBurst strong{margin-top:1cqw;font:800 8cqw/1 "Shippori Mincho B1",serif;letter-spacing:.16em;color:#fff0ad;
+  text-shadow:0 .3cqw .5cqw rgba(0,0,0,.8)}
+.allInBurst em{margin-top:1.2cqw;font-style:normal;font-size:2.5cqw;font-weight:900;color:#f6e8c3;font-variant-numeric:tabular-nums}
+@keyframes allInCurtain{0%{opacity:0}18%,70%{opacity:1}100%{opacity:0}}
+html.still .allInBurst{display:none!important}
+@media(prefers-reduced-motion:reduce){.allInBurst.on{animation:none;display:flex}}
+
 /* --- MY PRIVATE 8 --- */
 .sourceZone{position:absolute;left:49.36%;top:53.11%;transform:translateX(-50%);width:auto;height:5.08%;
   margin:0;padding:0;z-index:12;background:none;border-radius:0}
@@ -896,6 +912,12 @@ html.has-character .lb-standee .lb-standeecap{display:none}
   display:flex;flex-direction:column;align-items:center;justify-content:center;
   background:radial-gradient(85% 130% at 50% 0%,rgba(229,191,79,.34),rgba(9,39,31,.94) 70%);
   border:.2cqw solid rgba(240,214,132,.72);box-shadow:0 1.2cqw 3cqw rgba(0,0,0,.58)}
+#screen-result.user-win .rs-hero{border-color:#ffe59a;box-shadow:0 1.2cqw 3cqw rgba(0,0,0,.58),0 0 3.2cqw rgba(239,201,83,.46)}
+#screen-result.user-win .rs-hero>*{position:relative;z-index:2}
+html.has-fx-sparkle #screen-result.user-win .rs-hero::before{content:"";position:absolute;inset:-5cqw;z-index:1;pointer-events:none;
+  background:var(--asset-fx-sparkle) center/contain no-repeat;opacity:.72;animation:resultSpark 1.2s ease-out both}
+@keyframes resultSpark{from{opacity:0;transform:scale(.84)}to{opacity:.72;transform:scale(1)}}
+html.still #screen-result.user-win .rs-hero::before{animation:none}
 .rs-crown{font-size:5.5cqw;line-height:1;color:#F4D675;text-shadow:0 0 2cqw rgba(244,205,95,.7)}
 .rs-title{margin-top:1cqw;font-family:"Shippori Mincho B1",serif;font-size:8cqw;color:#FFF3CE;letter-spacing:.18em;
   text-shadow:0 .4cqw .6cqw rgba(0,0,0,.75)}
@@ -1669,6 +1691,9 @@ html.calib #calib{display:block}
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <div class="streetBurst" id="streetBurst"><strong id="burstTitle">共通牌 15枚</strong><small id="burstSub">情報が開く。確率が変わる。</small></div>
+  <div class="allInBurst" id="allInBurst" role="status" aria-live="assertive">
+    <div class="allInBurstInner"><small id="allInPlayer">あなた</small><strong>オールイン</strong><em id="allInAmount">総額 0</em></div>
+  </div>
   <div class="winRibbon" id="winRibbon"><strong>ツモ</strong><span>リーチ 1翻</span><span>門前ツモ 1翻</span><strong>2翻</strong></div>
   <div class="status" id="status"></div>
 
@@ -1768,7 +1793,7 @@ const CLOCKWISE_SEATS=[0,1,3,5,4,2];
 function nextClockwiseSeat(i){const at=CLOCKWISE_SEATS.indexOf(i);return CLOCKWISE_SEATS[(at<0?0:at+1)%CLOCKWISE_SEATS.length];}
 let betting=null,dealerSeat=2,userAction="",aiTimer=0,raiseSheetOpen=false;
 const IS_STILL=document.documentElement.classList.contains("still");
-let matchMode="rank",lastResult=null,resultInspectIndex=0,burstTimer=0;
+let matchMode="rank",lastResult=null,resultInspectIndex=0,burstTimer=0,allInTimer=0;
 let rankPoints=(function(){
   try{const n=Number(localStorage.getItem("mh.rankPoints"));return Number.isFinite(n)&&n>=0?n:1240;}catch(e){return 1240;}
 })();
@@ -1789,7 +1814,8 @@ function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i)
 
 function newHand(){
   ensureTable();
-  window.clearTimeout(aiTimer);
+  window.clearTimeout(aiTimer);window.clearTimeout(allInTimer);
+  const allInFx=document.getElementById("allInBurst");if(allInFx)allInFx.classList.remove("on");
   shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;resultInspectIndex=0;
   phase="play";userFolded=false;resultText="";raiseSheetOpen=false;
   betting=null;userAction="";dealerSeat=nextClockwiseSeat(dealerSeat);
@@ -1834,6 +1860,13 @@ function flashStreet(title,sub){
   document.getElementById("burstTitle").textContent=title;document.getElementById("burstSub").textContent=sub;
   el.classList.remove("on");void el.offsetWidth;el.classList.add("on");window.clearTimeout(burstTimer);
   burstTimer=window.setTimeout(function(){el.classList.remove("on");},1100);
+}
+function flashAllIn(player,target){
+  const el=document.getElementById("allInBurst");if(!el||IS_STILL)return;
+  document.getElementById("allInPlayer").textContent=player;
+  document.getElementById("allInAmount").textContent="総額 "+Number(target||0).toLocaleString();
+  el.classList.remove("on");void el.offsetWidth;el.classList.add("on");window.clearTimeout(allInTimer);
+  allInTimer=window.setTimeout(function(){el.classList.remove("on");},1500);
 }
 function lockUserPicks(){picks.forEach(function(p){p.locked=true;});}
 function chooseSeatLocks(s,count){
@@ -1894,6 +1927,7 @@ function setActionLabel(i,action){
   const text=(ja[action.type]||action.type)+amount;
   if(i===5)userAction=text;
   else{seats[i].thinking=false;seats[i].action=text;}
+  if(action.type==="ALL-IN")flashAllIn(i===5?"あなた":seats[i].n,action.target);
 }
 function applyBetAction(i,kind,target){
   const result=MahjongBetting.act(betting,i,kind,target);
@@ -2708,6 +2742,7 @@ function matchRender(){
 function resultRender(){
   const r=lastResult||{userWon:false,userFolded:false,winners:[],pot:0,detail:"未決着",hand:[],delta:0,summary:"対局結果がありません"};
   const title=document.getElementById("rsTitle");
+  document.getElementById("screen-result").classList.toggle("user-win",!!r.userWon);
   title.textContent=r.userWon?"勝利":"決着";title.classList.toggle("lose",!r.userWon);
   document.getElementById("rsCrown").textContent=r.userWon?"♛":"◆";
   document.getElementById("rsSummary").textContent=r.userFolded&&!r.userWon?"フォールド / "+r.summary:r.summary;
