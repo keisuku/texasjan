@@ -378,7 +378,7 @@ html.still .tile.waitCandidate{animation:none}
 .seat .publicLock .tile.sm{--w:2.75cqw}.seat .publicLock .tile.fixedCore::before{display:none}
 .seat.won .bet{border-color:#ffe89a;color:#fff6d2;
   background:linear-gradient(180deg,#8a6a17,#4a3607);box-shadow:0 0 1.6cqw rgba(255,222,120,.9)}
-.seat.won::after{content:"WIN";position:absolute;left:50%;top:-1.6cqw;transform:translateX(-50%);
+.seat.won::after{content:"勝";position:absolute;left:50%;top:-1.6cqw;transform:translateX(-50%);
   padding:.1cqw 1cqw;border-radius:99px;background:#ffd964;color:#2a1f04;font-size:1.6cqw;font-weight:900;letter-spacing:.1em}
 .seat.active{box-shadow:none}
 .seat.active::after{display:none}
@@ -466,7 +466,7 @@ html.still .tile.waitCandidate{animation:none}
 .tile.rk .glyph .m{font-size:calc(var(--w)*.52);margin-top:calc(var(--w)*.04)}
 .tile.rk .glyph .solo{font-size:calc(var(--w)*.86)}
 .tile.rk.last,.slot.last{--w:9.1cqw;--ar:1.68;margin-left:.85cqw}
-.tile.last::before,.slot.last::before{content:"TSUMO";top:-2.5cqw;font-size:1.9cqw;letter-spacing:.1em;
+.tile.last::before,.slot.last::before{content:"ツモ";top:-2.5cqw;font-size:1.9cqw;letter-spacing:.1em;
   color:var(--tx-gold);-webkit-text-stroke:.03em var(--tx-ink);paint-order:stroke fill;
   text-shadow:0 .06em .08em rgba(0,0,0,.7)}
 .tile.last{z-index:2;box-shadow:0 calc(var(--w)*.075) 0 var(--body-lo),0 0 0 .28cqw #f1ca53,0 0 2cqw rgba(244,190,40,.8)}
@@ -1277,7 +1277,7 @@ html.still .ttl-start{animation:none;opacity:1}
 .pm-mode-sub.quick{background:#173d64!important}.pm-mode-sub.private{background:#503762!important}
 .pm-mode-sub b{font:800 3.4cqw/1.15 "Shippori Mincho B1",serif;letter-spacing:.08em}
 .pm-mode-sub small{margin-top:.7cqw;font-size:1.8cqw;color:#d5d5d0;letter-spacing:.05em}
-.pm-mode-sub:disabled{opacity:.72;cursor:default}
+.pm-mode-sub:disabled{opacity:1;cursor:default;filter:saturate(.62)}
 .pm-mode-note{position:absolute;left:24%;right:24%;top:81.3%;height:5.2%;display:flex;align-items:center;justify-content:center;
   color:#f1dfab;background:rgba(8,43,35,.97);border:.16cqw solid #b69035;
   font-size:2cqw;font-weight:800;letter-spacing:.12em}
@@ -1611,10 +1611,10 @@ html.calib #calib{display:block}
 <!-- ============ 独立した対局結果 ============ -->
 <section id="screen-result" class="screen">
   <div class="rs-veil"></div>
-  <header class="rs-top"><span>MATCH RESULT</span></header>
+  <header class="rs-top"><span>対局結果</span></header>
   <div class="rs-hero">
     <div class="rs-crown" id="rsCrown">◆</div>
-    <div class="rs-title" id="rsTitle">RESULT</div>
+    <div class="rs-title" id="rsTitle">決着</div>
     <div class="rs-summary" id="rsSummary"></div>
     <div class="rs-pot" id="rsPot"></div>
   </div>
@@ -1638,37 +1638,37 @@ html.calib #calib{display:block}
   <div class="arena" id="arena">
     <div class="rail" id="rail"></div>
     <div class="meSeat" id="meSeat">
-      <div class="you gold-text">YOU</div>
+      <div class="you gold-text">あなた</div>
       <div class="backs" id="myBacks"></div>
       <div class="seatAction" id="meAction"></div>
       <div class="stack gold-text" data-num="me">5,870</div>
     </div>
     <div class="board">
       <div class="dora"><span class="eyebrow">ドラ</span><span id="doraSlot"></span></div>
-      <div class="badge" id="street">PREFLOP</div>
+      <div class="badge" id="street">プリフロップ</div>
       <button id="bNext" class="streetNext">参加する</button>
       <div class="pot"><span class="eyebrow">POT</span><span class="val plate-num" id="pot" data-num="pot">0</span></div>
-      <div class="goldLabel labelCommon">COMMON 15</div>
+      <div class="goldLabel labelCommon">共通牌 15枚</div>
       <div class="commons" id="commons"></div>
       <div class="revealRail" id="revealRail"></div>
       <div class="lockHud" id="lockHud"><b id="lockCount">0 / 6</b><span id="lockGuide">プリフロップ：固定なし</span></div>
     </div>
   </div>
 
-  <div class="goldLabel labelPrivate">MY PRIVATE 8</div>
+  <div class="goldLabel labelPrivate">私牌 8枚</div>
   <div class="zone sourceZone">
     <div class="zonehead"><span class="eyebrow">手元の8枚（非公開）</span><span class="meta" id="pMeta">私牌 0枚</span></div>
     <div class="row" id="myrow"></div>
   </div>
 
-  <div class="goldLabel labelFinal">MY FINAL HAND 13 ＋ TSUMO</div>
+  <div class="goldLabel labelFinal">最終手牌 13枚 ＋ ツモ</div>
   <div class="zone finalZone" id="finalZone">
-    <div class="zonehead"><span class="eyebrow">MY FINAL HAND 13 ＋ TSUMO</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
+    <div class="zonehead"><span class="eyebrow">最終手牌 13枚 ＋ ツモ</span><span class="meta" id="cMeta">合計 0 / 14</span></div>
     <div class="rack" id="rack"></div>
   </div>
 
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
-  <div class="streetBurst" id="streetBurst"><strong id="burstTitle">COMMON 15</strong><small id="burstSub">情報が開く。確率が変わる。</small></div>
+  <div class="streetBurst" id="streetBurst"><strong id="burstTitle">共通牌 15枚</strong><small id="burstSub">情報が開く。確率が変わる。</small></div>
   <div class="winRibbon" id="winRibbon"><strong>ツモ</strong><span>リーチ 1翻</span><span>門前ツモ 1翻</span><strong>2翻</strong></div>
   <div class="status" id="status"></div>
 
@@ -1686,10 +1686,10 @@ html.calib #calib{display:block}
   </div>
 
   <div class="betBar">
-    <button class="fold" id="bFold"><span class="btn-label">FOLD</span></button>
-    <button class="call" id="bCall">CALL<br>400</button>
-    <button class="raise" id="bRaise"><span class="btn-label">RAISE</span></button>
-    <button class="dial" id="bDial"><span class="gold-text">ALL-IN</span></button>
+    <button class="fold" id="bFold"><span class="btn-label">降りる</span></button>
+    <button class="call" id="bCall">コール<br>400</button>
+    <button class="raise" id="bRaise"><span class="btn-label">レイズ</span></button>
+    <button class="dial" id="bDial"><span class="gold-text">オールイン</span></button>
   </div>
 
   <div class="raiseSheet" id="raiseSheet" aria-hidden="true">
@@ -1703,8 +1703,8 @@ html.calib #calib{display:block}
     <div class="raisePresets">
       <button data-raise-preset="min">最小</button>
       <button data-raise-preset="half">1/2 POT</button>
-      <button data-raise-preset="pot">POT</button>
-      <button data-raise-preset="allin">ALL-IN</button>
+      <button data-raise-preset="pot">ポット</button>
+      <button data-raise-preset="allin">オールイン</button>
     </div>
     <button class="raiseConfirm" id="bRaiseConfirm">この金額でレイズ</button>
   </div>
@@ -1827,7 +1827,7 @@ function ensureTable(){
 function openCommon15(){
   common=wall.splice(0,15);stage=1;dealAnim=1;
   beginBettingRound();
-  flashStreet("COMMON 15","4枚を選び、次の公開まで固定");
+  flashStreet("共通牌 15枚","4枚を選び、次の公開まで固定");
 }
 function flashStreet(title,sub){
   const el=document.getElementById("streetBurst");if(!el||IS_STILL)return;
@@ -1890,7 +1890,8 @@ function syncBettingState(){
 }
 function setActionLabel(i,action){
   const amount=action.paid>0?" "+action.paid.toLocaleString():"";
-  const text=action.type+amount;
+  const ja={"FOLD":"降りる","CHECK":"チェック","CALL":"コール","BET":"ベット","RAISE":"レイズ","ALL-IN":"オールイン"};
+  const text=(ja[action.type]||action.type)+amount;
   if(i===5)userAction=text;
   else{seats[i].thinking=false;seats[i].action=text;}
 }
@@ -1936,7 +1937,7 @@ function continueBetting(){
     if(l&&betAmount<l.minRaiseTarget)betAmount=Math.min(l.maxTarget,l.minRaiseTarget);
     render();return;
   }
-  seats[i].thinking=true;seats[i].action="THINKING";render();
+  seats[i].thinking=true;seats[i].action="考え中";render();
   const run=function(){
     if(!betting||phase!=="play"||betting.currentActor!==i)return;
     const choice=chooseAiAction(i);applyBetAction(i,choice.kind,choice.target);render();continueBetting();
@@ -2054,9 +2055,9 @@ function showdown(){
   };});
   seats.filter(function(s){return s.folded;}).forEach(function(s){
     const foldedBest=seatBestHand(s);showdownData.push({who:s.n,privateIds:s.hand.slice(),finalIds:foldedBest,
-      winner:false,place:showdownData.length+1,detail:"FOLD（参考手牌）"});
+      winner:false,place:showdownData.length+1,detail:"フォールド（参考手牌）"});
   });
-  if(userFolded)showdownData.push({who:"あなた",privateIds:my.slice(),finalIds:[],winner:false,place:6,detail:"FOLD"});
+  if(userFolded)showdownData.push({who:"あなた",privateIds:my.slice(),finalIds:[],winner:false,place:6,detail:"フォールド"});
   lastResult={userWon:userWon,userFolded:userFolded,winners:winners.map(function(e){return e.who;}),
     pot:settledPot,detail:detail,hand:userFolded?[]:finalHand.slice(),showdown:showdownData,delta:delta,mode:matchMode,summary:resultText};
   render();
@@ -2265,7 +2266,7 @@ function isComplete14(ids){
 }
 
 /* ===== render ===== */
-const STAGE=["PREFLOP","COMMON 15","+4 I · 19","+4 II · 23","+4 III · 27"];
+const STAGE=["プリフロップ","共通牌 15枚","＋4 Ⅰ・19枚","＋4 Ⅱ・23枚","＋4 Ⅲ・27枚"];
 
 /* ===== 動き =====
    render() は毎回 innerHTML="" でDOMを作り直すので CSS transition が効かない。
@@ -2459,7 +2460,7 @@ function renderCore(fresh){
   me.classList.toggle("folded",userFolded);
   const meAction=document.getElementById("meAction");
   meAction.className="seatAction"+(activeSeat===5&&!userFolded?" yourTurn":"");
-  meAction.textContent=activeSeat===5&&!userFolded?"YOUR TURN":userAction;
+  meAction.textContent=activeSeat===5&&!userFolded?"あなたの番":userAction;
   me.querySelector(".stack").textContent=userStack.toLocaleString();
   const myBacks=document.getElementById("myBacks");myBacks.innerHTML="";
   for(let i=0;i<4;i++)myBacks.appendChild(backTile("sm"));
@@ -2591,7 +2592,7 @@ function renderCore(fresh){
     bn.classList.add("hot","afterResult");}
   else if(stage===0)bn.innerHTML='<span class="btn-label">対局を始める</span>';
   else if(betting&&betting.phase==="acting"){
-    const who=activeSeat===5?"YOUR TURN":(activeSeat>=0?seats[activeSeat].n+" THINKING":"BETTING");
+    const who=activeSeat===5?"あなたの番":(activeSeat>=0?seats[activeSeat].n+" 考え中":"ベット中");
     bn.innerHTML='<span class="btn-label">'+who+'</span>';bn.disabled=true;}
   else if(stage===1&&!userFolded&&picks.length!==4){bn.innerHTML='<span class="btn-label">固定4枚を選ぶ（'+picks.length+' / 4）</span>';bn.disabled=true;}
   else if(stage===2&&!userFolded&&picks.length!==6){bn.innerHTML='<span class="btn-label">追加2枚を選ぶ（'+Math.max(0,picks.length-4)+' / 2）</span>';bn.disabled=true;}
@@ -2611,7 +2612,7 @@ function renderCore(fresh){
   const call=document.getElementById("bCall");
   const wrap=function(t){return '<span class="btn-label">'+t+'</span>';};
   const yourTurn=phase==="play"&&betting&&betting.phase==="acting"&&betting.currentActor===5&&!userFolded;
-  call.innerHTML=wrap(currentCall>0?"CALL<br>"+Math.min(currentCall,userStack).toLocaleString():"CHECK");
+  call.innerHTML=wrap(currentCall>0?"コール<br>"+Math.min(currentCall,userStack).toLocaleString():"チェック");
   call.disabled=!yourTurn||userStack<=0;
   const legal=yourTurn?MahjongBetting.legal(betting,5):null;
   document.getElementById("bFold").disabled=!yourTurn;
@@ -2625,7 +2626,7 @@ function renderCore(fresh){
     betAmount=clampRaise(betAmount,legal);
     range.min=String(min);range.max=String(legal.maxTarget);range.step="100";range.value=String(betAmount);
     document.getElementById("raiseValue").textContent=betAmount.toLocaleString();
-    document.getElementById("bRaiseConfirm").textContent=(betAmount===legal.maxTarget?"ALL-IN ":"レイズ ") + betAmount.toLocaleString();
+    document.getElementById("bRaiseConfirm").textContent=(betAmount===legal.maxTarget?"オールイン ":"レイズ ") + betAmount.toLocaleString();
   }
   dealAnim=0;
 }
@@ -2646,7 +2647,7 @@ document.getElementById("bDial").onclick=function(){openRaiseSheet(true);};
 document.getElementById("bRaiseClose").onclick=closeRaiseSheet;
 document.getElementById("bRaiseMinus").onclick=function(){adjustRaise(-100);};
 document.getElementById("bRaisePlus").onclick=function(){adjustRaise(100);};
-document.getElementById("raiseRange").oninput=function(){const l=raiseLegal();if(!l)return;betAmount=clampRaise(this.value,l);document.getElementById("raiseValue").textContent=betAmount.toLocaleString();document.getElementById("bRaiseConfirm").textContent=(betAmount===l.maxTarget?"ALL-IN ":"レイズ ")+betAmount.toLocaleString();};
+document.getElementById("raiseRange").oninput=function(){const l=raiseLegal();if(!l)return;betAmount=clampRaise(this.value,l);document.getElementById("raiseValue").textContent=betAmount.toLocaleString();document.getElementById("bRaiseConfirm").textContent=(betAmount===l.maxTarget?"オールイン ":"レイズ ")+betAmount.toLocaleString();};
 document.querySelectorAll("[data-raise-preset]").forEach(function(btn){btn.onclick=function(){const l=raiseLegal();if(!l)return;betAmount=raisePreset(btn.dataset.raisePreset,l);render();};});
 document.getElementById("bRaiseConfirm").onclick=function(){playerAction("raise");};
 document.querySelectorAll("[data-mode]").forEach(function(btn){btn.onclick=function(){wasComplete=false;recommend(btn.dataset.mode);};});
@@ -2707,9 +2708,9 @@ function matchRender(){
 function resultRender(){
   const r=lastResult||{userWon:false,userFolded:false,winners:[],pot:0,detail:"未決着",hand:[],delta:0,summary:"対局結果がありません"};
   const title=document.getElementById("rsTitle");
-  title.textContent=r.userWon?"WIN":"RESULT";title.classList.toggle("lose",!r.userWon);
+  title.textContent=r.userWon?"勝利":"決着";title.classList.toggle("lose",!r.userWon);
   document.getElementById("rsCrown").textContent=r.userWon?"♛":"◆";
-  document.getElementById("rsSummary").textContent=r.userFolded&&!r.userWon?"FOLD / "+r.summary:r.summary;
+  document.getElementById("rsSummary").textContent=r.userFolded&&!r.userWon?"フォールド / "+r.summary:r.summary;
   document.getElementById("rsPot").textContent="POT "+Number(r.pot||0).toLocaleString();
 
   const show=(r.showdown&&r.showdown.length?r.showdown:[{who:"あなた",privateIds:my.slice(),finalIds:r.hand||[],winner:r.userWon,detail:r.detail}]);
@@ -2722,7 +2723,7 @@ function resultRender(){
   const tiles=document.getElementById("rsTiles");tiles.innerHTML="",privateRemain=cnt(inspected.privateIds||[]);
   (inspected.finalIds||[]).slice(0,14).sort(function(a,b){return a-b;}).forEach(function(id){const from=privateRemain[id]>0;if(from)privateRemain[id]--;tiles.appendChild(tile(id,from?"fromPrivate":""));});
   if(!tiles.childElementCount){
-    const empty=document.createElement("div");empty.className="rs-summary";empty.textContent="FOLD — 手牌は公開されません";tiles.appendChild(empty);
+    const empty=document.createElement("div");empty.className="rs-summary";empty.textContent="フォールド — 手牌は公開されません";tiles.appendChild(empty);
   }
 
   const ranking=[{n:"keisuku",stack:userStack,you:true}].concat(seats.map(function(s){return {n:s.n,stack:s.stack,you:false};}));
@@ -2767,8 +2768,8 @@ function cosPreviewBuild(){
   [0,4,13,22,28,31].forEach(function(id){tiles.appendChild(tile(id));});
   tiles.appendChild(backTile());
   const btns=document.createElement("div");btns.className="cos-prevbtns";
-  btns.innerHTML='<div class="pv-btn fold">FOLD</div><div class="pv-btn call">CALL</div>'+
-                 '<div class="pv-btn raise">RAISE</div><div class="pv-chip"></div>';
+  btns.innerHTML='<div class="pv-btn fold">降りる</div><div class="pv-btn call">コール</div>'+
+                 '<div class="pv-btn raise">レイズ</div><div class="pv-chip"></div>';
   st.appendChild(tiles);st.appendChild(btns);
 }
 

@@ -57,6 +57,16 @@ if(!html.includes('id="bGachaAgain"')||!html.includes('id="gcCards"')){
   throw new Error("gacha result must expose real reward data and draw-again control");
 }
 
+const gameStart=html.indexOf('<section id="screen-game"');
+const gameEnd=html.indexOf('</section>',gameStart);
+const gameMarkup=html.slice(gameStart,gameEnd);
+for(const label of ["共通牌 15枚","私牌 8枚","最終手牌 13枚 ＋ ツモ","降りる","コール","レイズ","オールイン"]){
+  if(!gameMarkup.includes(label))throw new Error(`Japanese game label missing: ${label}`);
+}
+for(const stale of [">FOLD<",">CALL<",">RAISE<",">ALL-IN<",">MY PRIVATE 8<",">MY FINAL HAND"]){
+  if(gameMarkup.includes(stale))throw new Error(`stale game label remains: ${stale}`);
+}
+
 if(!html.includes("これは最終UIではない")){
   throw new Error("temporary-shell boundary must remain explicit");
 }
