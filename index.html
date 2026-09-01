@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <script>{const q=new URLSearchParams(location.search);const r=document.documentElement;
 if(q.has("calib"))r.classList.add("calib");
-if(q.has("still"))r.classList.add("still");}</script>
+if(q.has("still"))r.classList.add("still");
+if(q.get("parts")==="r1")r.dataset.digitalParts="r1";}</script>
 <title>MAHJONG HOLD'EM</title>
 <script src="./skins/manifest.js"></script>
 <script>
@@ -1413,6 +1414,47 @@ html.still .ttl-start{animation:none;opacity:1}
 @media(max-width:380px){
   .golden-shell-ui button{min-width:40px;min-height:40px}
   #screen-lobby .shell-mode{font-size:3.05cqw!important}
+}
+
+/* ======================================================================
+   DIGITAL MATERIAL SYSTEM R1 — ?parts=r1
+   生成画像は無彩色の質感レイヤーだけを担当し、色・文字・状態は実DOM/CSSが所有する。
+   既存スキンを壊さず比較できるよう、明示クエリでのみ有効化する。
+   ====================================================================== */
+html[data-digital-parts="r1"]{--dp-bezel:url("./assets/ui/digital-bezel-neutral-v1.webp")}
+html[data-digital-parts="r1"] .betBar button:not(.dial){
+  --dp-rgb:82,224,211;
+  position:relative;isolation:isolate;overflow:visible;padding:0!important;border:0!important;
+  border-radius:3.1cqw!important;background:
+    radial-gradient(130% 170% at 50% -45%,rgba(var(--dp-rgb),.82),transparent 48%),
+    linear-gradient(180deg,rgba(var(--dp-rgb),.38),rgba(var(--dp-rgb),.10) 48%,rgba(0,0,0,.58)),
+    #06110f!important;
+  box-shadow:0 .7cqw 1.45cqw rgba(0,0,0,.58),0 0 2.1cqw rgba(var(--dp-rgb),.10),
+    inset 0 0 0 .12cqw rgba(var(--dp-rgb),.22)!important;
+  filter:none!important;
+}
+html[data-digital-parts="r1"] .betBar button:not(.dial)::before{
+  content:"";position:absolute;inset:9%;z-index:0;border-radius:2.2cqw;pointer-events:none;
+  background:linear-gradient(180deg,rgba(255,255,255,.13),transparent 34%);
+}
+html[data-digital-parts="r1"] .betBar button:not(.dial)::after{
+  content:"";position:absolute;inset:-5%;z-index:2;pointer-events:none;
+  background:var(--dp-bezel) center/100% 100% no-repeat;
+  filter:drop-shadow(0 .45cqw .34cqw rgba(0,0,0,.52));
+}
+html[data-digital-parts="r1"] .betBar .fold{--dp-rgb:255,79,92}
+html[data-digital-parts="r1"] .betBar .call{--dp-rgb:66,211,255}
+html[data-digital-parts="r1"] .betBar .raise{--dp-rgb:255,186,70;color:#fff7e7}
+html[data-digital-parts="r1"] .betBar button:not(.dial)>.btn-label{
+  position:relative;z-index:3;color:#f7fffd;-webkit-text-stroke:.02em rgba(0,0,0,.82);
+  text-shadow:0 .08em .18em rgba(0,0,0,.78);
+}
+html[data-digital-parts="r1"] .betBar button:not(.dial):active{
+  transform:translateY(.35cqw) scale(.982);filter:brightness(1.12)!important;
+  box-shadow:0 .25cqw .65cqw rgba(0,0,0,.62),inset 0 0 0 .14cqw rgba(var(--dp-rgb),.42)!important;
+}
+html[data-digital-parts="r1"] .betBar button:not(.dial):focus-visible{
+  outline:.36cqw solid rgba(var(--dp-rgb),.92);outline-offset:.3cqw;
 }
 
 /* --- dev-only calibration overlay: ?calib puts the Golden Visual on top --- */

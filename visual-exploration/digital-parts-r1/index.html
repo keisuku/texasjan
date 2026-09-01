@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>MAHJONG HOLD'EM — Digital Parts R1</title>
+<style>
+:root{
+  color-scheme:dark;
+  --accent:#55e9d6;
+  --accent-rgb:85,233,214;
+  --radius:30px;
+  --bezel:url("../../assets/ui/digital-bezel-neutral-v1.webp");
+  --ink:#ecf8f4;
+  --muted:#8ba29d;
+  --panel:#071411;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:#020806;color:var(--ink);font-family:Inter,"Noto Sans JP","Hiragino Sans",sans-serif}
+body{display:flex;justify-content:center;padding:24px 12px 60px;background:
+  radial-gradient(circle at 50% 0,rgba(52,211,181,.12),transparent 32rem),
+  linear-gradient(180deg,#05110e,#010403)}
+button,input{font:inherit}
+.board{width:min(941px,100%);min-height:calc(100vh - 48px);padding:clamp(22px,5vw,54px);border:1px solid rgba(150,220,204,.13);border-radius:36px;background:
+  linear-gradient(180deg,rgba(255,255,255,.032),transparent 24%),
+  rgba(4,13,11,.94);box-shadow:0 30px 100px #000}
+.eyebrow{font-size:12px;letter-spacing:.24em;color:#66ead7;text-transform:uppercase}
+h1{margin:8px 0 8px;font-size:clamp(28px,6vw,54px);line-height:1;letter-spacing:-.04em}
+.lead{max-width:680px;margin:0;color:var(--muted);font-size:14px;line-height:1.75}
+.rule{height:1px;margin:28px 0;background:linear-gradient(90deg,rgba(92,236,214,.7),rgba(92,236,214,0))}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px;padding:16px;border:1px solid rgba(255,255,255,.08);border-radius:20px;background:rgba(255,255,255,.025)}
+.controls label{display:grid;gap:7px;font-size:11px;letter-spacing:.08em;color:var(--muted)}
+input[type=color]{width:100%;height:42px;padding:4px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#07120f}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.section-title{display:flex;justify-content:space-between;align-items:end;margin:28px 0 12px}
+.section-title b{font-size:15px;letter-spacing:.08em}.section-title span{font-size:10px;color:var(--muted);letter-spacing:.12em}
+.action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.digital-control{
+  --local-accent:var(--accent);
+  --local-rgb:var(--accent-rgb);
+  --local-radius:var(--radius);
+  position:relative;isolation:isolate;min-height:96px;padding:18px 24px;border:0;border-radius:var(--local-radius);overflow:hidden;color:#f7fffd;
+  background:
+    radial-gradient(120% 160% at 50% -35%,rgba(var(--local-rgb),.75),transparent 46%),
+    linear-gradient(180deg,rgba(var(--local-rgb),.34),rgba(var(--local-rgb),.07) 48%,rgba(0,0,0,.42)),
+    #071310;
+  box-shadow:0 18px 28px rgba(0,0,0,.46),0 0 26px rgba(var(--local-rgb),.08),inset 0 0 0 1px rgba(var(--local-rgb),.24);
+  cursor:pointer;transition:transform .14s ease,filter .14s ease,box-shadow .14s ease
+}
+.digital-control::before{content:"";position:absolute;inset:8%;z-index:-1;border-radius:calc(var(--local-radius)*.68);background:linear-gradient(180deg,rgba(255,255,255,.10),rgba(255,255,255,0) 35%);pointer-events:none}
+.digital-control::after{content:"";position:absolute;inset:-5%;z-index:2;background:var(--bezel) center/100% 100% no-repeat;pointer-events:none;filter:drop-shadow(0 5px 4px rgba(0,0,0,.45))}
+.digital-control:active{transform:translateY(3px) scale(.985);filter:brightness(1.14);box-shadow:0 7px 14px #000,inset 0 0 0 1px rgba(var(--local-rgb),.45)}
+.digital-control:focus-visible{outline:3px solid rgba(var(--local-rgb),.9);outline-offset:4px}
+.digital-control strong{display:block;position:relative;z-index:3;font-size:clamp(20px,4vw,34px);line-height:1;letter-spacing:.08em;text-shadow:0 2px 12px #000}
+.digital-control small{display:block;position:relative;z-index:3;margin-top:8px;color:rgba(255,255,255,.62);font-size:10px;letter-spacing:.13em}
+.crimson{--local-accent:#ff5d68;--local-rgb:255,93,104}.cyan{--local-accent:#4edaff;--local-rgb:78,218,255}.amber{--local-accent:#ffc85a;--local-rgb:255,200,90}.violet{--local-accent:#aa7dff;--local-rgb:170,125,255}
+.pill{--local-radius:999px}.compact{min-height:70px;--local-radius:18px}.compact strong{font-size:18px}.square{aspect-ratio:1;min-height:0;--local-radius:28px;padding:12px}
+.neutral{--local-rgb:164,179,175;filter:saturate(.35)}
+.is-disabled{opacity:.38;filter:saturate(0);pointer-events:none}
+.hud{display:grid;grid-template-columns:1fr 1.25fr 1fr;gap:12px;align-items:center}
+.plate{position:relative;isolation:isolate;min-height:78px;padding:16px 18px;border-radius:22px;text-align:center;background:linear-gradient(180deg,rgba(33,232,197,.15),rgba(2,9,8,.92));box-shadow:inset 0 0 0 1px rgba(103,240,215,.16),0 16px 28px #000}
+.plate::after{content:"";position:absolute;inset:-7%;z-index:-1;background:var(--bezel) center/100% 100% no-repeat;opacity:.84;filter:brightness(.78)}
+.plate small{display:block;font-size:10px;color:var(--muted);letter-spacing:.18em}.plate b{display:block;margin-top:5px;font-size:24px;letter-spacing:.04em}
+.pot{min-height:104px;background:radial-gradient(circle at 50% -30%,rgba(255,202,89,.38),transparent 55%),#091310}.pot b{font-size:38px;color:#fff4d2}.pot::after{filter:sepia(.25) brightness(.92)}
+.swatches{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.swatch{height:60px;border:1px solid rgba(255,255,255,.08);border-radius:18px;background:radial-gradient(circle at 50% 0,rgba(var(--c),.52),transparent 58%),rgb(4,12,10);box-shadow:inset 0 0 0 1px rgba(var(--c),.15)}
+.note{margin-top:32px;padding:16px;border-left:2px solid var(--accent);background:rgba(76,226,203,.055);color:var(--muted);font-size:12px;line-height:1.7}
+.note b{color:#dffbf5}
+@media(max-width:560px){body{padding:0}.board{min-height:100vh;border:0;border-radius:0}.controls{grid-template-columns:1fr}.action-grid{gap:10px}.digital-control{min-height:82px;padding:14px}.hud{grid-template-columns:1fr 1fr}.pot{grid-column:1/-1;grid-row:1}.swatches{grid-template-columns:repeat(2,1fr)}}
+@media(prefers-reduced-motion:reduce){.digital-control{transition:none}}
+</style>
+</head>
+<body>
+<main class="board">
+  <div class="eyebrow">Digital Material System / R1</div>
+  <h1>色と形を、コードで変える。</h1>
+  <p class="lead">生成画像は無彩色チタンの質感だけ。色、角丸、比率、発光、押下状態はCSS変数で制御する。1枚の透過フレームから、対局・ロビー・ガチャまで同じ品質言語を展開する。</p>
+  <div class="rule"></div>
+
+  <div class="controls">
+    <label>GLOBAL ACCENT<input id="accent" type="color" value="#55e9d6"></label>
+    <label>CORNER RADIUS<input id="radius" type="range" min="12" max="64" value="30"></label>
+  </div>
+
+  <div class="section-title"><b>PRIMARY ACTIONS</b><span>COLOR / STATE</span></div>
+  <div class="action-grid">
+    <button class="digital-control crimson"><strong>降りる</strong><small>FOLD</small></button>
+    <button class="digital-control cyan"><strong>チェック</strong><small>CHECK</small></button>
+    <button class="digital-control amber"><strong>レイズ</strong><small>RAISE</small></button>
+    <button class="digital-control violet pill"><strong>オールイン</strong><small>ALL-IN</small></button>
+  </div>
+
+  <div class="section-title"><b>HUD FAMILY</b><span>SAME MATERIAL</span></div>
+  <div class="hud">
+    <div class="plate"><small>PLAYER</small><b>5,570</b></div>
+    <div class="plate pot"><small>POT</small><b>22,200</b></div>
+    <button class="digital-control square"><strong>＋4</strong><small>REVEAL</small></button>
+  </div>
+
+  <div class="section-title"><b>SHAPE &amp; SCALE</b><span>ONE SOURCE</span></div>
+  <div class="action-grid">
+    <button class="digital-control compact pill"><strong>確定</strong></button>
+    <button class="digital-control compact neutral"><strong>おすすめ</strong></button>
+    <button class="digital-control compact"><strong>装備する</strong></button>
+    <button class="digital-control compact is-disabled"><strong>準備中</strong></button>
+  </div>
+
+  <div class="section-title"><b>LIVE COLOR TOKENS</b><span>NO NEW BITMAPS</span></div>
+  <div class="swatches">
+    <div class="swatch" style="--c:255,93,104"></div><div class="swatch" style="--c:78,218,255"></div>
+    <div class="swatch" style="--c:255,200,90"></div><div class="swatch" style="--c:170,125,255"></div>
+  </div>
+
+  <p class="note"><b>狙い：</b>AI画像を完成ボタンとして固定せず、「高級感を供給する素材レイヤー」として利用する。文字・数値・色・操作状態は常に実装側が所有する。</p>
+</main>
+<script>
+const root=document.documentElement;
+const accent=document.querySelector('#accent');
+const radius=document.querySelector('#radius');
+function hexToRgb(hex){const n=parseInt(hex.slice(1),16);return `${n>>16},${n>>8&255},${n&255}`}
+accent.addEventListener('input',()=>{root.style.setProperty('--accent',accent.value);root.style.setProperty('--accent-rgb',hexToRgb(accent.value))});
+radius.addEventListener('input',()=>root.style.setProperty('--radius',`${radius.value}px`));
+</script>
+</body>
+</html>
