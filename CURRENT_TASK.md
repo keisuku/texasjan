@@ -1,38 +1,28 @@
 # Current Task
 
-Updated: **2026-08-20 JST**
+Updated: **2026-09-07**
 
-## Current status
+## 現在の指示
 
-There is no active image-generation or visual-implementation task. The previous visual attempts were rejected:
+ユーザーはtexasjan再開・抜本的な再検討・迅速な実装を明示的に依頼した。以前の「次の指示があるまで変更しない」は、その新指示で解除されている。同じ実装許可を再度求めない。
 
-- PR #43: merged, but all 29 images were subsequently rejected.
-- PR #44: closed unmerged and rejected.
-- PR #45: closed unmerged and rejected.
+## 今回の到達点
 
-The next session must not continue those directions by default.
+`build/holdem-restart-20260907` に、勝敗・ベットの整合と一局の操作体験を実装した。mainへの統合と最終ビジュアルの承認は別。PR #43〜45の不採用とPR #47の未承認は継続。
 
-## Required first response in a new session
+詳細と実装ファイルは `docs/RESTART_2026-09-07.md`、実行結果は `docs/RESTART_VALIDATION_2026-09-07.md`。
 
-After reading `NEW_SESSION_START_HERE.md`, `PROJECT_STATE.md`, `CURRENT_TASK.md`, and `DECISIONS.md`:
+## 次の一作業
 
-1. Inspect the current repository and relevant PR state read-only.
-2. Summarize, in no more than ten items, what is implemented, unapproved, rejected, and unresolved.
-3. Stop and wait for the user to assign the next scoped task.
+**本人用確認版で、配牌→固定4→固定6→最終14→ベット→結果→同じ配牌で練習を実機確認する。**
 
-## Do not do before a new instruction
+- 390px付近および320pxの操作、表示重なり、結果のタブ、金額調整、ガイド開閉を確認。
+- ブラウザ用検査は `node tests/run-browser-regression.cjs`。NodeのVM検証をブラウザ表示検証と呼ばない。
+- 読みづらい箇所を修正した後、同一seedのルール比較、対局一画面の完成見本を順に進める。
+- 大きな画風・構図は人間が見た成果を基準に判断する。PR #43〜45は再利用しない。
+- 新しいコードと判断はこの4ファイル＋PRへ保存する。
 
-- Do not generate more images.
-- Do not reuse PR #43, #44, or #45 visuals as an approved baseline.
-- Do not infer a requested art style from `audition-r5`; ask when a concrete choice is needed.
-- Do not merge visual work.
-- Do not bulk-generate similar variants.
-- Do not redesign gameplay rules or replace tested flow.
-- Do not ingest the entire archive into context.
+## 今回の成果
 
-## Safe work that remains available after assignment
-
-- Gameplay/probability: continue reproducible simulations from the current fixed-4-then-2 / common-27 working rule.
-- Implementation: diagnose or implement narrowly scoped changes while preserving tested scoring and flow.
-- Visual exploration: only after the user supplies a new scoped brief, compare genuinely distinct art-rendering/material/world treatments while keeping the existing game structure.
-- Documentation: keep the four canonical handoff files current at every material checkpoint.
+- [本人用確認版](https://texasjan-restart.keisuk03.chatgpt.site)
+- [実装PR #48](https://github.com/keisuku/texasjan/pull/48)（draft・main未反映）

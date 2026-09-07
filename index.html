@@ -1420,6 +1420,7 @@ html.still .ttl-start{animation:none;opacity:1}
   background:url("./claude-handoff/visual/golden-target.webp") center/100% 100% no-repeat}
 html.calib #calib{display:block}
 </style>
+<link rel="stylesheet" href="./play-experience.css">
 </head>
 <body>
 <div id="app">
@@ -1750,6 +1751,10 @@ html.calib #calib{display:block}
 <script src="./mahjong-score.js"></script>
 <script src="./betting-engine.js"></script>
 <script src="./betting-ai.js"></script>
+<script src="./pot-settlement.js"></script>
+<script src="./hand-strategy.js"></script>
+<script src="./play-session.js"></script>
+<script src="./play-experience.js"></script>
 <script>
 /* 素材の差し替えは head のスキンランタイムが済ませている（skins/manifest.js）。 */
 
@@ -1771,7 +1776,13 @@ function faceHTML(id){
 }
 function tileMarkup(id){return '<div class="tile"><div class="face">'+faceHTML(id)+'</div></div>';}
 function tile(id,cls){const d=document.createElement("div");d.className="tile "+(cls||"");
-  d.innerHTML=`<div class="face">${faceHTML(id)}</div>`;return d;}
+  d.innerHTML=`<div class="face">${faceHTML(id)}</div>`;d.setAttribute("aria-label",label(id));return d;}
+function interactiveTile(t,fn,selected,locked){
+  t.setAttribute("role","button");t.tabIndex=0;t.setAttribute("aria-pressed",selected?"true":"false");
+  t.setAttribute("aria-disabled",locked||phase!=="play"||userFolded?"true":"false");
+  if(locked)t.setAttribute("aria-label",t.getAttribute("aria-label")+"・固定牌");
+  t.onclick=fn;t.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();fn();}};
+}
 function backTile(cls){const d=document.createElement("div");d.className="tile back "+(cls||"");
   d.innerHTML='<div class="face"></div>';return d;}
 
@@ -1791,6 +1802,12 @@ const seats=NAMES.map(function(n,i){
    毎局の定常状態ではない。 */
 const ANTE=300, MIN_BET=100;
 let sessionResets=0;
+let handContributions=new Array(6).fill(0),handAntes=new Array(6).fill(0),handActions=[];
+let handSeed="",handRandom=Math.random,handStartingStacks=[],handStartedAt=0,handId="",handNumber=0;
+let practiceReturn=null,practiceHand=false,experiencePaused=false,runoutTimer=0;
+let playSpeed=(function(){try{return localStorage.getItem("mh.speed")==="2"?2:1;}catch(e){return 1;}})();
+const handHistory=MahjongSession.create((function(){try{return localStorage;}catch(e){return null;}})());
+let initialDeal=new URLSearchParams(location.search).get("deal");
 let wall=[],my=[],common=[],stage=0,pot=0,doraInd=0;
 let picks=[],pickSeq=0,notice="";
 let activeSeat=0,recOpen=false,recMode="total",wasComplete=false,dealAnim=0;
@@ -1817,15 +1834,30 @@ function expand(c){const a=[];for(let t=0;t<34;t++)for(let k=0;k<c[t];k++)a.push
 function label(id){ if(id<9)return KANJI[id]+"萬"; if(id<18)return (id-8)+"筒"; if(id<27)return (id-17)+"索"; return HONOR[id-27]; }
 
 function shuffle(){wall=[];for(let i=0;i<34;i++)for(let k=0;k<4;k++)wall.push(i);
-  for(let i=wall.length-1;i>0;i--){const j=Math.random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
-
-function newHand(){
+  const random=MahjongSession.random(handSeed+":wall");
+  for(let i=wall.length-1;i>0;i--){const j=random()*(i+1)|0;const t=wall[i];wall[i]=wall[j];wall[j]=t;}}
+function restoreStacks(values){seats.forEach(function(s,i){s.stack=values[i];});userStack=values[5];}
+function freshDealSeed(){
+  if(initialDeal){const seed=String(initialDeal).slice(0,64);initialDeal=null;return seed;}
+  if(window.crypto&&window.crypto.getRandomValues){const n=new Uint32Array(2);window.crypto.getRandomValues(n);return n[0].toString(36)+n[1].toString(36);}
+  return Date.now().toString(36)+Math.random().toString(36).slice(2);
+}
+function newHand(options){
+  options=options||{};
+  window.clearTimeout(runoutTimer);
+  if(phase==="play"&&pot>0){restoreStacks(tableStacks().map(function(n,i){return n+handContributions[i];}));}
+  if(options.replay){restoreStacks(options.stacks);dealerSeat=options.dealer;}
+  else if(practiceReturn){restoreStacks(practiceReturn.stacks);dealerSeat=practiceReturn.dealer;matchMode=practiceReturn.mode;practiceReturn=null;}
   ensureTable();
+  practiceHand=!!options.replay;
+  handStartingStacks=tableStacks();handContributions=new Array(6).fill(0);handAntes=new Array(6).fill(0);handActions=[];
+  handSeed=options.seed||freshDealSeed();handRandom=MahjongSession.random(handSeed+":opponents");
+  handStartedAt=Date.now();handId=Date.now().toString(36)+":"+(++handNumber)+":"+handSeed;
   window.clearTimeout(aiTimer);window.clearTimeout(allInTimer);
   const allInFx=document.getElementById("allInBurst");if(allInFx)allInFx.classList.remove("on");
   shuffle();stage=0;pot=0;common=[];picks=[];pickSeq=0;notice="";activeSeat=0;recOpen=false;recMode="total";wasComplete=false;resultInspectIndex=0;
   phase="play";userFolded=false;resultText="";raiseSheetOpen=false;
-  betting=null;userAction="";dealerSeat=nextClockwiseSeat(dealerSeat);
+  betting=null;userAction="";if(!options.replay)dealerSeat=nextClockwiseSeat(dealerSeat);
   Object.keys(recCursor).forEach(function(key){recCursor[key]=0;});
   my=wall.splice(0,8).sort(function(a,b){return a-b;});
   seats.forEach(function(s){
@@ -1842,11 +1874,11 @@ function newHand(){
 /* ポットは全て誰かの持ち点から出る。合計（全席+自分+POT）は常に保存される。 */
 function anteFor(stack){return Math.min(Math.max(50,Math.floor(stack*.06)),ANTE,stack);}
 function postAnte(){
-  seats.forEach(function(s){
+  seats.forEach(function(s,i){
     if(s.folded)return;
-    const paid=Math.min(anteFor(s.stack),s.stack);s.stack-=paid;s.bet=paid;pot+=paid;
+    const paid=Math.min(anteFor(s.stack),s.stack);s.stack-=paid;s.bet=paid;pot+=paid;handContributions[i]+=paid;handAntes[i]=paid;
   });
-  const mine=Math.min(anteFor(userStack),userStack);userStack-=mine;pot+=mine;
+  const mine=Math.min(anteFor(userStack),userStack);userStack-=mine;pot+=mine;handContributions[5]+=mine;handAntes[5]=mine;
 }
 /* 誰も相手がいなくなったらセッションを仕切り直す。 */
 function ensureTable(){
@@ -1877,9 +1909,8 @@ function flashAllIn(player,target){
 }
 function lockUserPicks(){picks.forEach(function(p){p.locked=true;});}
 function chooseSeatLocks(s,count){
-  let r=solveFlexible(s.mode,0,s.hand,s.locked),target=r?expand(r.hand):bestFallback(s.hand),available=cnt(s.hand.concat(common)),have=cnt(s.locked);
-  target.forEach(function(id){if(s.locked.length<count&&have[id]<available[id]){s.locked.push(id);have[id]++;}});
-  s.hand.concat(common).forEach(function(id){if(s.locked.length<count&&have[id]<available[id]){s.locked.push(id);have[id]++;}});
+  const r=solveFlexible(s.mode,0,s.hand,s.locked),target=r?expand(r.hand):bestFallback(s.hand,s.locked,s.mode);
+  s.locked=MahjongHandStrategy.chooseLocks({hand:s.hand,common:common,locked:s.locked,dora:doraOf(doraInd),mode:s.mode,targetHand:target,count:count});
 }
 function nextStreet(){
   if(phase!=="play")return;
@@ -1937,38 +1968,57 @@ function setActionLabel(i,action){
   if(action.type==="ALL-IN")flashAllIn(i===5?"あなた":seats[i].n,action.target);
 }
 function applyBetAction(i,kind,target){
+  const before=pot;
   const result=MahjongBetting.act(betting,i,kind,target);
+  handContributions[i]+=result.action.paid;
+  handActions.push(Object.assign({stage:stage,potBefore:before},result.action));
   pot+=result.action.paid;setActionLabel(i,result.action);syncBettingState();
   return result;
 }
 /* 完成役そのものを覗かず、私牌の寄与・面子・対子・ドラ・連結だけでAIの自信を作る。
    強い席も弱いブラフも残しつつ、ポットオッズに反応するため賭けに意味が生まれる。 */
 function aiConfidence(s){
-  return MahjongBettingAI.confidence({hand:s.hand,common:common,dora:doraOf(doraInd),mode:s.mode,street:stage});
+  return MahjongBettingAI.confidence({hand:s.hand,common:common,dora:doraOf(doraInd),mode:s.mode,street:stage,random:handRandom});
 }
 function chooseAiAction(i){
   const s=seats[i],l=MahjongBetting.legal(betting,i);
   return MahjongBettingAI.choose({legal:l,confidence:aiConfidence(s),pot:pot,street:stage,
-    mode:s.mode,state:betting,player:i});
+    mode:s.mode,state:betting,player:i,random:handRandom});
+}
+function settlePoints(scores){
+  const ledger=handContributions.reduce(function(a,b){return a+b;},0);
+  if(ledger!==pot)throw new Error("POT and contribution ledger diverged");
+  const settlement=MahjongPotSettlement.settle({contributions:handContributions,deadContributions:handAntes,
+    folded:tableFolded(),scores:scores,actionOrder:CLOCKWISE_SEATS,dealerIndex:dealerSeat});
+  seats.forEach(function(s,i){s.stack+=settlement.payouts[i];s.won=settlement.awards[i]>0;});
+  userStack+=settlement.payouts[5];pot=0;return settlement;
+}
+function completeHand(result,settlement){
+  result.net=userStack-handStartingStacks[5];result.seed=handSeed;result.startingStacks=handStartingStacks.slice();
+  result.dealer=dealerSeat;result.practice=practiceHand;result.actions=handActions.map(function(a){return Object.assign({},a);});
+  result.contributions=handContributions.slice();result.payouts=settlement.payouts.slice();result.refunds=settlement.refunds.slice();result.pots=settlement.pots;
+  result.duration=Math.max(0,Date.now()-handStartedAt);
+  handHistory.add({id:handId,at:Date.now(),seed:handSeed,net:result.net,pot:result.pot,won:result.userWon,folded:userFolded,practice:practiceHand,detail:result.detail,actions:result.actions});
+  lastResult=result;window.clearTimeout(runoutTimer);
 }
 function settleUncontested(winner){
   if(phase!=="play")return;
-  const won=pot;
-  if(winner===5)userStack+=pot;else{seats[winner].stack+=pot;seats[winner].won=true;}
-  pot=0;phase="result";activeSeat=-1;
+  const won=pot,settlement=settlePoints(new Array(6).fill(0));
+  phase="result";activeSeat=-1;
   const name=winner===5?"あなた":seats[winner].n;
   resultText=name+" の勝ち（全員フォールド） "+won.toLocaleString();
-  const userWon=winner===5,delta=matchMode!=="rank"?0:(userWon?16:-12);
+  const userWon=winner===5,delta=matchMode!=="rank"||practiceHand?0:(userWon?16:-12);
   rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
-  lastResult={userWon:userWon,userFolded:userFolded,winners:[name],pot:won,detail:"全員フォールド",
-    hand:[],delta:delta,mode:matchMode,summary:resultText};
+  completeHand({userWon:userWon,userFolded:userFolded,winners:[name],pot:won,detail:"全員フォールド",
+    hand:[],delta:delta,mode:practiceHand?"practice":matchMode,summary:resultText},settlement);
 }
 function finishBettingRound(){
   syncBettingState();activeSeat=-1;
   if(betting.uncontestedWinner!==null){settleUncontested(betting.uncontestedWinner);return;}
 }
 function continueBetting(){
-  if(!betting||phase!=="play")return;
+  window.clearTimeout(aiTimer);
+  if(experiencePaused||!betting||phase!=="play")return;
   syncBettingState();
   if(betting.phase==="complete"){finishBettingRound();render();return;}
   const i=betting.currentActor;
@@ -1983,7 +2033,7 @@ function continueBetting(){
     if(!betting||phase!=="play"||betting.currentActor!==i)return;
     const choice=chooseAiAction(i);applyBetAction(i,choice.kind,choice.target);render();continueBetting();
   };
-  if(IS_STILL)run();else aiTimer=window.setTimeout(run,420+Math.random()*360);
+  if(IS_STILL)run();else aiTimer=window.setTimeout(run,(420+Math.random()*360)/playSpeed);
 }
 /* ブラウザ受け入れテストと数百局シミュレーション用。通常UIからは呼ばない。 */
 function fastForwardBetting(userKind){
@@ -2029,27 +2079,17 @@ function handScore(ids,winTile){
   return quickMelds(c)*100+(hasPair?50:0)+doraCount(ids)*10;
 }
 /* solveFlexible が完成形を見つけられなかったときの14枚。私牌を優先して埋める。 */
-function bestFallback(priv){
-  const pool=priv.concat(common),all=cnt(pool),dora=doraOf(doraInd);
-  const items=pool.map(function(id,i){return {id:id,priv:i<priv.length};});
-  items.sort(function(a,b){return score(b)-score(a);});
-  function score(x){
-    const t=x.id;let v=t===dora?30:0;
-    if(t>=27)v+=all[t]*7;
-    else{const r=t%9;v+=(r>=2&&r<=6)?7:3;
-      for(let d=-2;d<=2;d++)if(r+d>=0&&r+d<=8)v+=all[t+d]*(3-Math.abs(d));}
-    if(x.priv)v+=1;
-    return v;
-  }
-  return items.slice(0,MAX_HAND).map(function(x){return x.id;});
+function bestFallback(priv,locked,mode){
+  return MahjongHandStrategy.fallback({hand:priv,common:common,locked:locked||[],dora:doraOf(doraInd),mode:mode||"total",limit:MAX_HAND});
 }
 function seatBestHand(s){
   let r=solveFlexible(s.mode,0,s.hand,s.locked);
   if(!r&&s.mode!=="total")r=solveFlexible("total",0,s.hand,s.locked);
-  return r?expand(r.hand):bestFallback(s.hand);
+  return r?expand(r.hand):bestFallback(s.hand,s.locked,s.mode);
 }
 function showdown(){
   if(phase!=="play")return;
+  if(stage!==4||(betting&&betting.phase!=="complete")){flashToast("すべての公開とベットを終えてから決着します。");return;}
   if(!userFolded&&picks.length<MAX_HAND){
     flashToast("14枚そろえてからショーダウンしてください。");return;
   }
@@ -2065,42 +2105,31 @@ function showdown(){
     entries.push({who:s.n,seat:s,privateIds:s.hand.slice(),ids:s.best,score:handScore(s.best),evaluation:seatEval});
   });
 
-  phase="result";
-  const settledPot=pot;
-  if(!entries.length){                       /* 全員降りた。POTは自分へ戻す */
-    userStack+=pot;pot=0;resultText="全員フォールド。POTを回収しました。";
-    const delta=matchMode==="rank"?8:0;rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
-    lastResult={userWon:true,userFolded:userFolded,winners:["あなた"],pot:settledPot,
-      detail:"全員フォールド",hand:userFolded?[]:finalHand,delta:delta,mode:matchMode,summary:resultText};
-    render();return;
-  }
-  let top=-1;entries.forEach(function(e){if(e.score>top)top=e.score;});
-  const winners=entries.filter(function(e){return e.score===top;});
-  const share=Math.floor(pot/winners.length), rest=pot-share*winners.length;
-  winners.forEach(function(e,i){
-    const amt=share+(i===0?rest:0);
-    if(e.seat){e.seat.stack+=amt;e.seat.won=true;}else userStack+=amt;
-  });
-  const won=pot;pot=0;
+  const settledPot=pot,scores=new Array(6).fill(null);
+  entries.forEach(function(e){scores[e.seat?seats.indexOf(e.seat):5]=e.score;});
+  const settlement=settlePoints(scores);
+  phase="result";activeSeat=-1;
+  const winners=entries.filter(function(e){return settlement.awards[e.seat?seats.indexOf(e.seat):5]>0;}).sort(function(a,b){return b.score-a.score;});
+  const won=settledPot;
   const w=winners[0];
   const detail=w.evaluation&&w.evaluation.complete
     ?w.evaluation.yakuNames.join("・")+" / "+w.evaluation.summary
     :"面子"+quickMelds(cnt(w.ids))+"組"+(doraCount(w.ids)?" ドラ"+doraCount(w.ids):"");
   resultText=winners.map(function(e){return e.who;}).join("・")+" の勝ち（"+detail+"） "+won.toLocaleString();
   const userWon=winners.some(function(e){return e.seat===null;});
-  const delta=matchMode!=="rank"?0:(userWon?(winners.length>1?12:24):(userFolded?-14:-8));
+  const delta=matchMode!=="rank"||practiceHand?0:(userWon?(winners.length>1?12:24):(userFolded?-14:-8));
   rankPoints=Math.max(0,rankPoints+delta);saveRankPoints();
   const showdownData=entries.slice().sort(function(a,b){return b.score-a.score;}).map(function(e,i){return {
     who:e.who,privateIds:e.privateIds.slice(),finalIds:e.ids.slice(),winner:winners.indexOf(e)>=0,place:i+1,
-    detail:e.evaluation&&e.evaluation.complete?(e.evaluation.yakuNames.join("・")||e.evaluation.summary):"未完成"
+    detail:(e.evaluation&&e.evaluation.complete?(e.evaluation.yakuNames.join("・")||e.evaluation.summary):"未完成")+" ／ 受取 "+settlement.payouts[e.seat?seats.indexOf(e.seat):5].toLocaleString()+"点"
   };});
   seats.filter(function(s){return s.folded;}).forEach(function(s){
     const foldedBest=seatBestHand(s);showdownData.push({who:s.n,privateIds:s.hand.slice(),finalIds:foldedBest,
       winner:false,place:showdownData.length+1,detail:"フォールド（参考手牌）"});
   });
   if(userFolded)showdownData.push({who:"あなた",privateIds:my.slice(),finalIds:[],winner:false,place:6,detail:"フォールド"});
-  lastResult={userWon:userWon,userFolded:userFolded,winners:winners.map(function(e){return e.who;}),
-    pot:settledPot,detail:detail,hand:userFolded?[]:finalHand.slice(),showdown:showdownData,delta:delta,mode:matchMode,summary:resultText};
+  completeHand({userWon:userWon,userFolded:userFolded,winners:winners.map(function(e){return e.who;}),
+    pot:settledPot,detail:detail,hand:userFolded?[]:finalHand.slice(),showdown:showdownData,delta:delta,mode:practiceHand?"practice":matchMode,summary:resultText},settlement);
   render();
 }
 
@@ -2146,6 +2175,7 @@ function flashToast(text){
 function isPicked(src,index){return picks.some(function(x){return x.src===src&&x.index===index;});}
 function selectionLimit(){return stage===1?4:stage===2?6:MAX_HAND;}
 function togglePick(src,index,id){
+  if(phase!=="play"||userFolded)return;
   if(stage===0){flashToast("プリフロップでは固定しません。参加判断のあと共通15枚が開きます。");return;}
   const at=picks.findIndex(function(x){return x.src===src&&x.index===index;});
   if(at>=0){if(picks[at].locked){flashToast("金枠の固定牌は外せません。");return;}picks.splice(at,1);notice="";render();return;}
@@ -2160,6 +2190,7 @@ function togglePick(src,index,id){
   render();
 }
 function removePick(seq){
+  if(phase!=="play"||userFolded)return;
   const at=picks.findIndex(function(x){return x.seq===seq;});
   if(at>=0){
     const p=picks[at];
@@ -2185,122 +2216,33 @@ function setPicksFromCounts(hand){
 }
 /* priv を省略すると自分の私牌。相手の手を解かせるときだけ渡す。 */
 function solveFlexible(mode,cursor,priv,requiredIds){
-  const hand=priv||my;
-  const A=cnt(hand.concat(common)), P=cnt(hand),required=cnt(requiredIds||[]);
-  const use=new Array(34).fill(0);
-  const dora=doraOf(doraInd);
-  let nodes=0;const solutions=new Map();
-
-  function canTake(ts){
-    const add=new Array(34).fill(0);
-    for(let i=0;i<ts.length;i++)add[ts[i]]++;
-    for(let t=0;t<34;t++)if(use[t]+add[t]>A[t])return false;
-    return true;
-  }
-  function take(ts,delta){for(let i=0;i<ts.length;i++)use[ts[i]]+=delta;}
-  function evaluate(isChiitoi){
-    for(let t=0;t<34;t++)if(use[t]<required[t])return;
-    let d=0,simple=true,privateUse=0,honors=0,triplets=0,pairTypes=0,sequences=0;const suits={},suitCount=[0,0,0];
-    for(let t=0;t<34;t++){
-      const n=use[t];if(!n)continue;
-      if(t===dora)d+=n;
-      privateUse+=Math.min(P[t],n);
-      if(n>=2)pairTypes++;
-      if(n>=3)triplets++;
-      if(t>=27){simple=false;honors+=n;}
-      else{const s=(t/9)|0;suits[s]=1;suitCount[s]+=n;if(t%9===0||t%9===8)simple=false;}
-    }
-    for(let s=0;s<3;s++)for(let r=0;r<=6;r++)sequences+=Math.min(use[s*9+r],use[s*9+r+1],use[s*9+r+2]);
-    const nsuit=Object.keys(suits).length;
-    const dominant=Math.max.apply(null,suitCount),offSuit=suitCount.reduce(function(a,b){return a+b;},0)-dominant;
-    let score=d*7+privateUse*.3;
-    if(mode==="sequence")score+=sequences*15-triplets*4+(simple?10:0)+pairTypes;
-    else if(mode==="pairs")score+=pairTypes*13+(isChiitoi?90:0)+d*3;
-    else if(mode==="triplet")score+=triplets*20+honors*2+pairTypes*2-sequences*2;
-    else if(mode==="flush")score+=dominant*5-offSuit*7+honors*1.3+(nsuit===1?38:0);
-    else score+=sequences*5+triplets*7+pairTypes*2+(simple?5:0)+(nsuit===1?12:0)+(isChiitoi?18:0);
-    const key=use.join("");
-    const prev=solutions.get(key);
-    if(!prev||score>prev.score)solutions.set(key,{hand:use.slice(),score:score});
-  }
-  function rec(t0,melds,pair){
-    if(++nodes>450000)return;
-    if(melds===4&&pair){evaluate(false);return;}
-    for(let t=t0;t<34;t++){
-      if(melds<4&&canTake([t,t,t])){
-        take([t,t,t],1);rec(t,melds+1,pair);take([t,t,t],-1);
-      }
-      if(!pair&&canTake([t,t])){
-        take([t,t],1);rec(t,melds,true);take([t,t],-1);
-      }
-      if(melds<4&&t<27&&t%9<=6&&canTake([t,t+1,t+2])){
-        take([t,t+1,t+2],1);rec(t,melds+1,pair);take([t,t+1,t+2],-1);
-      }
-    }
-  }
-  rec(0,0,false);
-
-  const pairChoices=[];
-  for(let t=0;t<34;t++)if(A[t]>=2)pairChoices.push(t);
-  function pairTileScore(t){
-    let v=t===dora?20:0;
-    if(mode==="flush"&&t<27){const suit=(t/9)|0;let suitAvail=0;for(let x=suit*9;x<suit*9+9;x++)suitAvail+=A[x];v+=suitAvail;}
-    if(mode==="pairs")v+=A[t]*4;
-    if(t>=27)v+=3;
-    return v;
-  }
-  pairChoices.sort(function(a,b){return pairTileScore(b)-pairTileScore(a);});
-  if(pairChoices.length>=7){
-    const tries=Math.min(10,pairChoices.length);
-    for(let shift=0;shift<tries;shift++){
-      use.fill(0);
-      for(let k=0;k<7;k++)use[pairChoices[(k+shift)%pairChoices.length]]=2;
-      evaluate(true);
-    }
-    use.fill(0);
-  }
-  const ranked=Array.from(solutions.values()).sort(function(a,b){return b.score-a.score;});
-  if(!ranked.length)return null;
-  const index=cursor%ranked.length;
-  return {hand:ranked[index].hand,index:index,total:ranked.length};
+  const result=MahjongHandStrategy.solve({hand:priv||my,common:common,locked:requiredIds||[],dora:doraOf(doraInd),mode:mode,cursor:cursor});
+  solveFlexible.lastSearch=result;return result.hand?result:null;
 }
 function fallbackRecommendation(mode){
-  const items=[];
-  my.forEach(function(id,index){items.push({src:"p",index:index,id:id});});
-  common.forEach(function(id,index){items.push({src:"c",index:index,id:id});});
-  const all=cnt(my.concat(common)),dora=doraOf(doraInd);
-  function score(x){
-    const t=x.id;let v=t===dora?30:0;
-    if(t>=27)v+=all[t]*7;
-    else{
-      const r=t%9;v+=(r>=2&&r<=6)?7:3;
-      for(let d=-2;d<=2;d++)if(r+d>=0&&r+d<=8)v+=all[t+d]*(3-Math.abs(d));
-    }
-    if(mode==="pairs")v+=all[t]*9;
-    if(mode==="triplet")v+=all[t]*12;
-    if(mode==="flush"&&t<27){const suit=(t/9)|0;let n=0;for(let q=suit*9;q<suit*9+9;q++)n+=all[q];v+=n*2;}
-    if(x.src==="p")v+=1;
-    return v;
-  }
-  items.sort(function(a,b){return score(b)-score(a);});
-  const kept=picks.filter(function(p){return p.locked;}),limit=selectionLimit();picks=kept;
-  items.forEach(function(x){if(picks.length<limit&&!isPicked(x.src,x.index))picks.push({src:x.src,index:x.index,id:x.id,seq:pickSeq++,locked:false});});
+  setPicksFromCounts(cnt(MahjongHandStrategy.fallback({hand:my,common:common,
+    locked:picks.filter(function(p){return p.locked;}).map(function(p){return p.id;}),dora:doraOf(doraInd),mode:mode,limit:selectionLimit()})));
 }
 function recommend(mode){
+  if(phase!=="play"||userFolded||stage===0)return;
   recOpen=true;recMode=mode||"total";
   const cursor=recCursor[recMode]++;
   const result=solveFlexible(recMode,cursor,undefined,picks.filter(function(p){return p.locked;}).map(function(p){return p.id;}));
   const modeName={total:"総合",sequence:"順子系",pairs:"対子系",triplet:"刻子系",flush:"染め系"}[recMode];
   if(result){
-    setPicksFromCounts(result.hand);
-    notice=modeName+"候補 "+(result.index+1)+" / "+Math.min(result.total,99)+"。同じボタンでもう一案を表示します。";
+    const limit=selectionLimit();
+    const candidate=limit<14?cnt(MahjongHandStrategy.chooseLocks({hand:my,common:common,
+      locked:picks.filter(function(p){return p.locked;}).map(function(p){return p.id;}),
+      dora:doraOf(doraInd),mode:recMode,targetHand:expand(result.hand),count:limit})):result.hand;
+    setPicksFromCounts(candidate);
+    notice=modeName+"候補 "+(result.index+1)+" / "+result.total.toLocaleString()+"。同じボタンでもう一案を表示します。";
   }else{
     fallbackRecommendation(recMode);
-    notice=modeName+"の完成形がないため、近い候補を仮選択しました。";
+    notice=solveFlexible.lastSearch&&solveFlexible.lastSearch.truncated?"探索の上限内で完成形を見つけられず、近い候補を選びました。":modeName+"の完成形を見つけられず、近い候補を仮選択しました。";
   }
   render();
 }
-function clearRack(){picks=picks.filter(function(p){return p.locked;});notice="";recOpen=false;recMode="total";render();}
+function clearRack(){if(phase!=="play"||userFolded)return;picks=picks.filter(function(p){return p.locked;});notice="";recOpen=false;recMode="total";render();}
 
 function isComplete14(ids){
   return MahjongScore.evaluate(ids,ids[ids.length-1],{dora:doraOf(doraInd)}).complete;
@@ -2513,7 +2455,7 @@ function renderCore(fresh){
       const isUsed=isPicked("c",i);
       const pick=picks.find(function(x){return x.src==="c"&&x.index===i;}),cls="md"+(isUsed?" used":"")+(pick&&pick.locked?" fixedCore":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":"");
       const t=tile(id,cls);t.dataset.k="c:"+i;
-      t.onclick=function(){togglePick("c",i,id);};
+      interactiveTile(t,function(){togglePick("c",i,id);},isUsed,!!(pick&&pick.locked));
       c.appendChild(t);});
   }
   const rr=document.getElementById("revealRail");rr.innerHTML="";
@@ -2533,7 +2475,7 @@ function renderCore(fresh){
       const index=15+g*4+k,id=common[index];
       if(id!==undefined){
         const used=isPicked("c",index),pick=picks.find(function(x){return x.src==="c"&&x.index===index;}),t=tile(id,(used?"used ":"")+(pick&&pick.locked?"fixedCore ":"")+(id===dora?"doraMark ":"")+(!used&&waitSet.has(id)?"waitCandidate ":""));
-        t.dataset.k="c:"+index;t.onclick=function(){togglePick("c",index,id);};group.appendChild(t);
+        t.dataset.k="c:"+index;interactiveTile(t,function(){togglePick("c",index,id);},used,!!(pick&&pick.locked));group.appendChild(t);
       }else group.appendChild(backTile(""));
     }
     const label=document.createElement("div");label.className="revealLabel gold-text";label.textContent="+4 "+["I","II","III"][g];group.appendChild(label);rr.appendChild(group);
@@ -2543,7 +2485,7 @@ function renderCore(fresh){
   my.forEach(function(id,i){
     const isUsed=isPicked("p",i);
     const pick=picks.find(function(x){return x.src==="p"&&x.index===i;}),t=tile(id,(isUsed?"used":"")+(pick&&pick.locked?" fixedCore":"")+(id===dora?" doraMark":"")+(!isUsed&&waitSet.has(id)?" waitCandidate":""));
-    t.dataset.k="p:"+i;t.onclick=function(){togglePick("p",i,id);};
+    t.dataset.k="p:"+i;interactiveTile(t,function(){togglePick("p",i,id);},isUsed,!!(pick&&pick.locked));
     mr.appendChild(t);});
   const privateCount=picks.filter(function(x){return x.src==="p";}).length;
   const commonCount=picks.length-privateCount;
@@ -2567,7 +2509,7 @@ function renderCore(fresh){
       const pick=ordered[i];
       const t=tile(pick.id,"rk pop"+(pick.locked?" fixedCore":"")+(pick.id===dora?" doraMark":"")+(i===13?" last":""));
       t.dataset.k="r:"+pick.seq;t.style.setProperty("--i",i);
-      t.onclick=function(){removePick(pick.seq);};
+      interactiveTile(t,function(){removePick(pick.seq);},true,!!pick.locked);
       rk.appendChild(t);
     }else{
       const d=document.createElement("div");
@@ -2631,10 +2573,11 @@ function renderCore(fresh){
   bn.classList.remove("hot","afterResult");bn.disabled=false;
   if(phase==="result"){bn.innerHTML='<span class="btn-label">結果を見る</span>';
     bn.classList.add("hot","afterResult");}
-  else if(stage===0)bn.innerHTML='<span class="btn-label">対局を始める</span>';
+  else if(userFolded){bn.innerHTML='<span class="btn-label">決着まで見る</span>';}
   else if(betting&&betting.phase==="acting"){
     const who=activeSeat===5?"あなたの番":(activeSeat>=0?seats[activeSeat].n+" 考え中":"ベット中");
     bn.innerHTML='<span class="btn-label">'+who+'</span>';bn.disabled=true;}
+  else if(stage===0)bn.innerHTML='<span class="btn-label">共通15枚を公開</span>';
   else if(stage===1&&!userFolded&&picks.length!==4){bn.innerHTML='<span class="btn-label">固定4枚を選ぶ（'+picks.length+' / 4）</span>';bn.disabled=true;}
   else if(stage===2&&!userFolded&&picks.length!==6){bn.innerHTML='<span class="btn-label">追加2枚を選ぶ（'+Math.max(0,picks.length-4)+' / 2）</span>';bn.disabled=true;}
   else if(stage<4)bn.innerHTML='<span class="btn-label">＋4 '+ROMAN[stage-1]+' を公開</span>';
@@ -2646,8 +2589,8 @@ function renderCore(fresh){
   document.getElementById("recommendPanel").classList.toggle("open",recOpen);
   document.getElementById("bRec").textContent=recOpen?"総合おすすめ":"おすすめ";
   document.querySelectorAll("[data-mode]").forEach(function(btn){btn.classList.toggle("selected",recOpen&&btn.dataset.mode===recMode);});
-  document.getElementById("bRec").disabled=(stage===0);
-  document.getElementById("bClear").disabled=(stage===0);
+  document.getElementById("bRec").disabled=(stage===0||phase!=="play"||userFolded);
+  document.getElementById("bClear").disabled=(stage===0||phase!=="play"||userFolded);
   /* CALLは賭けの行為だけを持つ。局の進行は上の進行ボタンが持つ。
      以前はCALLがショーダウンと次局を兼ねていたが、2つの意味が1つのボタンに乗っていた。 */
   const call=document.getElementById("bCall");
@@ -2665,17 +2608,19 @@ function renderCore(fresh){
   if(raiseSheetOpen&&legal){
     const min=Math.min(legal.maxTarget,legal.minRaiseTarget),range=document.getElementById("raiseRange");
     betAmount=clampRaise(betAmount,legal);
-    range.min=String(min);range.max=String(legal.maxTarget);range.step="100";range.value=String(betAmount);
+    range.min=String(min);range.max=String(legal.maxTarget);range.step="1";range.value=String(betAmount);
     document.getElementById("raiseValue").textContent=betAmount.toLocaleString();
     document.getElementById("bRaiseConfirm").textContent=(betAmount===legal.maxTarget?"オールイン ":"レイズ ") + betAmount.toLocaleString();
   }
   dealAnim=0;
+  if(window.MahjongExperience)MahjongExperience.render(experienceView());
 }
 
 document.getElementById("bRec").onclick=function(){wasComplete=false;recommend("total");};
 document.getElementById("bClear").onclick=clearRack;
 document.getElementById("bNext").onclick=function(){
   if(phase==="result"){go("result");return;}
+  if(userFolded){runoutFolded();return;}
   nextStreet();
 };
 document.getElementById("bFold").onclick=function(){playerAction("fold");};
@@ -2731,7 +2676,7 @@ document.getElementById("bTitleStart").onclick=function(){go("lobby");};
 /* ロビーと対局の間に、対戦相手が確定する独立した入場画面を置く。 */
 function matchRender(){
   const rank=matchMode==="rank";
-  document.getElementById("mtMode").textContent=rank?"ランク戦":"リング戦";
+  document.getElementById("mtMode").textContent=rank?"ランク戦・CPU":"リング戦・CPU";
   document.getElementById("mtRule").textContent=rank
     ?"6人戦・レート変動あり・固定4→2・共通27枚"
     :"6人戦・持ち点制・固定4→2・共通27枚";
@@ -2753,7 +2698,7 @@ function resultRender(){
   title.textContent=r.userWon?"勝利":"決着";title.classList.toggle("lose",!r.userWon);
   document.getElementById("rsCrown").textContent=r.userWon?"♛":"◆";
   document.getElementById("rsSummary").textContent=r.userFolded&&!r.userWon?"フォールド / "+r.summary:r.summary;
-  document.getElementById("rsPot").textContent="POT "+Number(r.pot||0).toLocaleString();
+  document.getElementById("rsPot").innerHTML=Number.isFinite(r.net)?'<span class="rs-net '+(r.net>=0?"positive":"negative")+'">収支 '+MahjongSession.signed(r.net)+' 点</span><small>POT '+Number(r.pot||0).toLocaleString()+' ／ '+(r.practice?"同じ配牌の練習":"CPU対戦")+'</small>':"POT "+Number(r.pot||0).toLocaleString();
 
   const show=(r.showdown&&r.showdown.length?r.showdown:[{who:"あなた",privateIds:my.slice(),finalIds:r.hand||[],winner:r.userWon,detail:r.detail}]);
   resultInspectIndex=Math.max(0,Math.min(resultInspectIndex,show.length-1));
@@ -2780,6 +2725,7 @@ function resultRender(){
   const delta=document.getElementById("rsDelta"),n=Number(r.delta||0);
   delta.textContent=(n>0?"+":"")+n;delta.classList.toggle("down",n<0);
   document.getElementById("rsRankNow").textContent=r.mode==="rank"?rankPoints.toLocaleString()+" pt":"レート変動なし";
+  MahjongExperience.render(experienceView());
 }
 
 document.getElementById("bMatchStart").onclick=function(){newHand();go("game");};
@@ -2995,6 +2941,24 @@ document.getElementById("bGachaClose").onclick=function(){
   document.getElementById("gcModal").classList.remove("on");
 };
 
+function experienceView(){return {stage:stage,result:phase==="result",folded:userFolded,selected:picks.length,
+  yourTurn:phase==="play"&&betting&&betting.currentActor===5,acting:!!(betting&&betting.phase==="acting"),
+  call:currentCall,invested:handContributions[5],speed:playSpeed};}
+function replayLastHand(){
+  if(!lastResult||!lastResult.seed)return;
+  if(!practiceReturn)practiceReturn={stacks:tableStacks(),dealer:dealerSeat,mode:matchMode};
+  const replay={replay:true,seed:lastResult.seed,stacks:lastResult.startingStacks.slice(),dealer:lastResult.dealer};
+  newHand(replay);go("game");
+}
+function runoutFolded(){
+  if(!userFolded||phase!=="play"||experiencePaused)return;
+  window.clearTimeout(aiTimer);window.clearTimeout(runoutTimer);
+  fastForwardBetting();
+  if(phase==="result"){go("result");return;}
+  nextStreet();
+  if(phase==="result"){go("result");return;}
+  runoutTimer=window.setTimeout(runoutFolded,IS_STILL?0:360/playSpeed);
+}
 /* 配牌アニメーションが走るよう、newHand() の前に対局画面を可視にしておく */
 showScreen(new URLSearchParams(location.search).get("screen")||"title");
 walletPaint();
@@ -3003,6 +2967,10 @@ if(currentScreen==="match")matchRender();
 if(currentScreen==="result")resultRender();
 if(currentScreen==="cosmetics")cosRender();
 if(currentScreen==="shop")shopRender();
+MahjongExperience.init({view:experienceView,result:function(){return lastResult;},history:function(){return handHistory.read();},stats:function(){return handHistory.stats();},
+  name:function(i){return i===5?"あなた":seats[i].n;},retry:replayLastHand,
+  speed:function(){playSpeed=playSpeed===1?2:1;try{localStorage.setItem("mh.speed",String(playSpeed));}catch(e){}},
+  pause:function(value){experiencePaused=value;window.clearTimeout(aiTimer);window.clearTimeout(runoutTimer);if(!value&&phase==="play")continueBetting();}});
 </script>
 </body>
 </html>

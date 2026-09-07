@@ -1,0 +1,37 @@
+/* Information and interaction layer; existing board, character art and skins remain the visual baseline. */
+.play-tools{position:absolute;right:1.6cqw;top:1.6cqw;z-index:31;display:flex;gap:1cqw}
+.play-tools button,.play-dialog button,.rs-review button{font:700 12px/1.35 "Zen Kaku Gothic New",system-ui,sans-serif;letter-spacing:.02em;min-height:44px;min-width:44px;border:1px solid #668c7e;border-radius:10px;padding:7px 11px;background:#102b24;color:#f0e5c9;box-shadow:none}
+.play-tools button{font-size:clamp(10px,2.1cqw,16px);padding:5px 9px;background:#09251fea}
+.play-tools button:focus-visible,.play-dialog button:focus-visible,.rs-review button:focus-visible,.tile[role=button]:focus-visible{outline:3px solid #98f0d5;outline-offset:3px}
+.play-context{position:absolute;z-index:21;left:3cqw;right:3cqw;top:84.6%;height:2.8%;display:flex;align-items:center;justify-content:space-between;gap:1cqw;padding:0 1.4cqw;background:#09251fee;border-radius:1cqw;font-size:clamp(10px,2.2cqw,19px);color:#bed7ca;pointer-events:none}
+.play-context strong{color:#f1dd9d;font-variant-numeric:tabular-nums}
+.play-context [data-turn=you]{color:#a2f0d1}
+.play-dialog{position:fixed;inset:0;margin:auto;width:min(94vw,540px);max-height:88dvh;padding:0;overflow:hidden;background:#0a241d;color:#edf2e9;border:1px solid #729684;border-radius:18px;box-shadow:0 18px 90px #000b;font:14px/1.65 "Zen Kaku Gothic New",system-ui,sans-serif}
+.play-dialog::backdrop{background:#020d0bb8;backdrop-filter:blur(5px)}
+.play-dialog-head{display:flex;align-items:center;justify-content:space-between;padding:15px 18px;border-bottom:1px solid #345245;gap:12px}
+.play-dialog h2{font-size:18px;color:#f4e3b4}.play-dialog-head button{font-size:21px;padding:0}
+.play-dialog-body{overflow:auto;max-height:calc(88dvh - 79px);padding:20px;overscroll-behavior:contain}
+.play-dialog p+p{margin-top:10px}.play-dialog .play-kicker{color:#a6c3b4;font-size:11px;letter-spacing:.14em;font-weight:700}
+.play-dialog .play-lead{font-size:23px;line-height:1.5;font-weight:800;color:#f3e1ae;margin:6px 0 15px}
+.play-dialog .play-current{padding:14px;border-left:3px solid #8ae6c3;background:#14392e;margin:16px 0}
+.play-dialog .play-current strong{display:block;color:#b5f5d8}.play-dialog .play-current p{font-size:13px;color:#bed3c7}
+.play-guide-step{display:grid;grid-template-columns:30px 1fr;gap:10px;margin:19px 0}.play-guide-step>b{color:#f3d581;font-size:20px;font-variant-numeric:tabular-nums}.play-guide-step strong{color:#f2e8cc}.play-guide-step p{font-size:13px;color:#b4cdbd;margin:4px 0 0}
+.play-guide-tiles{display:flex;gap:3px;align-items:center;margin:9px 0}.play-guide-tiles img{height:39px;width:28px;object-fit:contain;background:#ece4d6;border-radius:3px}.play-guide-tiles span{padding:0 6px;color:#bbd7c5;font-size:11px}
+.play-dialog .play-start{width:100%;background:#dec27c;color:#11271e;font-size:15px;margin-top:12px}
+.play-dialog .play-note{font-size:12px;color:#98b5a6}.play-history-stats{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #45634f;padding:0 0 16px;margin-bottom:15px}.play-history-stats span{color:#a5bdb0;font-size:11px}.play-history-stats b{display:block;font-size:22px;color:#edd492}
+.play-history-empty{padding:20px 0;color:#b4c8bc}.play-history-row{padding:12px 0;border-bottom:1px solid #294b3a}.play-history-row header{display:flex;justify-content:space-between;gap:8px}.play-history-row b{font-size:17px}.play-history-row small{color:#9bb8a7}.play-history-row p{font-size:12px;color:#bfd3c6}.play-history-row .positive{color:#a5f0ca}.play-history-row .negative{color:#f0b09a}
+.play-action-list{padding-left:20px;margin:15px 0;color:#c5d8cc;font-size:13px}.play-action-list li{margin:7px 0}.play-action-list strong{color:#f1d78e}.play-action-list small{color:#9fbdad}
+.play-pot-row{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid #2c4a3c;padding:7px 0;font-size:13px}.play-pot-row b{color:#edcf85}
+.rs-review{position:absolute;left:4cqw;right:4cqw;top:140cqw;display:grid;grid-template-columns:1fr 1fr;gap:2cqw}.rs-review button{font-size:clamp(11px,2.5cqw,20px);padding:5px}
+.rs-handbox{height:42cqw}.rs-showtab{min-height:44px!important;min-width:72px;font-size:clamp(11px,2.1cqw,18px)!important}.rs-label{font-size:clamp(9px,1.8cqw,15px);letter-spacing:.04em}.rs-ranking{top:87cqw;height:36.5cqw}.rs-rankrow{height:5.7cqw}.rs-reward{top:127cqw}.rs-actions{min-height:44px}
+.rs-summary{max-width:95%;line-height:1.35}.rs-pot{font-size:3.8cqw}.rs-pot small{display:block;color:#adbfaf;font:500 2.3cqw/1.5 system-ui,sans-serif}
+.rs-net{font-variant-numeric:tabular-nums}.rs-net.positive{color:#a7f0cf}.rs-net.negative{color:#f0b09a}
+#screen-game .streetNext{top:59%}
+#screen-game .streetNext.afterResult{top:59%;min-height:44px;height:4.8%;font-size:2.7cqw}
+/* A 44px action and a second result banner cannot both fit above the final rack
+   on 320px devices. The complete result remains on the dedicated result screen. */
+#screen-game .winRibbon.result{display:none}
+#screen-game .raiseSheet button{min-height:44px}.raiseSheetClose{min-width:44px}.raiseAdjust{grid-template-columns:44px 1fr 44px}
+#screen-game .gameHome{min-width:44px;min-height:44px}
+@media(max-width:360px){.rs-handbox{height:45cqw}.rs-ranking{top:90cqw;height:36cqw}.rs-reward{top:129cqw}.rs-review{top:142cqw}.rs-showtab{min-width:64px}.play-tools button{padding:4px 6px}}
+@media(prefers-reduced-motion:reduce){.play-dialog::backdrop{backdrop-filter:none}}
