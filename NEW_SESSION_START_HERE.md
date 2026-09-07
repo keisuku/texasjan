@@ -29,3 +29,8 @@
 ## 次の具体作業
 
 今回のPRと本人用確認版を起点に、実機で一局を確認する。先に壊れている操作・可読性を直し、そのあと同じseedによるルール比較と対局画面一枚の完成見本へ進む。GitHubの短い状態ファイルを正典とし、巨大な会話履歴は前提にしない。
+
+## 今回の成果
+
+- [本人用確認版](https://texasjan-restart.keisuk03.chatgpt.site)
+- [実装PR #48](https://github.com/keisuku/texasjan/pull/48)（draft・main未反映）

@@ -21,3 +21,8 @@ Updated: **2026-09-07**
 - 読みづらい箇所を修正した後、同一seedのルール比較、対局一画面の完成見本を順に進める。
 - 大きな画風・構図は人間が見た成果を基準に判断する。PR #43〜45は再利用しない。
 - 新しいコードと判断はこの4ファイル＋PRへ保存する。
+
+## 今回の成果
+
+- [本人用確認版](https://texasjan-restart.keisuk03.chatgpt.site)
+- [実装PR #48](https://github.com/keisuku/texasjan/pull/48)（draft・main未反映）

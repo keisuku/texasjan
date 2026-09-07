@@ -45,3 +45,10 @@ node tests/run-browser-regression.cjs --output /tmp/texasjan-browser-qa --screen
 ```
 
 上段はNodeの論理・構文検査のみ。下段はPlaywrightとChromiumがある環境で実行する。検証が省略された状態を全PASSとして記録しない。
+
+## 確認版と保存先
+
+- [本人用確認版](https://texasjan-restart.keisuk03.chatgpt.site)
+- [実装PR #48](https://github.com/keisuku/texasjan/pull/48)（draft・main未反映）
+
+確認版は実装コミット `9a16e6c941655672fd63fb99201cbdb40f93f12b` と同一のゲームソースを使用。2026-09-07に本人用配信の成功を確認した。以後のPR変更は文書のリンク追記のみ。
