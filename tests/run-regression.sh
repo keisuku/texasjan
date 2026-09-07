@@ -30,7 +30,7 @@ if [[ "$(id -u)" -eq 0 ]]; then
   chrome_args+=(--no-sandbox)
 fi
 
-browser_tests=(acceptance hands motion skins flow mobile scoring visual-events)
+browser_tests=(acceptance hands motion skins flow mobile scoring visual-events betting progressive-lock)
 failures=0
 
 printf 'BROWSER  %s\n' "$browser_bin"
@@ -55,7 +55,7 @@ for test_name in "${browser_tests[@]}"; do
   rm -f "$output_file"
 done
 
-node_tests=(tests/visual-shell.js tests/cosmetic-catalog.js)
+node_tests=(tests/visual-shell.js tests/cosmetic-catalog.js tests/betting-integrity.js tests/hand-strategy.js tests/play-session.js tests/game-integration.cjs)
 for test_file in "${node_tests[@]}"; do
   if node "${repo_root}/${test_file}"; then
     printf 'PASS     %s\n' "$test_file"
@@ -65,7 +65,7 @@ for test_file in "${node_tests[@]}"; do
   fi
 done
 
-syntax_files=(betting-engine.js betting-ai.js mahjong-score.js skins/manifest.js)
+syntax_files=(betting-engine.js betting-ai.js mahjong-score.js skins/manifest.js pot-settlement.js hand-strategy.js play-session.js play-experience.js)
 for source_file in "${syntax_files[@]}"; do
   if node --check "${repo_root}/${source_file}" >/dev/null; then
     printf 'PASS     syntax:%s\n' "$source_file"

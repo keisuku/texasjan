@@ -54,3 +54,32 @@ bash tests/run-regression.sh
 ```
 
 Chromeを自動検出できない環境では、`BROWSER_BIN=/path/to/chrome bash tests/run-regression.sh` と指定します。終了コード0が全PASS、1がテスト失敗、2がブラウザ未検出です。
+
+## Playwrightによる実時間の一括検証
+
+```bash
+node tests/run-browser-regression.cjs --output /tmp/mahjong-qa --screenshots
+```
+
+既存の10検査（上記8種＋`betting`＋`progressive-lock`）を、検査ごとに保存状態を分離して実行します。仮想時間を使わず、終了マーカー、失敗行、未捕捉例外、クラッシュ、タイムアウトを確認します。部分的なPASSだけでは合格にしません。
+
+PlaywrightとChromiumを事前に用意してください。ローカルの`playwright`パッケージを優先し、`CODEX_PRIMARY_RUNTIME_NODE_MODULES`があればそこも参照します。既存Chromeは`BROWSER_BIN=/path/to/chrome`で指定できます。このスクリプトがソフトウェアを自動取得することはありません。
+
+- `--output`: 各検査の全文と`regression.json`を保存。
+- `--screenshots`: 対局・結果を390×844、941×1672で保存。`--output`必須。
+- `--tests acceptance,flow`: 対象を限定。
+- `--timeout 120000`: 一つの読み込み／終了待ちの上限（ミリ秒）。
+- `--root /path/to/source`: 別のソーススナップショットを検証。
+- `--static-only`: ブラウザを起動せず、既存のNode静的検査と構文検査だけを実行。
+
+終了コードは0＝指定検査合格、1＝検査失敗、2＝設定・起動などにより完了できなかった状態です。
+
+## Nodeだけでのゲーム進行検証
+
+```bash
+node tests/game-integration.cjs
+```
+
+実際の`index.html`と外部スクリプトをNodeのVMへ読み込み、画面遷移のイベントハンドラー、固定牌、おすすめ、30局の進行、点棒保存、決着の二重実行防止を検証します。再開版では同一配牌の練習、ランク・集計の分離、通常対局への復帰、ガイドの開閉、フォールド後の進行も検査します。比較元は`node tests/game-integration.cjs /path/to/source`で指定できます。
+
+**これはブラウザ検証ではありません。** `tests/helpers/game-vm.cjs`の限定的なDOM代替を使い、通常は描画を無効化します。一つのスモーク検査では実際の`renderCore()`を実行し、牌要素の数、進行文言、操作ボタンの無効状態、結果の支払表示まで確認します。CSS、画面寸法、素材表示、アニメーション、実ブラウザのイベント挙動は保証しません。描画の完成判定には上のブラウザ検査と実画像確認が必要です。

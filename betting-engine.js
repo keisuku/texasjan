@@ -33,22 +33,27 @@
   function livePlayers(s){
     const out=[];for(let i=0;i<s.playerCount;i++)if(!s.folded[i])out.push(i);return out;
   }
+  function needsAction(s,i){
+    return canAct(s,i)&&(!s.acted[i]||s.roundBets[i]<s.highestBet);
+  }
   function nextActor(s,after){
     const order=s.actionOrder;
     let at=order.indexOf(after);
     if(at<0)at=order.length-1;
     for(let step=1;step<=order.length;step++){
       const i=order[(at+step)%order.length];
-      if(canAct(s,i))return i;
+      if(needsAction(s,i))return i;
     }
     return -1;
   }
   function roundComplete(s){
     const live=livePlayers(s);
     if(live.length<=1)return true;
-    return live.every(function(i){
-      return s.allIn[i]||(s.acted[i]&&s.roundBets[i]===s.highestBet);
-    });
+    const actors=live.filter(function(i){return canAct(s,i);});
+    // With no funded opponent there is nothing left to bet. The last actor
+    // still has to call or fold when an all-in has increased the current bet.
+    if(actors.length<=1)return !actors.length||s.roundBets[actors[0]]>=s.highestBet;
+    return actors.every(function(i){return !needsAction(s,i);});
   }
   function refreshPhase(s,after){
     if(roundComplete(s)){
@@ -66,6 +71,7 @@
       street:Number(config.street)||1,phase:"acting",currentActor:-1,
       stacks:cloneNum(config.stacks,n),folded:cloneBool(config.folded,n,false),
       allIn:new Array(n).fill(false),acted:new Array(n).fill(false),
+      raiseReopenAt:new Array(n).fill(0),
       roundBets:new Array(n).fill(0),highestBet:0,
       minRaise:Math.max(1,Number(config.minRaise)||100),lastFullRaise:Math.max(1,Number(config.minRaise)||100),
       lastAggressor:null,actions:[],uncontestedWinner:null
@@ -78,11 +84,19 @@
     if(s.phase!=="acting"||s.currentActor!==i||!canAct(s,i))return null;
     const toCall=Math.max(0,s.highestBet-s.roundBets[i]);
     const maxTarget=s.roundBets[i]+s.stacks[i];
+    // Response obligations and raise rights are separate. A short all-in can
+    // require another call without re-opening a player who already acted.
+    // Several short all-ins can cumulatively reach that player's threshold.
+    const raiseReopened=!s.acted[i]||s.highestBet>=s.raiseReopenAt[i];
+    const hasRaiseOpponent=livePlayers(s).some(function(p){
+      return p!==i&&canAct(s,p)&&s.roundBets[p]+s.stacks[p]>s.highestBet;
+    });
     return {
       toCall:Math.min(toCall,s.stacks[i]),rawToCall:toCall,maxTarget:maxTarget,
       minRaiseTarget:s.highestBet+s.lastFullRaise,
       canCheck:toCall===0,canCall:toCall>0&&s.stacks[i]>0,
-      canRaise:maxTarget>s.highestBet
+      canRaise:maxTarget>s.highestBet&&raiseReopened&&hasRaiseOpponent,
+      raiseReopened:raiseReopened
     };
   }
   function act(s,i,kind,targetTotal){
@@ -113,12 +127,12 @@
         const size=target-oldHigh;
         if(size>=s.lastFullRaise)s.lastFullRaise=size;
         s.highestBet=target;s.lastAggressor=i;
-        for(let p=0;p<s.playerCount;p++)if(p!==i&&canAct(s,p))s.acted[p]=false;
       }
       s.acted[i]=true;
       label=s.allIn[i]?"ALL-IN":(oldHigh===0?"BET":"RAISE");
     }else throw new Error("unknown action: "+kind);
 
+    s.raiseReopenAt[i]=s.highestBet+s.lastFullRaise;
     const action={player:i,type:label,paid:paid,target:s.roundBets[i],raised:raised};
     s.actions.push(action);refreshPhase(s,i);
     return {action:action,phase:s.phase,nextActor:s.currentActor,
